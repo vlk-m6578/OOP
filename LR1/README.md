@@ -38,3 +38,4 @@
 ---
 
 ## Class Diagram 🧩
+![uml](https://github.com/user-attachments/assets/354e9f7d-cef9-4891-802c-c50e51a069bd)
