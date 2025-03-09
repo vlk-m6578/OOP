@@ -42,10 +42,6 @@ namespace PAINT.Models
                 }
                 consoleBuffer[y, w - 1] = '|';
             }
-            for (int x = 0; x < w; x++)
-            {
-                consoleBuffer[h - 1, x] = '_';
-            }
 
             int startX = Math.Max(X, 0);
             int startY = Math.Max(Y, 0);
