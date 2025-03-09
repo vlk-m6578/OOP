@@ -1,5 +1,4 @@
-﻿
-namespace PAINT.Models
+﻿namespace PAINT.Models
 {
     public class Canvas
     {
@@ -34,7 +33,22 @@ namespace PAINT.Models
 
         public void Display()
         {
-            
+            //Process.Start("PAINT.exe", "/c cls");
+            //Console.SetCursorPosition(Console.WindowTop, Console.WindowTop);
+            //Console.Clear();
+
+            Console.WriteLine(new string('_', _width)); 
+            for (int i = 0; i < _height; i++) 
+            { 
+                Console.WriteLine("|" + new string(' ', _width - 1) + "|"); 
+            }
+            Console.WriteLine("|" + new string('_', _width - 1) + "|");
+
+            foreach (var shape in _shapes)
+            {
+                //shape.Draw(_width, _height+1);
+
+            }
         }
         public void ClearShapes()
         {
@@ -44,11 +58,17 @@ namespace PAINT.Models
         public void AddShape(Shape shape)
         {
             _shapes.Add(shape);
+            Display();
         }
 
         public void ListShapes()
         {
-            
+            int i = 0;
+            foreach(var shape in _shapes)
+            {
+                Console.WriteLine((i + 1) + ". " + shape.Name);
+                i++;
+            }
         }
         public int ShapesCount()
         {
@@ -58,18 +78,5 @@ namespace PAINT.Models
         {
             return _shapes[index];
         }
-
-        public void RemoveShape(int index)
-        {
-           
-        }
-        public void SaveToFile(string filename)
-        {
-            
-        }
-        public void LoadFromFile(string filename)
-        {
-            
-        }
-    }
+     }
 }
