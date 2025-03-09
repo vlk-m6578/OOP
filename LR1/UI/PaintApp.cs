@@ -7,7 +7,6 @@ namespace PAINT.UI
     {
         private Canvas _canvas;
         private Menu _menu;
-        private CommandManager _commandManager = new CommandManager();
         public PaintApp()
         {
             _menu = new Menu();
@@ -43,7 +42,7 @@ namespace PAINT.UI
                         MoveShape();
                         break;
                     case 5:
-   
+
                         break;
                     case 6:
 
@@ -102,25 +101,43 @@ namespace PAINT.UI
             switch(choice)
             {
                 case 1:
+                    Console.Write("Enter shape name: ");
+                    string name1 = Console.ReadLine();
 
+                    Console.Write("Enter width for the rectangle: ");
+                    int width = InputValidator.GetIntInput(2, 60);
+                    Console.Write("Enter length for the rectangle: ");
+                    int height = InputValidator.GetIntInput(2, 20);
+
+                    shape = new Rectangle(name1, symbol, symbolBackground, width, height);
                     break;
                 case 2:
 
                     break;
                 case 3:
+                    Console.Write("Enter shape name: ");
+                    string name3 = Console.ReadLine();
 
+                    Console.Write("Enter radius for the circle: ");
+                    int radius = InputValidator.GetIntInput(2, Console.WindowWidth);            
+                    shape = new Circle(name3, symbol, symbolBackground, radius);
                     break;
             }
             _canvas.AddShape(shape);
         }
         private void MoveShape()
         {
-            
+
         }
         private void RemoveShape()
         {
+            Console.WriteLine("\nSelect a shape to remove: ");
+            _canvas.ListShapes();
+            Console.Write("Choose: ");
+            int index = InputValidator.GetIntInput(1, _canvas.ShapesCount());
 
+            _canvas.RemoveShape(index - 1);
+            _canvas.Display();
         }
-       
     }
 }
