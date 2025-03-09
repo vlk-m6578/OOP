@@ -61,7 +61,8 @@ namespace PAINT.Models
                     {
                         if (consoleBuffer[y, x] == '|' || consoleBuffer[y, x] == '_')
                         {
-                            continue;
+                            continue; // don't touch canvas
+
                         }
                         Console.Write(s);
                     }
@@ -69,7 +70,7 @@ namespace PAINT.Models
                     {
                         if (consoleBuffer[y, x] == '|' || consoleBuffer[y, x] == '_')
                         {
-                            continue;
+                            continue; // don't touch canvas
                         }
                         Console.Write(sB);
                     }
