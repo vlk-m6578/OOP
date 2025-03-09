@@ -79,11 +79,11 @@ namespace PAINT.Models
         }
         public override void Move(int deltaX, int deltaY)
         {
-            
+
         }
         public override Shape Clone()
         {
-            
+
         }
     }
 }
