@@ -33,6 +33,7 @@
 
         public void Display()
         {
+            Program.clear();
             //Process.Start("PAINT.exe", "/c cls");
             //Console.SetCursorPosition(Console.WindowTop, Console.WindowTop);
             //Console.Clear();
