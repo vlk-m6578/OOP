@@ -47,7 +47,7 @@
 
             foreach (var shape in _shapes)
             {
-                //shape.Draw(_width, _height+1);
+                shape.Draw(_width, _height+1);
 
             }
         }

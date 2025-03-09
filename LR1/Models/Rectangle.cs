@@ -25,15 +25,57 @@ namespace PAINT.Models
         }
         public override void Draw(int w, int h)
         {
-            
-        }
-        public override void Move(int deltaX, int deltaY)
-        {
-           
-        }
-        public override Shape Clone()
-        {
-      
+            char s = Symbol; char sB = SymbolBackground;
+
+            ///// Fill borders of the canvas //////
+            char[,] consoleBuffer = new char[h, w];
+            for (int x = 0; x < w; x++)
+            {
+                consoleBuffer[0, x] = '_';
+            }
+            for (int y = 1; y < h - 1; y++)
+            {
+                consoleBuffer[y, 0] = '|';
+                for (int x = 1; x < w - 1; x++)
+                {
+                    consoleBuffer[y, x] = ' ';
+                }
+                consoleBuffer[y, w - 1] = '|';
+            }
+            for (int x = 0; x < w; x++)
+            {
+                consoleBuffer[h - 1, x] = '_';
+            }
+
+            int startX = Math.Max(X, 0);
+            int startY = Math.Max(Y, 0);
+            int endX = Math.Min(X + _length, w);
+            int endY = Math.Min(Y + _height, h);
+
+            for (int y = startY; y < endY; y++)
+            {
+                Console.SetCursorPosition(startX, y);
+                for (int x = startX; x < endX; x++)
+                {
+                    if (y == Y || y == Y + _height - 1 || x == X || x == X + _length - 1)
+                    {
+                        if (consoleBuffer[y, x] == '|' || consoleBuffer[y, x] == '_')
+                        {
+                            continue;
+                        }
+                        Console.Write(s);
+                    }
+                    else
+                    {
+                        if (consoleBuffer[y, x] == '|' || consoleBuffer[y, x] == '_')
+                        {
+                            continue;
+                        }
+                        Console.Write(sB);
+                    }
+                }
+            }
+            Console.SetCursorPosition(0, h+2); // For output menu
         }
     }
 }
