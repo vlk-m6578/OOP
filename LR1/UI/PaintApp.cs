@@ -7,6 +7,7 @@ namespace PAINT.UI
     {
         private Canvas _canvas;
         private Menu _menu;
+        private CommandManager _commandManager = new CommandManager();
         public PaintApp()
         {
             _menu = new Menu();
@@ -96,8 +97,6 @@ namespace PAINT.UI
             _menu.ShowShapesMenu();
             int choice = InputValidator.GetIntInput(1, 3);
 
-            
-
             switch(choice)
             {
                 case 1:
@@ -112,7 +111,7 @@ namespace PAINT.UI
                     shape = new Rectangle(name1, symbol, symbolBackground, width, height);
                     break;
                 case 2:
-
+                    
                     break;
                 case 3:
                     Console.Write("Enter shape name: ");
@@ -127,10 +126,43 @@ namespace PAINT.UI
         }
         private void MoveShape()
         {
+            if (_canvas == null)
+            {
+                Console.WriteLine("\n----------> Canvas not created <----------"); 
+                return;
+            }
+            if (_canvas.ShapesCount() == 0)
+            {
+                Console.WriteLine("\n----------> No shapes to move <----------"); 
+                return;
+            }
 
+            Console.WriteLine("\nSelect a shape to move: ");
+            _canvas.ListShapes();
+            Console.Write("Choose: ");
+            int index = InputValidator.GetIntInput(1, _canvas.ShapesCount());
+            
+            Console.Write("Enter delta X:");
+            int deltaX = InputValidator.GetIntInput(-Console.WindowWidth, Console.WindowWidth);
+            Console.Write("Enter delta Y:");
+            int deltaY = InputValidator.GetIntInput(-Console.WindowHeight, Console.WindowHeight);
+
+            Shape selectedShape = _canvas.GetShape(index-1);
+            //selectedShape.Move(deltaX, deltaY);
+            _canvas.Display();
         }
         private void RemoveShape()
         {
+            if (_canvas == null)
+            {
+                Console.WriteLine("\n----------> Canvas not created <----------");
+                return;
+            }
+            if (_canvas.ShapesCount() == 0)
+            {
+                Console.WriteLine("\n----------> No shapes to remove <----------");
+                return;
+            }
             Console.WriteLine("\nSelect a shape to remove: ");
             _canvas.ListShapes();
             Console.Write("Choose: ");
