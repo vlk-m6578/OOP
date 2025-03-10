@@ -148,7 +148,6 @@ namespace PAINT.UI
             int deltaY = InputValidator.GetIntInput(-Console.WindowHeight, Console.WindowHeight);
 
             Shape selectedShape = _canvas.GetShape(index-1);
-            //selectedShape.Move(deltaX, deltaY);
             _canvas.Display();
         }
         private void RemoveShape()
