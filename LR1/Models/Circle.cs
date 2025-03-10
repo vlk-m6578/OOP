@@ -82,5 +82,13 @@ namespace PAINT.Models
             X += deltaX;
             Y += deltaY;
         }
+        public override Shape Clone()
+        {
+            return new Circle(this.Name, this.Symbol, this.SymbolBackground, this.Radius)
+            {
+                X = this.X,
+                Y= this.Y
+            };
+        }
     }
 }

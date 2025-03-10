@@ -82,5 +82,13 @@ namespace PAINT.Models
             X += deltaX;
             Y += deltaY;
         }
+        public override Shape Clone()
+        {
+            return new Rectangle(this.Name, this.Symbol, this.SymbolBackground, this.Length, this.Height)
+            {
+                X = this.X,
+                Y = this.Y
+            };
+        }
     }
 }
