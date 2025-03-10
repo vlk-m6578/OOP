@@ -126,5 +126,15 @@ namespace PAINT.Models
                 Console.WriteLine("\nError: " + ex.Message);
             }
         }
+        public List<Shape> GetState()
+        {
+            return _shapes.Select(shape=>shape.Clone()).ToList();
+        }
+        public void RestoreState(List<Shape> state)
+        {
+            _shapes.Clear();
+            _shapes.AddRange(state.Select(shape=>shape.Clone()));
+            Display();
+        }
     }
 }
