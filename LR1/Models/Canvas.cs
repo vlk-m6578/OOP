@@ -1,4 +1,6 @@
-﻿namespace PAINT.Models
+﻿using System.Text.Json;
+
+namespace PAINT.Models
 {
     public class Canvas
     {
@@ -34,6 +36,7 @@
         public void Display()
         {
             Program.clear();
+
             //Process.Start("PAINT.exe", "/c cls");
             //Console.SetCursorPosition(Console.WindowTop, Console.WindowTop);
             //Console.Clear();
@@ -79,5 +82,14 @@
         {
             return _shapes[index];
         }
-     }
+
+        public void RemoveShape(int index)
+        {
+            if(index>=0 && index< _shapes.Count)
+            {
+                _shapes.RemoveAt(index);
+                Display();
+            }
+        }
+    }
 }
