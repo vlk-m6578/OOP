@@ -91,5 +91,40 @@ namespace PAINT.Models
                 Display();
             }
         }
+        public void SaveToFile(string filename)
+        {
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                IncludeFields = true,
+            };
+            string json = JsonSerializer.Serialize(_shapes, options);
+            File.WriteAllText(filename, json);
+        }
+        public void LoadFromFile(string filename)
+        {
+            try
+            {
+                if (!File.Exists(filename))
+                {
+                    Console.WriteLine("\n The file was not found. The download is not possible.");
+                    return;
+                }
+                string json = File.ReadAllText(filename);
+
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+
+                _shapes = JsonSerializer.Deserialize<List<Shape>>(json);
+
+                Display();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("\nError: " + ex.Message);
+            }
+        }
     }
 }
