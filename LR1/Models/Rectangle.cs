@@ -42,6 +42,10 @@ namespace PAINT.Models
                 }
                 consoleBuffer[y, w - 1] = '|';
             }
+            for (int x = 0; x < w; x++)
+            {
+                consoleBuffer[h - 1, x] = '_';
+            }
 
             int startX = Math.Max(X, 0);
             int startY = Math.Max(Y, 0);
@@ -57,8 +61,7 @@ namespace PAINT.Models
                     {
                         if (consoleBuffer[y, x] == '|' || consoleBuffer[y, x] == '_')
                         {
-                            continue; // don't touch canvas
-
+                            continue;
                         }
                         Console.Write(s);
                     }
@@ -66,13 +69,18 @@ namespace PAINT.Models
                     {
                         if (consoleBuffer[y, x] == '|' || consoleBuffer[y, x] == '_')
                         {
-                            continue; // don't touch canvas
+                            continue;
                         }
                         Console.Write(sB);
                     }
                 }
             }
             Console.SetCursorPosition(0, h+2); // For output menu
+        }
+        public override void Move(int deltaX, int deltaY)
+        {
+            X += deltaX;
+            Y += deltaY;
         }
     }
 }
