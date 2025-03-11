@@ -1,5 +1,10 @@
-﻿namespace PAINT.Models
+﻿using System.Text.Json.Serialization;
+
+namespace PAINT.Models
 {
+    [JsonDerivedType(typeof(Circle), typeDiscriminator: "circle")]
+    [JsonDerivedType(typeof(Triangle), typeDiscriminator: "triangle")]
+    [JsonDerivedType(typeof(Rectangle), typeDiscriminator: "rectangle")]
     public abstract class Shape
     {
         protected string name;
