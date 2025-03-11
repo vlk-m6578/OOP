@@ -37,12 +37,12 @@ namespace PAINT.Models
             double deltaY = 10 - localCenterY;
 
             ///////// Final coordinates //////////
-            x1 = (int)Math.Round(deltaX);
-            y1 = (int)Math.Round(deltaY);
-            x2 = (int)Math.Round(deltaX);
-            y2 = (int)Math.Round(deltaY);
-            x3 = (int)Math.Round(deltaX);
-            y3 = (int)Math.Round(deltaY);
+            x1 = (int)Math.Round(localX1 + deltaX);
+            y1 = (int)Math.Round(localY1 + deltaY);
+            x2 = (int)Math.Round(localX2 + deltaX);
+            y2 = (int)Math.Round(localY2 + deltaY);
+            x3 = (int)Math.Round(localX3 + deltaX);
+            y3 = (int)Math.Round(localY3 + deltaY);
 
             //////////////// Correct ///////////////////
             AdjustCoordinates(x1, x2, x3, 90); // 30 * 3
