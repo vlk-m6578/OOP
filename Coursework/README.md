@@ -10,7 +10,7 @@ A console application for personal and joint finance accounting with support:
 - Report generation
 
 ## Class Diagram 🧩
-![Class Diagram]() 
+![Class Diagram](     ) 
 
 ## Functional Requirements 📋
 
