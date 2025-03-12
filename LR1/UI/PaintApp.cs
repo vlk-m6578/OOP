@@ -72,12 +72,10 @@ namespace PAINT.UI
 
             //Console.Write("Enter canvas width: ");
             //int width = InputValidator.GetIntInput(1, 100);
-            int width = 60;
             //Console.Write("Enter canvas height: ");
             //int height=InputValidator.GetIntInput(1,100);
-            int height = 20;
 
-            _canvas = new Canvas(width, height);
+            _canvas = new Canvas(Canvas.DefaultWidth, Canvas.DefaultHeight);
             _commandManager.SaveState(_canvas);
             Console.SetCursorPosition(0, 0);
             //Console.Clear();

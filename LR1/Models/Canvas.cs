@@ -4,6 +4,9 @@ namespace PAINT.Models
 {
     public class Canvas
     {
+        private static int _defaultWidth = 60;
+        private static int _defaultHeight = 20;
+
         private int _width;
         private int _height;
 
@@ -16,7 +19,17 @@ namespace PAINT.Models
             _shapes = new List<Shape>();
         }
         public Canvas() { }
+        public static int DefaultWidth
+        {
+            get { return _defaultWidth; }
+            set { _defaultWidth = value; }
+        }
 
+        public static int DefaultHeight
+        {
+            get { return _defaultHeight; }
+            set { _defaultHeight = value; }
+        }
         public int Width
         {
             get { return _width; }
@@ -50,7 +63,7 @@ namespace PAINT.Models
 
             foreach (var shape in _shapes)
             {
-                shape.Draw(_width, _height+1);
+                shape.Draw(Canvas.DefaultWidth, Canvas.DefaultHeight+1);
 
             }
         }
