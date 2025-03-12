@@ -64,8 +64,8 @@ A console application for personal and joint finance accounting with support:
 
 ### 5. Reporting
 - ** Standard Reports**: Generation of reports for the selected period.
-  - **Types of reports**: income vs expenses, expenses by category.
   - **Visualization**: depending on the type of report, for example:
+  - 
   ===== JANUARY 2024 =====
   Income: 50,000 ₽
   Expenses: 35,000 ₽
