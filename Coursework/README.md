@@ -10,7 +10,7 @@ A console application for personal and joint finance accounting with support:
 - Report generation
 
 ## Class Diagram 🧩
-![Class Diagram](     ) 
+![Диаграмма drawio](https://github.com/user-attachments/assets/54b26883-53d2-4568-a7cb-4174959130bb)
 
 ## Functional Requirements 📋
 
