@@ -21,7 +21,7 @@ namespace PAINT.Models
         public override void Draw(int w, int h)
         {
             int centerX = X; int centerY = Y; char s = Symbol; char sB = SymbolBackground;
-
+   
             ///// Fill borders of the canvas //////
             char[,] consoleBuffer = new char[h, w];
             for (int x = 0; x < w; x++)

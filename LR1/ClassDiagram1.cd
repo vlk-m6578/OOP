@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="PAINT.Models.Canvas">
+    <Position X="0.5" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QIAEIEAgBACAAAAAAAAAAUACABAAAAAABABAAAAAEEA=</HashCode>
+      <FileName>Models\Canvas.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="_shapes" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="PAINT.Models.Circle" Collapsed="true">
+    <Position X="5.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAIAAAAAIAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAABA=</HashCode>
+      <FileName>Models\Circle.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PAINT.Models.Rectangle" Collapsed="true">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABICAAgAAAAAAAABAAAAAAAAABAAAAAAAABA=</HashCode>
+      <FileName>Models\Rectangle.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PAINT.Models.Shape">
+    <Position X="7" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAAIAAAgAAAARAAAQAAAAEAAAAAABgAAAAaBA=</HashCode>
+      <FileName>Models\Shape.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PAINT.Models.Triangle" Collapsed="true">
+    <Position X="7.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAwAAAAAAIAAAgAAAAAAAEAAAwAEAACAAUAAAAAAABA=</HashCode>
+      <FileName>Models\Triangle.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PAINT.UI.PaintApp">
+    <Position X="5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAAABICAAAAIAAABAAAAAAAACAAAAiAIAEI=</HashCode>
+      <FileName>UI\PaintApp.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_canvas" />
+      <Field Name="_commandManager" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="PAINT.Utilities.CommandManager">
+    <Position X="2.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgIAAAAAAAAEBAAAAAAAAAABAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Utilities\CommandManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

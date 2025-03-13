@@ -1,4 +1,5 @@
-﻿using PAINT.UI;
+﻿
+using PAINT.UI;
 using System.Runtime.InteropServices;
 
 public static class Program

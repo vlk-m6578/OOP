@@ -1,0 +1,21 @@
+[
+  {
+    "$type": "rectangle",
+    "Height": 6,
+    "Length": 5,
+    "Name": "\u0435\u0435",
+    "X": 33,
+    "Y": 12,
+    "Symbol": "%",
+    "SymbolBackground": " "
+  },
+  {
+    "$type": "circle",
+    "Radius": 8,
+    "Name": "uu",
+    "X": 30,
+    "Y": 10,
+    "Symbol": "*",
+    "SymbolBackground": "*"
+  }
+]
