@@ -38,4 +38,4 @@
 ---
 
 ## Class Diagram 🧩
-![uml](https://github.com/user-attachments/assets/354e9f7d-cef9-4891-802c-c50e51a069bd)
+![uml](![Диаграмма без названия drawio](https://github.com/user-attachments/assets/c2dd891e-859e-433c-a3ae-e8d022713d63)
