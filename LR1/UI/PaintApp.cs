@@ -1,5 +1,6 @@
 ﻿using PAINT.Models;
 using PAINT.Utilities;
+using System.Text.Json;
 
 namespace PAINT.UI
 {
@@ -198,7 +199,13 @@ namespace PAINT.UI
             }
             try
             {
-                _canvas.SaveToFile("canvas.json");
+                var options = new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    IncludeFields = true,
+                };
+                string json = JsonSerializer.Serialize(_canvas.Shapes, options);
+                File.WriteAllText("canvas.json", json);
                 Console.WriteLine("\n----------> Canvas saved successfully on the way \"D:\\PAINT\\bin\\Debug\\net8.0\\canvas.json\" <----------");
             }
             catch(Exception ex)
@@ -210,7 +217,28 @@ namespace PAINT.UI
         {
             if (_canvas != null)
             {
-                _canvas.LoadFromFile("canvas.json");
+                try
+                {
+                    if (!File.Exists("canvas.json"))
+                    {
+                        Console.WriteLine("\n The file was not found. The download is not possible.");
+                        return;
+                    }
+                    string json = File.ReadAllText("canvas.json");
+
+                    var options = new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    };
+
+                    _canvas.Shapes = JsonSerializer.Deserialize<List<Shape>>(json);
+
+                    _canvas.Display();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("\nError: " + ex.Message);
+                }
                 _commandManager.SaveState(_canvas);
             }
             else
