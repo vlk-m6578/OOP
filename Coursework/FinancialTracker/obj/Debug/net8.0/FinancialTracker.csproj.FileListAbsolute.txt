@@ -1,0 +1,15 @@
+D:\OOP\Coursework\FinancialTracker\bin\Debug\net8.0\FinancialTracker.exe
+D:\OOP\Coursework\FinancialTracker\bin\Debug\net8.0\FinancialTracker.deps.json
+D:\OOP\Coursework\FinancialTracker\bin\Debug\net8.0\FinancialTracker.runtimeconfig.json
+D:\OOP\Coursework\FinancialTracker\bin\Debug\net8.0\FinancialTracker.dll
+D:\OOP\Coursework\FinancialTracker\bin\Debug\net8.0\FinancialTracker.pdb
+D:\OOP\Coursework\FinancialTracker\obj\Debug\net8.0\FinancialTracker.GeneratedMSBuildEditorConfig.editorconfig
+D:\OOP\Coursework\FinancialTracker\obj\Debug\net8.0\FinancialTracker.AssemblyInfoInputs.cache
+D:\OOP\Coursework\FinancialTracker\obj\Debug\net8.0\FinancialTracker.AssemblyInfo.cs
+D:\OOP\Coursework\FinancialTracker\obj\Debug\net8.0\FinancialTracker.csproj.CoreCompileInputs.cache
+D:\OOP\Coursework\FinancialTracker\obj\Debug\net8.0\FinancialTracker.sourcelink.json
+D:\OOP\Coursework\FinancialTracker\obj\Debug\net8.0\FinancialTracker.dll
+D:\OOP\Coursework\FinancialTracker\obj\Debug\net8.0\refint\FinancialTracker.dll
+D:\OOP\Coursework\FinancialTracker\obj\Debug\net8.0\FinancialTracker.pdb
+D:\OOP\Coursework\FinancialTracker\obj\Debug\net8.0\FinancialTracker.genruntimeconfig.cache
+D:\OOP\Coursework\FinancialTracker\obj\Debug\net8.0\ref\FinancialTracker.dll
