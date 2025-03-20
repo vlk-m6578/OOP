@@ -10,7 +10,7 @@ A console application for personal and joint finance accounting with support:
 - Report generation
 
 ## Class Diagram 🧩
-![Class Diagram](     ) 
+![Диаграмма drawio](https://github.com/user-attachments/assets/7c225e0c-549e-46de-9400-6f3023aeec4d)
 
 ## Functional Requirements 📋
 
@@ -64,8 +64,8 @@ A console application for personal and joint finance accounting with support:
 
 ### 5. Reporting
 - ** Standard Reports**: Generation of reports for the selected period.
-  - **Types of reports**: income vs expenses, expenses by category.
   - **Visualization**: depending on the type of report, for example:
+
   ===== JANUARY 2024 =====
   Income: 50,000 ₽
   Expenses: 35,000 ₽
