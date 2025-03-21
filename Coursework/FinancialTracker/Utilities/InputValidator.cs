@@ -25,5 +25,9 @@ namespace FinancialTracker.Utilities
                 }
             }
         }
+        public static string GetValidUsername()
+        {
+
+        }
     }
 }
