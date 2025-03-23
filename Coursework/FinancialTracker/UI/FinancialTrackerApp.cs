@@ -118,7 +118,7 @@ namespace FinancialTracker.UI
                 return;
             }
 
-            Console.Write("Enter new password: ");
+            Console.Write("Recovery -> ");
             var newPassword = InputValidator.GetValidPassword();
 
             user.ResetPassword(newPassword);
