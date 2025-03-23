@@ -18,7 +18,7 @@ namespace FinancialTracker.UI
             Console.WriteLine("2. Sign up");
             Console.WriteLine("3. Password recovery");
             Console.WriteLine("4. Exit");
-            Console.WriteLine("Option: ");
+            Console.Write("Option: ");
         }
         public void ShowDashboardMenu()
         {

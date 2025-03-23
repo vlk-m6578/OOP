@@ -19,6 +19,7 @@ namespace FinancialTracker.UI
         public void Run()
         {
             bool isRun = true;
+
             while(isRun)
             {
                 _menu.ShowStartMenu();
@@ -27,7 +28,7 @@ namespace FinancialTracker.UI
                 switch(choice)
                 {
                     case 1:
-
+                        Login();
                         break;
                     case 2:
                         Registration();
@@ -39,15 +40,14 @@ namespace FinancialTracker.UI
                         isRun = false;
                         break;
                 }
-                Console.WriteLine("\nGoodbye!");
-                Console.ReadKey();
             }
-            //
+            Console.WriteLine("\nGoodbye!");
+            Console.ReadKey();
         }
         private void Registration()
         {
             Console.Clear();
-            Console.WriteLine("================================================== REGISTRATION ==================================================");
+            Console.WriteLine("========================================================== REGISTRATION ==============================================================");
 
             var username = InputValidator.GetValidUsername();
             var email = InputValidator.GetValidEmail();
@@ -61,6 +61,34 @@ namespace FinancialTracker.UI
                 _currentUser = newUser;
                 //ShowDashboard();
             }
+        }
+        private void Login() 
+        {
+            Console.Clear();
+            Console.WriteLine("================================================================ LOGIN ==============================================================");
+
+            Console.Write("Enter username/email: ");
+            string login = Console.ReadLine();
+            Console.Write("Enter password: ");
+            string password = Console.ReadLine();
+
+            var user = User.Users.Find(u => (u.Username == login || u.Email ==  login) && u.PasswordHash == PasswordHasher.Hash(password));
+
+            if(user != null && user.IsActive) 
+            {
+                _currentUser = user;
+                Console.WriteLine($"Welcome back {user.Username}!");
+            }
+            else
+            {
+                HandleError("Inactive account.");
+            }
+        }
+        private void HandleError(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"\nError: {message}");
+            Console.ResetColor();
         }
     }
 }
