@@ -1,4 +1,5 @@
-﻿using FinancialTracker.Utilities;
+﻿using FinancialTracker.Entities;
+using FinancialTracker.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace FinancialTracker.UI
     public class FinancialTrackerApp
     {
         private Menu _menu;
+        private User _currentUser;
         public FinancialTrackerApp()
         {
             _menu = new Menu();
@@ -28,14 +30,37 @@ namespace FinancialTracker.UI
 
                         break;
                     case 2:
-
+                        Registration();
                         break;
                     case 3:
 
                         break;
+                    case 4:
+                        isRun = false;
+                        break;
                 }
+                Console.WriteLine("\nGoodbye!");
+                Console.ReadKey();
             }
             //
+        }
+        private void Registration()
+        {
+            Console.Clear();
+            Console.WriteLine("================================================== REGISTRATION ==================================================");
+
+            var username = InputValidator.GetValidUsername();
+            var email = InputValidator.GetValidEmail();
+            var password = InputValidator.GetValidPassword();
+
+            var newUser = new User(username, email);
+            if (newUser.Register(password))
+            {
+                User.Users.Add(newUser);
+                Console.WriteLine(" -----> Registration successful! Auto-login...");
+                _currentUser = newUser;
+                //ShowDashboard();
+            }
         }
     }
 }
