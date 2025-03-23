@@ -9,8 +9,8 @@ namespace FinancialTracker.Interfaces
     public interface IAuthService
     {
         public bool Register(string password);
-        //public void Login();
-        //public void ResetPassword();
+        public bool Login(string password);
+        public void ResetPassword(string newPassword);
         public void ActivateAccount();
         public void DeactivateAccount();
     }

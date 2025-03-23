@@ -20,5 +20,10 @@ namespace FinancialTracker.Utilities
             var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
             return Encoding.UTF8.GetString(hashedBytes);
         }
+        public static bool Verify(string password, string hash)
+        {
+            var calculatedHash = Hash(password);
+            return calculatedHash == hash;
+        }
     }
 }

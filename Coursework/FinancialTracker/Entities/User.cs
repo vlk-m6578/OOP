@@ -27,7 +27,15 @@ namespace FinancialTracker.Entities
             return true;
         }
 
-
+        public bool Login(string password)
+        {
+            if (!IsActive) return false;
+            return PasswordHasher.Verify(password, PasswordHash);
+        }
+        public void ResetPassword(string newPassword)
+        {
+            PasswordHash = PasswordHasher.Hash(newPassword);
+        }
         public void ActivateAccount() => IsActive = true;
         public void DeactivateAccount() => IsActive = false;
 

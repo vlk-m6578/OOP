@@ -1,5 +1,6 @@
 ﻿using FinancialTracker.Entities;
 using FinancialTracker.Utilities;
+using FinancialTracker.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace FinancialTracker.UI
     {
         private Menu _menu;
         private User _currentUser;
+        private readonly PasswordRecoveryService _service = new PasswordRecoveryService();
         public FinancialTrackerApp()
         {
             _menu = new Menu();
@@ -34,7 +36,7 @@ namespace FinancialTracker.UI
                         Registration();
                         break;
                     case 3:
-
+                        PasswordRecovery();
                         break;
                     case 4:
                         isRun = false;
@@ -47,7 +49,7 @@ namespace FinancialTracker.UI
         private void Registration()
         {
             Console.Clear();
-            Console.WriteLine("========================================================== REGISTRATION ==============================================================");
+            Console.WriteLine("========================================================= REGISTRATION ==============================================================");
 
             var username = InputValidator.GetValidUsername();
             var email = InputValidator.GetValidEmail();
@@ -89,6 +91,40 @@ namespace FinancialTracker.UI
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"\nError: {message}");
             Console.ResetColor();
+        }
+        private void PasswordRecovery()
+        {
+            Console.Clear();
+            Console.WriteLine("========================================================= PASSWORD RECOVERY ========================================================");
+
+            Console.Write("Enter your email: ");
+            var email = Console.ReadLine()?.Trim();
+
+            var user = User.Users.FirstOrDefault(u => u.Email == email);
+            if(user == null)
+            {
+                HandleError("Email not found in system.");
+                return;
+            }
+
+            var code = _service.GenerateRecoveryPassword(email);
+            Console.WriteLine($"\nGenerated recovery code: {code}");
+            Console.Write("Enter the 6-digit code: ");
+            var inputCode = Console.ReadLine();
+
+            if(!_service.ValidateCode(email, inputCode))
+            {
+                HandleError("Invalid code.");
+                return;
+            }
+
+            Console.Write("Enter new password: ");
+            var newPassword = InputValidator.GetValidPassword();
+
+            user.ResetPassword(newPassword);
+            Console.WriteLine("\n -----> Password successfully reset.");
+            Console.WriteLine(" -----> You can now login with your new password.");
+            return;
         }
     }
 }
