@@ -1,8 +1,9 @@
-﻿
+﻿using DocMaster.UI;
 public static class Program
 {
     public static void Main(string[] args)
     {
-        Console.WriteLine("d");
+        App app = new App();
+        app.Run();
     }
 }

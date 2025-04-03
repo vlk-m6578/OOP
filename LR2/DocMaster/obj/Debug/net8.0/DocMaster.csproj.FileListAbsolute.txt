@@ -1,8 +1,4 @@
 D:\OOP\LR2\DocMaster\bin\Debug\net8.0\DocMaster.exe
-D:\OOP\LR2\DocMaster\bin\Debug\net8.0\DocMaster.deps.json
-D:\OOP\LR2\DocMaster\bin\Debug\net8.0\DocMaster.runtimeconfig.json
-D:\OOP\LR2\DocMaster\bin\Debug\net8.0\DocMaster.dll
-D:\OOP\LR2\DocMaster\bin\Debug\net8.0\DocMaster.pdb
 D:\OOP\LR2\DocMaster\obj\Debug\net8.0\DocMaster.GeneratedMSBuildEditorConfig.editorconfig
 D:\OOP\LR2\DocMaster\obj\Debug\net8.0\DocMaster.AssemblyInfoInputs.cache
 D:\OOP\LR2\DocMaster\obj\Debug\net8.0\DocMaster.AssemblyInfo.cs
@@ -11,5 +7,9 @@ D:\OOP\LR2\DocMaster\obj\Debug\net8.0\DocMaster.sourcelink.json
 D:\OOP\LR2\DocMaster\obj\Debug\net8.0\DocMaster.dll
 D:\OOP\LR2\DocMaster\obj\Debug\net8.0\refint\DocMaster.dll
 D:\OOP\LR2\DocMaster\obj\Debug\net8.0\DocMaster.pdb
+D:\OOP\LR2\DocMaster\bin\Debug\net8.0\DocMaster.deps.json
+D:\OOP\LR2\DocMaster\bin\Debug\net8.0\DocMaster.runtimeconfig.json
+D:\OOP\LR2\DocMaster\bin\Debug\net8.0\DocMaster.dll
+D:\OOP\LR2\DocMaster\bin\Debug\net8.0\DocMaster.pdb
 D:\OOP\LR2\DocMaster\obj\Debug\net8.0\DocMaster.genruntimeconfig.cache
 D:\OOP\LR2\DocMaster\obj\Debug\net8.0\ref\DocMaster.dll

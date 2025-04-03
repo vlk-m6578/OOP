@@ -12,6 +12,7 @@ namespace DocMaster.UI
         public void Run()
         {
             SelectRole();
+            MainLoop();
         }
         public void SelectRole()
         {
@@ -30,6 +31,7 @@ namespace DocMaster.UI
             {
                 _menu.ShowMainMenu(_currentRole);
                 int maxOption = GetMaxMenuOption();
+                Console.Write("Choice: ");
                 int choice = InputValidator.GetIntInput(1, maxOption);
 
                 switch (choice)
