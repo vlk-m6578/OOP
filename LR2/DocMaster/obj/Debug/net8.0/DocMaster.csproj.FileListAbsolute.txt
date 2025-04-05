@@ -13,3 +13,6 @@ D:\OOP\LR2\DocMaster\bin\Debug\net8.0\DocMaster.dll
 D:\OOP\LR2\DocMaster\bin\Debug\net8.0\DocMaster.pdb
 D:\OOP\LR2\DocMaster\obj\Debug\net8.0\DocMaster.genruntimeconfig.cache
 D:\OOP\LR2\DocMaster\obj\Debug\net8.0\ref\DocMaster.dll
+D:\OOP\LR2\DocMaster\bin\Debug\net8.0\Spectre.Console.dll
+D:\OOP\LR2\DocMaster\obj\Debug\net8.0\DocMaster.csproj.AssemblyReference.cache
+D:\OOP\LR2\DocMaster\obj\Debug\net8.0\DocMaster.csproj.CopyComplete

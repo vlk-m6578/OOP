@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "FG8VQ0/zPoHk+USAu2d66rVDgoKn8YopVUtR6rB+P9KBJxkKKuTYjm974WosHAkEJFzWvd7vwgHWPjsS88fEvg==",
+  "dgSpecHash": "X/mQNc9ImoeqF5gas/ehrDebv12Y/2K/7+mOwFDexiRcgeAQyNO7gT9PBS7UNbEByGIxlUJfDC/kzUa/Ne7sRQ==",
   "success": true,
   "projectFilePath": "D:\\OOP\\LR2\\DocMaster\\DocMaster.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\lebed\\.nuget\\packages\\spectre.console\\0.49.1\\spectre.console.0.49.1.nupkg.sha512"
+  ],
   "logs": []
 }
