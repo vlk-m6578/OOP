@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DocMaster.Models;
+﻿using DocMaster.Models;
 
 namespace DocMaster.Services
 {
@@ -17,5 +12,9 @@ namespace DocMaster.Services
             user?.SetRole(newRole);
         }
         public IEnumerable<User> GetAllUsers() => _users.AsReadOnly();
+        public User GetUser(string username)
+        {
+            return _users.FirstOrDefault(u => u.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+        }
     }
 }

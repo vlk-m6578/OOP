@@ -29,7 +29,7 @@ namespace DocMaster.Roles
         };
         public void Update(UserRole newRole)
         {
-            Console.WriteLine($"Role updated to {newRole}");
+            //Console.WriteLine($"Role updated to {newRole}");
             //SetRole(newRole);
         }
         public bool CanEditDocument => _strategy.CanEdit;
