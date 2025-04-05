@@ -26,11 +26,7 @@ namespace DocMaster.Roles
             UserRole.Admin => new AdminStrategy(),
             _ => new ViewerStrategy()
         };
-        public void Update(UserRole newRole)
-        {
-            //Console.WriteLine($"Role updated to {newRole}");
-            //SetRole(newRole);
-        }
+        
         public bool CanEditDocument => _strategy.CanEdit;
         public bool CanSaveDocument => _strategy.CanSave;
         public bool CanManageUsers => _strategy.CanManageUsers;

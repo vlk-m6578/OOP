@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace DocMaster.Models.Documents
 {
-    internal class MarkdownDocument
+    public class MarkdownDocument : Document
     {
+        public MarkdownDocument() => Type = DocumentType.Markdown;
+        public override string GetFormattedContent() => Content;
     }
+
 }

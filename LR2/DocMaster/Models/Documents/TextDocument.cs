@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace DocMaster.Models.Documents
 {
-    internal class TextDocument
+    public class TextDocument : Document
     {
+        public TextDocument() => Type = DocumentType.Text;
+        public override string GetFormattedContent() => Content;
     }
 }

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DocMaster")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5f43861513cdb62de89cae11c8db54b36b3ad121")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+55fd59a72f46d46edf891db86a654cbaab4bb8df")]
 [assembly: System.Reflection.AssemblyProductAttribute("DocMaster")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DocMaster")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
