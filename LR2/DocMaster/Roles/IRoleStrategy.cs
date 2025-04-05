@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace DocMaster.Roles
 {
-    internal interface IRoleStrategy
+    public interface IRoleStrategy
     {
+        bool CanEdit { get; }
+        bool CanSave { get; }
+        bool CanManageUsers { get; }
+        void HandleRoleChange(UserRole newRole);
+
     }
 }

@@ -6,7 +6,14 @@ using System.Threading.Tasks;
 
 namespace DocMaster.Roles.Strategies
 {
-    internal class ViewerStrategy
+    public class ViewerStrategy : IRoleStrategy
     {
+        public bool CanEdit => false;
+        public bool CanSave => false;
+        public bool CanManageUsers => false;
+        public void HandleRoleChange(UserRole newRole)
+        {
+            Console.WriteLine($"Viewer role changed to {newRole}");
+        }
     }
 }

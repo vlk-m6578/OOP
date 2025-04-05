@@ -6,7 +6,15 @@ using System.Threading.Tasks;
 
 namespace DocMaster.Roles.Strategies
 {
-    internal class EditorStrategy
+    public class EditorStrategy : IRoleStrategy
     {
+        public bool CanEdit => true;
+        public bool CanSave => true;
+        public bool CanManageUsers => false;
+
+        public void HandleRoleChange(UserRole newRole)
+        {
+            Console.WriteLine($"Editor role changed to {newRole}");
+        }
     }
 }
