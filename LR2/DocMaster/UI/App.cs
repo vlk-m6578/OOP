@@ -186,13 +186,25 @@ namespace DocMaster.UI
                 Console.Write("\nEnter username: ");
                 string username  = Console.ReadLine();
 
+                var targetUser = _userManager.GetUser(username);
+                if (targetUser == null)
+                {
+                    Console.WriteLine($"\n-----> User {username} not found!");
+                    return;
+                }
+                if (targetUser.Username == _currentUser.Username)
+                {
+                    Console.WriteLine("\n-----> You cannot change your own role!");
+                    return;
+                }
+
                 Console.WriteLine("Select new role:");
-                Console.WriteLine("1. Viewer\n2. Editor\n3. Admin");
+                Console.WriteLine("1. Viewer\n2. Editor");
                 Console.Write("Choice: ");
-                int roleChoice = InputValidator.GetIntInput(1, 3);
+                int roleChoice = InputValidator.GetIntInput(1, 2);
 
                 _userManager.ChangeUserRole(username, (UserRole)(roleChoice - 1));
-                Console.WriteLine($"\n-----> Role for {username} updated.");
+                //Console.WriteLine($"\n-----> Role for {username} updated.");
             }
             else if(choice == 2)
             {

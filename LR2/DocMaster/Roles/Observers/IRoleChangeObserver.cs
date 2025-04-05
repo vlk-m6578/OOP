@@ -1,8 +1,9 @@
-﻿
+﻿using DocMaster.Models;
+
 namespace DocMaster.Roles.Observers
 {
     public interface IRoleChangeObserver
     {
-        void Update(UserRole newRole);
+        void OnRoleChanged(User user, UserRole newRole);
     }
 }

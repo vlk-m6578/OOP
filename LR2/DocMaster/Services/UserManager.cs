@@ -1,15 +1,24 @@
 ﻿using DocMaster.Models;
+using DocMaster.Roles.Observers;
 
 namespace DocMaster.Services
 {
     public class UserManager
     {
         private readonly List<User> _users = new();
-        public void AddUser(User user) => _users.Add(user);
+        private readonly RoleChangeNotifier _roleNotifier = new();
+        public void AddUser(User user)
+        {
+            _users.Add(user);
+            _roleNotifier.Subscribe(user);
+        }
         public void ChangeUserRole(string username, UserRole newRole)
         {
             var user = _users.FirstOrDefault(u => u.Username == username);
-            user?.SetRole(newRole);
+            if(user != null)
+            {
+                user?.SetRole(newRole, _roleNotifier);
+            }
         }
         public IEnumerable<User> GetAllUsers() => _users.AsReadOnly();
         public User GetUser(string username)

@@ -17,13 +17,22 @@ namespace DocMaster.Models
             Username = username ?? throw new ArgumentNullException(nameof(username));
             CurrentRole = initialRole;
         }
-        public void SetRole(UserRole newRole)
+        public void SetRole(UserRole newRole, RoleChangeNotifier notifier)
         {
+            var oldRole = CurrentRole;
             CurrentRole = newRole;
+            notifier.Notify(this, newRole);
         }
-        public void Update(UserRole newRole)
+        public void OnRoleChanged(User changedUser, UserRole newRole)
         {
-            Console.WriteLine($"[SYSTEM] Your role has been changed to {newRole}");
+            if (changedUser.Username == this.Username)
+            {
+                Console.WriteLine($"[SYSTEM] Your role was changed to {newRole}");
+            }
+            else if (this.CurrentRole == UserRole.Admin)
+            {
+                Console.WriteLine($"[ADMIN] User {changedUser.Username} role changed to {newRole}");
+            }
         }
     }
 }

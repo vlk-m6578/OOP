@@ -1,4 +1,5 @@
-﻿
+﻿using DocMaster.Models;
+
 namespace DocMaster.Roles.Observers
 {
     public class RoleChangeNotifier
@@ -13,11 +14,11 @@ namespace DocMaster.Roles.Observers
         {
             _observers.Remove(observer);
         }
-        public void Notify(UserRole newRole)
+        public void Notify(User user, UserRole newRole)
         {
             foreach(var observer in _observers)
             {
-                observer.Update(newRole);
+                observer.OnRoleChanged(user, newRole);
             }
         }
 
