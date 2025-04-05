@@ -36,8 +36,8 @@ namespace DocMaster.UI
         public void ShowAdminMenu()
         {
             Console.WriteLine("\n=== Admin Dashboard ===");
-            Console.WriteLine("1. Change user rights");
-            Console.WriteLine("2. View all users");
+            Console.WriteLine("1. Change user role");
+            Console.WriteLine("2. View all access rights");
             Console.WriteLine("3. Block document");
             Console.Write("Choice: ");
         }

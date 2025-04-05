@@ -1,19 +1,14 @@
 ﻿using DocMaster.Roles.Observers;
 using DocMaster.Roles.Strategies;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DocMaster.Roles
 {
     public class RoleContext : IRoleChangeObserver
     {
-        private UserRole _currentRole;
         private IRoleStrategy _strategy;
         private readonly RoleChangeNotifier _notifier = new();
+
+        public UserRole CurrentRole { get; private set; }
 
         public RoleContext()
         {
@@ -22,7 +17,7 @@ namespace DocMaster.Roles
         }
         public void SetRole(UserRole newRole)
         {
-            _currentRole = newRole;
+            CurrentRole = newRole;
             _strategy = CreateStrategy(newRole);
             _notifier.Notify(newRole);
         }
@@ -30,12 +25,12 @@ namespace DocMaster.Roles
         {
             UserRole.Editor => new EditorStrategy(),
             UserRole.Admin => new AdminStrategy(),
-            UserRole.Viewer => new ViewerStrategy()
+            _ => new ViewerStrategy()
         };
         public void Update(UserRole newRole)
         {
             Console.WriteLine($"Role updated to {newRole}");
-            SetRole(newRole);
+            //SetRole(newRole);
         }
         public bool CanEditDocument => _strategy.CanEdit;
         public bool CanSaveDocument => _strategy.CanSave;
