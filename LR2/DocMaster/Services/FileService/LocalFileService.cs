@@ -28,7 +28,7 @@ namespace DocMaster.Services.FileService
                 ".txt" => DocumentFormat.TXT,
                 ".md" => DocumentFormat.Markdown,
                 ".rtf" => DocumentFormat.RichText,
-                _ => throw new NotSupportedException("Unsupported file format")
+                _ => throw new NotSupportedException("-----> Unsupported file format")
             };
             return new Document(fileName, format) { Content = content };
         }

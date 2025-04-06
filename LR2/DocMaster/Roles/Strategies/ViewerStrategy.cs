@@ -7,7 +7,7 @@
         public bool CanManageUsers => false;
         public void HandleRoleChange(UserRole newRole)
         {
-            Console.WriteLine($"Viewer role changed to {newRole}");
+            Console.WriteLine($"-----> Viewer role changed to {newRole}");
         }
     }
 }

@@ -3,6 +3,7 @@ using DocMaster.Services;
 using DocMaster.Utilities;
 using DocMaster.Models;
 using DocMaster.Services.FileService;
+using DocMaster.Services.StorageStrategies;
 
 namespace DocMaster.UI
 {
@@ -22,7 +23,7 @@ namespace DocMaster.UI
             while (true)
             {
                 var selectedRole = ChooseRole();
-                if(selectedRole == UserRole.Admin)
+                if (selectedRole == UserRole.Admin)
                 {
                     if (!HandleAdminLogin()) continue;
                 }
@@ -37,7 +38,7 @@ namespace DocMaster.UI
         {
             _userManager.AddUser(new User("admin", UserRole.Admin));
         }
-        
+
         private UserRole ChooseRole()
         {
             Console.Clear();
@@ -49,12 +50,12 @@ namespace DocMaster.UI
             Console.Write("Choice: ");
 
             int choice = InputValidator.GetIntInput(1, 4);
-            if(choice == 4) Environment.Exit(0);
+            if (choice == 4) Environment.Exit(0);
             return (UserRole)(choice - 1);
         }
         private bool HandleAdminLogin()
         {
-            Console.Write("Enter admin password: ");
+            Console.Write("\nEnter admin password: ");
             string password = Console.ReadLine();
             if (password != "parol")
             {
@@ -71,18 +72,18 @@ namespace DocMaster.UI
         }
         private void HandleUserLogin(UserRole role)
         {
-            Console.Write("Enter your username: ");
+            Console.Write("\nEnter your username: ");
             string username = Console.ReadLine();
             _currentUser = _userManager.GetUser(username);
-            
-            if(_currentUser ==  null)
+
+            if (_currentUser == null)
             {
                 _currentUser = new User(username, role);
                 _userManager.AddUser(_currentUser);
             }
 
             _roleContext.SetRole(role);
-            Console.WriteLine($"Welcome, {username}! Role: {role}.");
+            Console.WriteLine($"Welcome, {username}! Your role: {role}.");
             Console.Write("Press any key...");
             Console.ReadKey();
         }
@@ -100,7 +101,7 @@ namespace DocMaster.UI
                     _currentUser = null;
                     return;
                 }
-                if(_roleContext.CurrentRole == UserRole.Admin)
+                if (_roleContext.CurrentRole == UserRole.Admin)
                 {
                     switch (choice)
                     {
@@ -132,7 +133,7 @@ namespace DocMaster.UI
                             break;
                     }
                 }
-                else if(_roleContext.CurrentRole == UserRole.Editor)
+                else if (_roleContext.CurrentRole == UserRole.Editor)
                 {
                     switch (choice)
                     {
@@ -188,7 +189,7 @@ namespace DocMaster.UI
             if (choice == 1)
             {
                 Console.Write("\nEnter username: ");
-                string username  = Console.ReadLine();
+                string username = Console.ReadLine();
 
                 var targetUser = _userManager.GetUser(username);
                 if (targetUser == null)
@@ -210,12 +211,20 @@ namespace DocMaster.UI
                 _userManager.ChangeUserRole(username, (UserRole)(roleChoice - 1));
                 //Console.WriteLine($"\n-----> Role for {username} updated.");
             }
-            else if(choice == 2)
+            else if (choice == 2)
             {
-                Console.WriteLine("\nAll users:");
+                Console.WriteLine("\nAll users: ");
+                Console.WriteLine("-------------");
                 foreach (var user in _userManager.GetAllUsers())
                 {
-                    Console.WriteLine($"{user.Username} - {user.CurrentRole}");
+                    if (user.CurrentRole == UserRole.Admin)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"|* {user.Username} - {user.CurrentRole}");
+                        Console.ResetColor();
+                        continue;
+                    }
+                    Console.WriteLine($"| {user.Username} - {user.CurrentRole}");
                 }
             }
         }
@@ -237,7 +246,8 @@ namespace DocMaster.UI
             _currentDocument = _documentManager.CreateDocument(name, format);
             _documentManager.SaveDocument(_currentDocument);
 
-            Console.WriteLine($"Document {name} created successfully!");
+            Console.WriteLine($"-----> Document {name} created successfully!");
+            Console.Write("Press any key...");
             Console.ReadKey();
         }
 
@@ -247,18 +257,20 @@ namespace DocMaster.UI
 
             if (documents.Count == 0)
             {
-                Console.WriteLine("No documents found!");
+                Console.WriteLine("-----> No documents found!");
+                Console.Write("Press any key...");
                 Console.ReadKey();
                 return;
             }
 
-            Console.WriteLine("Available documents:");
+            Console.WriteLine("\nAvailable documents:");
+            Console.WriteLine("--------------------");
             for (int i = 0; i < documents.Count; i++)
             {
-                Console.WriteLine($"{i + 1}. {Path.GetFileName(documents[i])}");
+                Console.WriteLine($"{i + 1}.* {Path.GetFileName(documents[i])}");
             }
 
-            Console.WriteLine("\nEnter file number or full path:");
+            Console.Write("\nEnter file number or full path:");
             string input = Console.ReadLine();
 
             try
@@ -273,13 +285,15 @@ namespace DocMaster.UI
                 }
 
                 Console.WriteLine("\nDocument content:");
+                Console.WriteLine("--------------------\n");
                 Console.WriteLine(_currentDocument.Content);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error opening document: {ex.Message}");
+                Console.WriteLine($"[ERROR] Error opening document: {ex.Message}");
             }
-
+            Console.WriteLine("\n--------------------");
+            Console.Write("Press any key...");
             Console.ReadKey();
         }
         private void DeleteDocument()
@@ -288,28 +302,32 @@ namespace DocMaster.UI
 
             if (documents.Count == 0)
             {
-                Console.WriteLine("No documents found!");
+                Console.WriteLine("-----> No documents found!");
+                Console.Write("Press any key...");
                 Console.ReadKey();
                 return;
             }
 
-            Console.WriteLine("Available documents:");
+            Console.WriteLine("\nAvailable documents:");
+            Console.WriteLine("--------------------");
             for (int i = 0; i < documents.Count; i++)
             {
-                Console.WriteLine($"{i + 1}. {Path.GetFileName(documents[i])}");
+                Console.WriteLine($"{i + 1}.* {Path.GetFileName(documents[i])}");
             }
 
-            Console.WriteLine("\nEnter file number:");
+            Console.Write("\nEnter file number:");
             string input = Console.ReadLine();
 
-            
+
             if (int.TryParse(input, out int choice) && choice > 0 && choice <= documents.Count)
             {
-                _documentManager.DeleteDocument(documents[choice-1]);
+                _documentManager.DeleteDocument(documents[choice - 1]);
             }
 
-            Console.WriteLine("\nDocument was deleted.");
+            Console.WriteLine("\n-----> Document was deleted.");
+            Console.Write("Press any key...");
             Console.ReadKey();
         }
+
     }
 }

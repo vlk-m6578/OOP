@@ -8,7 +8,7 @@
 
         public void HandleRoleChange(UserRole newRole)
         {
-            Console.WriteLine($"Admin role changed to {newRole}");
+            Console.WriteLine($"-----> Admin role changed to {newRole}");
         }
 
     }

@@ -1,9 +1,7 @@
 ﻿using DocMaster.Services.FileService;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using DocMaster.Models;
+using DocMaster.Services.StorageStrategies;
+
 
 namespace DocMaster.Services
 {
@@ -21,15 +19,6 @@ namespace DocMaster.Services
             _storagePath = storagePath;
             _manifestPath = Path.Combine(storagePath, ManifestFileName);
         }
-        private void LoadManifest()
-        {
-            var manifestPath = Path.Combine(_storagePath, ManifestFileName);
-            if (File.Exists(manifestPath))
-            {
-                var lines = File.ReadAllLines(manifestPath);
-                _createdDocuments.AddRange(lines.Where(File.Exists));
-            }
-        }
         private void SaveManifest()
         {
             var manifestPath = Path.Combine(_storagePath, ManifestFileName);
@@ -45,7 +34,7 @@ namespace DocMaster.Services
         public Document CreateDocument(string name, DocumentFormat format)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Document name cannot be empty");
+                throw new ArgumentException("-----> Document name cannot be empty");
 
             var doc = new Document(name, format);
             var fullPath = GetFullPath(doc);
@@ -58,7 +47,7 @@ namespace DocMaster.Services
         private string GetFullPath(Document document)
         {
             var extensions = new Dictionary<DocumentFormat, string>
-            {       
+            {
                 { DocumentFormat.TXT, ".txt" },
                 { DocumentFormat.Markdown, ".md" },
                 { DocumentFormat.RichText, ".rtf" }
@@ -84,22 +73,20 @@ namespace DocMaster.Services
             return _fileService.Load(filePath);
         }
         public void DeleteDocument(string filePath)
-    {
-        try
         {
-            // Удаляем из файловой системы
-            if (File.Exists(filePath))
+            try
             {
-                File.Delete(filePath);
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                }
+
+                _fileService.RemoveFromManifest(_manifestPath, filePath);
             }
-            
-            // Удаляем из манифеста
-            _fileService.RemoveFromManifest(_manifestPath, filePath);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"------> Error deleting document: {ex.Message}");
+            }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error deleting document: {ex.Message}");
-        }
-    }
     }
 }

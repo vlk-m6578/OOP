@@ -25,13 +25,13 @@ namespace DocMaster.Models
         }
         public void OnRoleChanged(User changedUser, UserRole newRole)
         {
-            if (changedUser.Username == this.Username)
+            //if (changedUser.Username == this.Username)
+            //{
+            //    Console.WriteLine($"[SYSTEM] Your role was changed to {newRole}");
+            //}
+            if (this.CurrentRole == UserRole.Admin)
             {
-                Console.WriteLine($"[SYSTEM] Your role was changed to {newRole}");
-            }
-            else if (this.CurrentRole == UserRole.Admin)
-            {
-                Console.WriteLine($"[ADMIN] User {changedUser.Username} role changed to {newRole}");
+                Console.WriteLine($"[ADMIN NOTIFICATION] User {changedUser.Username} role changed to {newRole}");
             }
         }
     }
