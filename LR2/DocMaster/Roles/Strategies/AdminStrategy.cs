@@ -1,5 +1,4 @@
-﻿
-namespace DocMaster.Roles.Strategies
+﻿namespace DocMaster.Roles.Strategies
 {
     public class AdminStrategy : IRoleStrategy
     {

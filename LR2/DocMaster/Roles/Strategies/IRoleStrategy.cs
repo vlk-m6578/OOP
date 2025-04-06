@@ -1,5 +1,4 @@
-﻿
-namespace DocMaster.Roles
+﻿namespace DocMaster.Roles.Strategies
 {
     public interface IRoleStrategy
     {

@@ -2,6 +2,7 @@
 using DocMaster.Services;
 using DocMaster.Utilities;
 using DocMaster.Models;
+using DocMaster.Services.FileService;
 
 namespace DocMaster.UI
 {
@@ -10,7 +11,10 @@ namespace DocMaster.UI
         private readonly Menu _menu = new();
         private readonly RoleContext _roleContext = new();
         private readonly UserManager _userManager = new();
+
         private User _currentUser;
+        private readonly DocumentManager _documentManager = new DocumentManager(new LocalFileService());
+        private Document _currentDocument;
 
         public void Run()
         {
@@ -101,16 +105,16 @@ namespace DocMaster.UI
                     switch (choice)
                     {
                         case 1 when _roleContext.CanEditDocument:
-                            //create
+                            CreateDocument();
                             break;
                         case 2:
-                            //open
+                            OpenDocument();
                             break;
                         case 3:
-                            //view
+                            //ViewDocument();
                             break;
                         case 4:
-                            //edit
+                            //EditDocument();
                             break;
                         case 5:
                             //save
@@ -133,16 +137,16 @@ namespace DocMaster.UI
                     switch (choice)
                     {
                         case 1 when _roleContext.CanEditDocument:
-                            //create
+                            CreateDocument();
                             break;
                         case 2:
-                            //open
+                            OpenDocument();
                             break;
                         case 3:
-                            //view
+                            //ViewDocument();
                             break;
                         case 4:
-                            //edit
+                            //EditDocument();
                             break;
                         case 5:
                             //save
@@ -160,7 +164,7 @@ namespace DocMaster.UI
                     switch (choice)
                     {
                         case 1:
-                            //read for viewer
+                            OpenDocument();
                             break;
                         case 2:
                             break;
@@ -215,6 +219,68 @@ namespace DocMaster.UI
                 }
             }
         }
-        
+
+        private void CreateDocument()
+        {
+            Console.Write("Enter document name: ");
+            string name = Console.ReadLine();
+
+            Console.WriteLine("Select document format:");
+            Console.WriteLine("1. TXT");
+            Console.WriteLine("2. Markdown");
+            Console.WriteLine("3. RichText");
+            Console.Write("Choice: ");
+
+            int formatChoice = InputValidator.GetIntInput(1, 3);
+            DocumentFormat format = (DocumentFormat)(formatChoice - 1);
+
+            _currentDocument = _documentManager.CreateDocument(name, format);
+            _documentManager.SaveDocument(_currentDocument);
+
+            Console.WriteLine($"Document {name} created successfully!");
+            Console.ReadKey();
+        }
+
+        private void OpenDocument()
+        {
+            var documents = _documentManager.GetDocumentList();
+
+            if (documents.Count == 0)
+            {
+                Console.WriteLine("No documents found!");
+                Console.ReadKey();
+                return;
+            }
+
+            Console.WriteLine("Available documents:");
+            for (int i = 0; i < documents.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {Path.GetFileName(documents[i])}");
+            }
+
+            Console.WriteLine("\nEnter file number or full path:");
+            string input = Console.ReadLine();
+
+            try
+            {
+                if (int.TryParse(input, out int choice) && choice > 0 && choice <= documents.Count)
+                {
+                    _currentDocument = _documentManager.OpenDocument(documents[choice - 1]);
+                }
+                else
+                {
+                    _currentDocument = _documentManager.OpenDocument(input);
+                }
+
+                Console.WriteLine("\nDocument content:");
+                Console.WriteLine(_currentDocument.Content);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error opening document: {ex.Message}");
+            }
+
+            Console.ReadKey();
+        }
     }
 }
