@@ -115,7 +115,7 @@ namespace DocMaster.UI
                             DeleteDocument();
                             break;
                         case 4:
-                            //EditDocument();
+                            EditDocument();
                             break;
                         case 5:
                             //save
@@ -147,7 +147,7 @@ namespace DocMaster.UI
                             DeleteDocument();
                             break;
                         case 4:
-                            //EditDocument();
+                            EditDocument();
                             break;
                         case 5:
                             //save
@@ -328,6 +328,26 @@ namespace DocMaster.UI
             Console.Write("Press any key...");
             Console.ReadKey();
         }
+        private void EditDocument()
+        {
+            if (_currentDocument == null)
+            {
+                Console.WriteLine("No document opened!");
+                Console.ReadKey();
+                return;
+            }
 
+            if (_currentDocument.Format != DocumentFormat.TXT)
+            {
+                Console.WriteLine("Advanced editing supported only for TXT files");
+                Console.ReadKey();
+                return;
+            }
+
+            var editor = new TextEditor(_currentDocument);
+            editor.StartEditing();
+
+            _documentManager.SaveDocument(_currentDocument);
+        }
     }
 }

@@ -16,3 +16,5 @@ D:\OOP\LR2\DocMaster\obj\Debug\net8.0\ref\DocMaster.dll
 D:\OOP\LR2\DocMaster\bin\Debug\net8.0\Spectre.Console.dll
 D:\OOP\LR2\DocMaster\obj\Debug\net8.0\DocMaster.csproj.AssemblyReference.cache
 D:\OOP\LR2\DocMaster\obj\Debug\net8.0\DocMaster.csproj.CopyComplete
+D:\OOP\LR2\DocMaster\bin\Debug\net8.0\System.Reactive.dll
+D:\OOP\LR2\DocMaster\bin\Debug\net8.0\System.Reactive.Windows.Forms.dll
