@@ -102,41 +102,49 @@ namespace DocMaster.Services
             switch (key)
             {
                 case ConsoleKey.Z:
-                    _history.Undo();
+                    var (undoPos, undoSuccess) = _history.Undo(_cursorPosition);
+                    if (undoSuccess)
+                    {
+                        _cursorPosition = undoPos;
+                        _cursorPosition = Math.Clamp(_cursorPosition, 0, _document.Content.Length);
+                    }
                     break;
+
                 case ConsoleKey.Y:
-                    _history.Redo();
-                    break;
-                case ConsoleKey.C:
-                    CopySelection();
-                    break;
-                case ConsoleKey.V:
-                    PasteText();
+                    var (redoPos, redoSuccess) = _history.Redo(_cursorPosition);
+                    if (redoSuccess)
+                    {
+                        _cursorPosition = redoPos;
+                        _cursorPosition = Math.Clamp(_cursorPosition, 0, _document.Content.Length);
+                    }
                     break;
             }
         }
 
         private void InsertChar(char c)
         {
-            var cmd = new TextInsertCommand(_document, _cursorPosition, c.ToString());
+            var before = _cursorPosition;
+            var cmd = new TextInsertCommand(_document, _cursorPosition, c.ToString(), before);
             cmd.Execute();
             _history.Push(cmd);
-            _cursorPosition++;
+            _cursorPosition = cmd.CursorPositionAfter;
         }
 
         private void DeleteChar(int pos)
         {
-            var cmd = new TextDeleteCommand(_document, pos, 1);
+            var before = _cursorPosition;
+            var cmd = new TextDeleteCommand(_document, pos, 1, before);
             cmd.Execute();
             _history.Push(cmd);
-            if (pos < _cursorPosition) _cursorPosition--;
+            _cursorPosition = cmd.CursorPositionAfter;
         }
         private void InsertText(string text)
         {
-            var cmd = new TextInsertCommand(_document, _cursorPosition, text);
+            var before = _cursorPosition;
+            var cmd = new TextInsertCommand(_document, _cursorPosition, text, before);
             cmd.Execute();
             _history.Push(cmd);
-            _cursorPosition += text.Length;
+            _cursorPosition = cmd.CursorPositionAfter;
         }
         private void CopySelection()
         {
@@ -152,10 +160,22 @@ namespace DocMaster.Services
             var text = Clipboard.GetText();
             if (string.IsNullOrEmpty(text)) return;
 
-            var cmd = new TextInsertCommand(_document, _cursorPosition, text);
+            // Создаем команду с текущей позицией курсора
+            var cmd = new TextInsertCommand(
+                doc: _document,
+                pos: _cursorPosition,
+                text: text,
+                cursorBefore: _cursorPosition
+            );
+
             cmd.Execute();
             _history.Push(cmd);
-            _cursorPosition += text.Length;
+
+            // Обновляем позицию курсора через свойство команды
+            _cursorPosition = cmd.CursorPositionAfter;
+
+            // Обеспечиваем корректные границы
+            _cursorPosition = Math.Clamp(_cursorPosition, 0, _document.Content.Length);
         }
 
         private void RenderText()

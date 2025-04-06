@@ -9,20 +9,26 @@ namespace DocMaster.Command
 
         public void Push(ICommand command) => _undoStack.Push(command);
 
-        public void Undo()
+        public (int newPosition, bool success) Undo(int currentPosition)
         {
-            if (_undoStack.Count == 0) return;
+            if (_undoStack.Count == 0) return (currentPosition, false);
+
             var cmd = _undoStack.Pop();
             cmd.Undo();
             _redoStack.Push(cmd);
+
+            return (cmd.CursorPositionBefore, true);
         }
 
-        public void Redo()
+        public (int newPosition, bool success) Redo(int currentPosition)
         {
-            if (_redoStack.Count == 0) return;
+            if (_redoStack.Count == 0) return (currentPosition, false);
+
             var cmd = _redoStack.Pop();
             cmd.Execute();
             _undoStack.Push(cmd);
+
+            return (cmd.CursorPositionAfter, true);
         }
     }
 
@@ -33,15 +39,26 @@ namespace DocMaster.Command
         private readonly int _position;
         private readonly string _text;
 
-        public TextInsertCommand(Document doc, int pos, string text)
+        public int CursorPositionBefore { get; }
+        public int CursorPositionAfter => _position + _text.Length;
+
+        public TextInsertCommand(Document doc, int pos, string text, int cursorBefore)
         {
             _document = doc;
             _position = pos;
             _text = text;
+            CursorPositionBefore = cursorBefore;
         }
 
-        public void Execute() => _document.Content = _document.Content.Insert(_position, _text);
-        public void Undo() => _document.Content = _document.Content.Remove(_position, _text.Length);
+        public void Execute()
+        {
+            _document.Content = _document.Content.Insert(_position, _text);
+        }
+
+        public void Undo()
+        {
+            _document.Content = _document.Content.Remove(_position, _text.Length);
+        }
     }
 
     public class TextDeleteCommand : ICommand
@@ -50,14 +67,25 @@ namespace DocMaster.Command
         private readonly int _position;
         private readonly string _deletedText;
 
-        public TextDeleteCommand(Document doc, int pos, int length)
+        public int CursorPositionBefore { get; }
+        public int CursorPositionAfter => _position;
+
+        public TextDeleteCommand(Document doc, int pos, int length, int cursorBefore)
         {
             _document = doc;
             _position = pos;
             _deletedText = doc.Content.Substring(pos, length);
+            CursorPositionBefore = cursorBefore;
         }
 
-        public void Execute() => _document.Content = _document.Content.Remove(_position, _deletedText.Length);
-        public void Undo() => _document.Content = _document.Content.Insert(_position, _deletedText);
+        public void Execute()
+        {
+            _document.Content = _document.Content.Remove(_position, _deletedText.Length);
+        }
+
+        public void Undo()
+        {
+            _document.Content = _document.Content.Insert(_position, _deletedText);
+        }
     }
 }

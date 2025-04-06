@@ -10,5 +10,7 @@ namespace DocMaster.Command
     {
         void Execute();
         void Undo();
+        int CursorPositionBefore { get; }
+        int CursorPositionAfter { get; }
     }
 }
