@@ -41,5 +41,37 @@ namespace DocMaster.Services.FileService
             }
             return files;
         }
+        public void RemoveFromManifest(string manifestPath, string filePath)
+        {
+            if (!File.Exists(manifestPath)) return;
+
+            var entries = File.ReadAllLines(manifestPath)
+                .Where(entry => entry != filePath)
+                .ToList();
+
+            File.WriteAllLines(manifestPath, entries);
+        }
+
+        public void AddToManifest(string manifestPath, string filePath)
+        {
+            var entries = new List<string>();
+            if (File.Exists(manifestPath))
+            {
+                entries = File.ReadAllLines(manifestPath).ToList();
+            }
+
+            if (!entries.Contains(filePath))
+            {
+                entries.Add(filePath);
+                File.WriteAllLines(manifestPath, entries);
+            }
+        }
+
+        public List<string> ReadManifest(string manifestPath)
+        {
+            return File.Exists(manifestPath)
+                ? File.ReadAllLines(manifestPath).ToList()
+                : new List<string>();
+        }
     }
 }

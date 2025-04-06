@@ -18,7 +18,7 @@ namespace DocMaster.UI
             {
                 Console.WriteLine("1. Create document");
                 Console.WriteLine("2. Open document");
-                Console.WriteLine("3. View document");
+                Console.WriteLine("3. Delete document");
                 Console.WriteLine("4. Edit document");
                 Console.WriteLine("5. Save document");
                 Console.WriteLine("6. Text formatting");
@@ -29,7 +29,7 @@ namespace DocMaster.UI
             {
                 Console.WriteLine("1. Create document");
                 Console.WriteLine("2. Open document");
-                Console.WriteLine("3. View document");
+                Console.WriteLine("3. Delete document");
                 Console.WriteLine("4. Edit document");
                 Console.WriteLine("5. Save document");
                 Console.WriteLine("6. Text formatting");

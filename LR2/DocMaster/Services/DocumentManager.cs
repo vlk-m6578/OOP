@@ -13,11 +13,13 @@ namespace DocMaster.Services
         private readonly string _storagePath = Directory.GetCurrentDirectory();
         private const string ManifestFileName = ".docmaster_manifest";
         private readonly List<string> _createdDocuments = new();
+        private readonly string _manifestPath;
 
-        public DocumentManager(IFileService fileService)
+        public DocumentManager(IFileService fileService, string storagePath)
         {
             _fileService = fileService;
-            LoadManifest();
+            _storagePath = storagePath;
+            _manifestPath = Path.Combine(storagePath, ManifestFileName);
         }
         private void LoadManifest()
         {
@@ -36,7 +38,6 @@ namespace DocMaster.Services
 
         public List<string> GetAvailableDocuments()
         {
-            // Обновляем список, удаляя несуществующие файлы
             _createdDocuments.RemoveAll(path => !File.Exists(path));
             return new List<string>(_createdDocuments);
         }
@@ -67,22 +68,38 @@ namespace DocMaster.Services
         public void SaveDocument(Document document)
         {
             var fullPath = GetFullPath(document);
-            if (!_createdDocuments.Contains(fullPath))
-            {
-                _createdDocuments.Add(fullPath);
-                SaveManifest();
-            }
             _fileService.Save(document, _storagePath);
+            _fileService.AddToManifest(_manifestPath, fullPath);
         }
 
         public List<string> GetDocumentList()
         {
-            return _fileService.GetAvailableDocuments(_storagePath);
+            return _fileService.ReadManifest(_manifestPath)
+            .Where(File.Exists)
+            .ToList();
         }
 
         public Document OpenDocument(string filePath)
         {
             return _fileService.Load(filePath);
         }
+        public void DeleteDocument(string filePath)
+    {
+        try
+        {
+            // Удаляем из файловой системы
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
+            
+            // Удаляем из манифеста
+            _fileService.RemoveFromManifest(_manifestPath, filePath);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting document: {ex.Message}");
+        }
+    }
     }
 }

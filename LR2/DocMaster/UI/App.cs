@@ -13,7 +13,7 @@ namespace DocMaster.UI
         private readonly UserManager _userManager = new();
 
         private User _currentUser;
-        private readonly DocumentManager _documentManager = new DocumentManager(new LocalFileService());
+        private readonly DocumentManager _documentManager = new DocumentManager(new LocalFileService(), Directory.GetCurrentDirectory());
         private Document _currentDocument;
 
         public void Run()
@@ -111,7 +111,7 @@ namespace DocMaster.UI
                             OpenDocument();
                             break;
                         case 3:
-                            //ViewDocument();
+                            DeleteDocument();
                             break;
                         case 4:
                             //EditDocument();
@@ -143,7 +143,7 @@ namespace DocMaster.UI
                             OpenDocument();
                             break;
                         case 3:
-                            //ViewDocument();
+                            DeleteDocument();
                             break;
                         case 4:
                             //EditDocument();
@@ -280,6 +280,35 @@ namespace DocMaster.UI
                 Console.WriteLine($"Error opening document: {ex.Message}");
             }
 
+            Console.ReadKey();
+        }
+        private void DeleteDocument()
+        {
+            var documents = _documentManager.GetDocumentList();
+
+            if (documents.Count == 0)
+            {
+                Console.WriteLine("No documents found!");
+                Console.ReadKey();
+                return;
+            }
+
+            Console.WriteLine("Available documents:");
+            for (int i = 0; i < documents.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {Path.GetFileName(documents[i])}");
+            }
+
+            Console.WriteLine("\nEnter file number:");
+            string input = Console.ReadLine();
+
+            
+            if (int.TryParse(input, out int choice) && choice > 0 && choice <= documents.Count)
+            {
+                _documentManager.DeleteDocument(documents[choice-1]);
+            }
+
+            Console.WriteLine("\nDocument was deleted.");
             Console.ReadKey();
         }
     }
