@@ -1,13 +1,29 @@
 {
   "version": 2,
-  "dgSpecHash": "ntwJBAnnzOgKuOGsPXXKAlOiHPbqflcG4SSypT7+tNeS5tcc8hXZsp0xX65cZFQwCT/Hr9Iy9biCu3cJontgFA==",
+  "dgSpecHash": "FOn4AvQG7jPZ5FxdntsbVhy4PsFPh/hgIYHqWup7aP8h5NNnG6gJ5jow2oJD1ASCDRBabdUOiEJnSgbd0lYY6A==",
   "success": true,
   "projectFilePath": "D:\\OOP\\LR2\\DocMaster\\DocMaster.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\lebed\\.nuget\\packages\\harfbuzzsharp\\8.3.0.1\\harfbuzzsharp.8.3.0.1.nupkg.sha512",
+    "C:\\Users\\lebed\\.nuget\\packages\\harfbuzzsharp.nativeassets.macos\\8.3.0.1\\harfbuzzsharp.nativeassets.macos.8.3.0.1.nupkg.sha512",
+    "C:\\Users\\lebed\\.nuget\\packages\\harfbuzzsharp.nativeassets.win32\\8.3.0.1\\harfbuzzsharp.nativeassets.win32.8.3.0.1.nupkg.sha512",
+    "C:\\Users\\lebed\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\7.0.0\\microsoft.extensions.dependencyinjection.abstractions.7.0.0.nupkg.sha512",
+    "C:\\Users\\lebed\\.nuget\\packages\\microsoft.win32.systemevents\\6.0.0\\microsoft.win32.systemevents.6.0.0.nupkg.sha512",
     "C:\\Users\\lebed\\.nuget\\packages\\spectre.console\\0.49.1\\spectre.console.0.49.1.nupkg.sha512",
+    "C:\\Users\\lebed\\.nuget\\packages\\spire.doc\\13.3.7\\spire.doc.13.3.7.nupkg.sha512",
+    "C:\\Users\\lebed\\.nuget\\packages\\system.drawing.common\\6.0.0\\system.drawing.common.6.0.0.nupkg.sha512",
+    "C:\\Users\\lebed\\.nuget\\packages\\system.formats.asn1\\6.0.0\\system.formats.asn1.6.0.0.nupkg.sha512",
     "C:\\Users\\lebed\\.nuget\\packages\\system.reactive\\6.0.1\\system.reactive.6.0.1.nupkg.sha512",
     "C:\\Users\\lebed\\.nuget\\packages\\system.reactive.windows.forms\\6.0.1\\system.reactive.windows.forms.6.0.1.nupkg.sha512",
-    "C:\\Users\\lebed\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512"
+    "C:\\Users\\lebed\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
+    "C:\\Users\\lebed\\.nuget\\packages\\system.security.accesscontrol\\6.0.0\\system.security.accesscontrol.6.0.0.nupkg.sha512",
+    "C:\\Users\\lebed\\.nuget\\packages\\system.security.cryptography.pkcs\\6.0.0\\system.security.cryptography.pkcs.6.0.0.nupkg.sha512",
+    "C:\\Users\\lebed\\.nuget\\packages\\system.security.cryptography.xml\\6.0.0\\system.security.cryptography.xml.6.0.0.nupkg.sha512",
+    "C:\\Users\\lebed\\.nuget\\packages\\system.security.permissions\\6.0.0\\system.security.permissions.6.0.0.nupkg.sha512",
+    "C:\\Users\\lebed\\.nuget\\packages\\system.text.encoding.codepages\\6.0.0\\system.text.encoding.codepages.6.0.0.nupkg.sha512",
+    "C:\\Users\\lebed\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512",
+    "C:\\Users\\lebed\\.nuget\\packages\\system.windows.extensions\\6.0.0\\system.windows.extensions.6.0.0.nupkg.sha512",
+    "C:\\Users\\lebed\\.nuget\\packages\\textcopy\\6.2.1\\textcopy.6.2.1.nupkg.sha512"
   ],
   "logs": [
     {
