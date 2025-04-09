@@ -70,17 +70,14 @@ namespace DocMaster.Services
         {
             bool isShiftPressed = (key.Modifiers & ConsoleModifiers.Shift) != 0;
 
-            // Вызываем перед обновлением позиции
-            if (isShiftPressed) CopyToSystemClipboard();
-
-            // Включаем режим выделения при нажатии Shift
-            UpdateSelection(isShiftPressed);
-
-            if (key.Modifiers == ConsoleModifiers.Control)
+            // 1. Сначала обработать Control+Комбинации
+            if ((key.Modifiers & ConsoleModifiers.Control) != 0)
             {
                 HandleControlCombination(key.Key);
+                UpdateSelection(isShiftPressed); // Обновить выделение после обработки
                 return;
             }
+
 
             switch (key.Key)
             {
@@ -114,7 +111,7 @@ namespace DocMaster.Services
                     break;
             }
 
-            if (!isShiftPressed) UpdateSelection(false);
+            UpdateSelection(isShiftPressed);
         }
 
         private void HandleControlCombination(ConsoleKey key)
@@ -160,25 +157,26 @@ namespace DocMaster.Services
             int end = Math.Max(_selectionStart, _cursorPosition);
             int length = end - start;
 
-            // Копирование в буфер
-            string selectedText = _document.Content.Substring(start, length);
-            try
-            {
-                TextCopy.ClipboardService.SetText(selectedText);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка буфера: {ex.Message}");
-            }
+            // Копируем в буфер
+            CopySelection();
 
-            // Удаление текста
-            var cmd = new TextDeleteCommand(_document, start, length, _cursorPosition);
+            // Создаем команду удаления диапазона
+            var cmd = new TextDeleteCommand(
+                doc: _document,
+                pos: start,
+                length: length,
+                cursorBefore: _cursorPosition
+            );
+
             cmd.Execute();
             _history.Push(cmd);
-            _cursorPosition = start; // Перемещаем курсор в начало удаленного фрагмента
 
-            // Сбрасываем выделение
+            // Перемещаем курсор и сбрасываем выделение
+            _cursorPosition = start;
             _selectionStart = -1;
+
+            // Явно обновляем экран
+            RenderText();
         }
         private void InsertChar(char c)
         {
@@ -314,7 +312,7 @@ namespace DocMaster.Services
 
             // Подсветка
             //Console.BackgroundColor = ConsoleColor.Gray;
-            //Console.ForegroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.Black;
             Console.Write(_cursorPosition < _document.Content.Length ? _document.Content[_cursorPosition] : ' ');
             //Console.ResetColor();
             Console.SetCursorPosition(consoleColumn, consoleLine);
