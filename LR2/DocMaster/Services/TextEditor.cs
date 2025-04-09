@@ -312,21 +312,12 @@ namespace DocMaster.Services
 
             // Подсветка
             //Console.BackgroundColor = ConsoleColor.Gray;
-            Console.ForegroundColor = ConsoleColor.Black;
+            //Console.ForegroundColor = ConsoleColor.Black;
             Console.Write(_cursorPosition < _document.Content.Length ? _document.Content[_cursorPosition] : ' ');
             //Console.ResetColor();
             Console.SetCursorPosition(consoleColumn, consoleLine);
         }
-        public void ApplyFormatting(string formatType)
-        {
-            var decorator = _document.Format switch
-            {
-                DocumentFormat.Markdown => new MarkdownDecorator(_document),
-                _ => null
-            };
-
-            decorator?.ApplyFormat(formatType);
-        }
+        
     }
 
     // Простой буфер обмена

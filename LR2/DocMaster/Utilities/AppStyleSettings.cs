@@ -15,27 +15,27 @@ namespace DocMaster.Utilities
 
         // Добавляем фоновый цвет
         public ConsoleColor BackgroundColor { get; private set; }
-        //public ConsoleColor ForegroundColor { get; private set; }
+        public ConsoleColor ForegroundColor { get; private set; }
 
         private AppStyleSettings()
         {
             // Устанавливаем дефолтные цвета
             BackgroundColor = ConsoleColor.Black;
-            //ForegroundColor = ConsoleColor.White;
+            ForegroundColor = ConsoleColor.White;
             ApplyColors(); // Применяем сразу
         }
 
-        public void ChangeColors(ConsoleColor background)
+        public void ChangeColors(ConsoleColor background, ConsoleColor foreground)
         {
             BackgroundColor = background;
-            //ForegroundColor = foreground;
+            ForegroundColor = foreground;
             ApplyColors();
         }
 
         private void ApplyColors()
         {
             Console.BackgroundColor = BackgroundColor;
-            //Console.ForegroundColor = ForegroundColor;
+            Console.ForegroundColor = ForegroundColor;
             Console.Clear(); // Важно: очищаем консоль для применения фона
         }
         

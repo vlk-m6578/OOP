@@ -99,7 +99,7 @@ namespace DocMaster.UI
                 if ((maxOption == 9 && choice == 9) || (maxOption == 7 && choice == 7) || (maxOption == 3 && choice == 3))
                 {
                     Console.ForegroundColor = ConsoleColor.White;
-                    Console.BackgroundColor = ConsoleColor.Black; 
+                    Console.BackgroundColor = ConsoleColor.Black;
                     _currentUser = null;
                     return;
                 }
@@ -131,7 +131,7 @@ namespace DocMaster.UI
                         case 8:
                             //system settings
                             break;
-  
+
                     }
                 }
                 else if (_roleContext.CurrentRole == UserRole.Editor)
@@ -371,27 +371,27 @@ namespace DocMaster.UI
                 _ => ConsoleColor.Black
             };
 
-            //Console.WriteLine("\nSelect text color:");
-            //Console.WriteLine("1. White");
-            //Console.WriteLine("2. Yellow");
-            //Console.WriteLine("3. Cyan");
-            //Console.WriteLine("4. Magenta");
-            //Console.WriteLine("5. Green");
-            //Console.Write("Choice: ");
+            Console.WriteLine("\nSelect text color:");
+            Console.WriteLine("1. White");
+            Console.WriteLine("2. Yellow");
+            Console.WriteLine("3. Cyan");
+            Console.WriteLine("4. Magenta");
+            Console.WriteLine("5. Green");
+            Console.Write("Choice: ");
 
-            //int fgChoice = InputValidator.GetIntInput(1, 5);
-            //ConsoleColor fgColor = fgChoice switch
-            //{
-            //    1 => ConsoleColor.White,
-            //    2 => ConsoleColor.Yellow,
-            //    3 => ConsoleColor.Cyan,
-            //    4 => ConsoleColor.Magenta,
-            //    5 => ConsoleColor.Green,
-            //    _ => ConsoleColor.White
-            //};
+            int fgChoice = InputValidator.GetIntInput(1, 5);
+            ConsoleColor fgColor = fgChoice switch
+            {
+                1 => ConsoleColor.White,
+                2 => ConsoleColor.Yellow,
+                3 => ConsoleColor.Cyan,
+                4 => ConsoleColor.Magenta,
+                5 => ConsoleColor.Green,
+                _ => ConsoleColor.White
+            };
 
-            AppStyleSettings.Instance.ChangeColors(bgColor);
-            
+            AppStyleSettings.Instance.ChangeColors(bgColor, fgColor);
+
         }
     }
 }
