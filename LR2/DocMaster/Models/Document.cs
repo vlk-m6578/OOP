@@ -17,7 +17,5 @@ namespace DocMaster.Models
             Format = format;
             Content = string.Empty;
         }
-
-
     }
 }

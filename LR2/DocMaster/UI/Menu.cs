@@ -11,7 +11,8 @@ namespace DocMaster.UI
             if(role == UserRole.Viewer)
             {
                 Console.WriteLine("1. View document");
-                Console.WriteLine("2. Exit");
+                Console.WriteLine("2. System settings");
+                Console.WriteLine("3. Exit");
             }
 
             if (role == UserRole.Editor)
@@ -21,7 +22,7 @@ namespace DocMaster.UI
                 Console.WriteLine("3. Delete document");
                 Console.WriteLine("4. Edit document");
                 Console.WriteLine("5. Save document");
-                Console.WriteLine("6. Text formatting");
+                Console.WriteLine("6. System settings");
                 Console.WriteLine("7. Exit");
             }
 
@@ -32,9 +33,9 @@ namespace DocMaster.UI
                 Console.WriteLine("3. Delete document");
                 Console.WriteLine("4. Edit document");
                 Console.WriteLine("5. Save document");
-                Console.WriteLine("6. Text formatting");
+                Console.WriteLine("6. System settings");
                 Console.WriteLine("7. User management");
-                Console.WriteLine("8. System settings");
+                Console.WriteLine("8. sjsjsjsjsjsjsjs");
                 Console.WriteLine("9. Exit");
             }
 

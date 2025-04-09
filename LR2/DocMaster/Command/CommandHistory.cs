@@ -68,19 +68,27 @@ namespace DocMaster.Command
         private readonly string _deletedText;
 
         public int CursorPositionBefore { get; }
-        public int CursorPositionAfter => _position;
+        public int CursorPositionAfter { get; }
 
         public TextDeleteCommand(Document doc, int pos, int length, int cursorBefore)
         {
+            // Защита от некорректных значений
+            length = Math.Max(0, Math.Min(length, doc.Content.Length - pos));
+            pos = Math.Clamp(pos, 0, doc.Content.Length - length);
+
             _document = doc;
             _position = pos;
             _deletedText = doc.Content.Substring(pos, length);
             CursorPositionBefore = cursorBefore;
+            CursorPositionAfter = pos;
         }
 
         public void Execute()
         {
-            _document.Content = _document.Content.Remove(_position, _deletedText.Length);
+            if (_position + _deletedText.Length <= _document.Content.Length)
+            {
+                _document.Content = _document.Content.Remove(_position, _deletedText.Length);
+            }
         }
 
         public void Undo()

@@ -144,9 +144,10 @@ namespace DocMaster.Services
                     CopySelection();
                     break;
 
-                case ConsoleKey.Q:
+                case ConsoleKey.V:
                     PasteText();
                     break;
+
             }
         }
 

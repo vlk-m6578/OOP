@@ -96,8 +96,10 @@ namespace DocMaster.UI
                 int maxOption = GetMaxMenuOption();
                 int choice = InputValidator.GetIntInput(1, maxOption);
 
-                if ((maxOption == 9 && choice == 9) || (maxOption == 7 && choice == 7) || (maxOption == 2 && choice == 2))
+                if ((maxOption == 9 && choice == 9) || (maxOption == 7 && choice == 7) || (maxOption == 3 && choice == 3))
                 {
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.ForegroundColor = ConsoleColor.White;
                     _currentUser = null;
                     return;
                 }
@@ -121,15 +123,13 @@ namespace DocMaster.UI
                             //save
                             break;
                         case 6:
-                            //text formattig
+                            ChooseColor();
                             break;
                         case 7 when _roleContext.CanManageUsers:
                             ManageUsers();
                             break;
                         case 8:
                             //system settings
-                            break;
-                        case 9:
                             break;
                     }
                 }
@@ -153,10 +153,7 @@ namespace DocMaster.UI
                             //save
                             break;
                         case 6:
-                            //text formatting
-                            break;
-                        case 7 when _roleContext.CanManageUsers:
-                            ManageUsers();
+                            ChooseColor();
                             break;
                     }
                 }
@@ -168,6 +165,7 @@ namespace DocMaster.UI
                             OpenDocument();
                             break;
                         case 2:
+                            ChooseColor();
                             break;
                     }
                 }
@@ -177,7 +175,7 @@ namespace DocMaster.UI
         {
             UserRole.Admin => 9,
             UserRole.Editor => 7,
-            _ => 2
+            _ => 3
         };
 
         private void ManageUsers()
@@ -348,6 +346,53 @@ namespace DocMaster.UI
             editor.StartEditing();
 
             _documentManager.SaveDocument(_currentDocument);
+        }
+        private void ChooseColor()
+        {
+            Console.WriteLine("\nSelect background color:");
+            Console.WriteLine("1. Black");
+            Console.WriteLine("2. DarkBlue");
+            Console.WriteLine("3. DarkGreen");
+            Console.WriteLine("4. DarkRed");
+            Console.WriteLine("5. DarkYellow");
+            Console.WriteLine("6. DarkCyan");
+            Console.Write("Choice: ");
+
+            int bgChoice = InputValidator.GetIntInput(1, 6);
+            ConsoleColor bgColor = bgChoice switch
+            {
+                1 => ConsoleColor.Black,
+                2 => ConsoleColor.DarkBlue,
+                3 => ConsoleColor.DarkGreen,
+                4 => ConsoleColor.DarkRed,
+                5 => ConsoleColor.DarkYellow,
+                6 => ConsoleColor.DarkCyan,
+                _ => ConsoleColor.Black
+            };
+
+            Console.WriteLine("\nSelect text color:");
+            Console.WriteLine("1. White");
+            Console.WriteLine("2. Yellow");
+            Console.WriteLine("3. Cyan");
+            Console.WriteLine("4. Magenta");
+            Console.WriteLine("5. Green");
+            Console.Write("Choice: ");
+
+            int fgChoice = InputValidator.GetIntInput(1, 5);
+            ConsoleColor fgColor = fgChoice switch
+            {
+                1 => ConsoleColor.White,
+                2 => ConsoleColor.Yellow,
+                3 => ConsoleColor.Cyan,
+                4 => ConsoleColor.Magenta,
+                5 => ConsoleColor.Green,
+                _ => ConsoleColor.White
+            };
+
+            AppStyleSettings.Instance.ChangeColors(bgColor, fgColor);
+            Console.WriteLine("\n-----> Style has been changed!");
+            Console.Write("Press any key...");
+            Console.ReadKey();
         }
     }
 }
