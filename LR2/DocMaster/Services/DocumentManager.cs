@@ -18,6 +18,16 @@ namespace DocMaster.Services
             _fileService = fileService;
             _storagePath = storagePath;
             _manifestPath = Path.Combine(storagePath, ManifestFileName);
+
+            // Загрузка существующего манифеста
+            var existingEntries = _fileService.ReadManifest(_manifestPath);
+            _createdDocuments.AddRange(existingEntries);
+
+            // Очистка от несуществующих файлов
+            _createdDocuments.RemoveAll(path => !File.Exists(path));
+
+            // Сохраняем обновленный манифест
+            SaveManifest();
         }
         private void SaveManifest()
         {
@@ -38,8 +48,15 @@ namespace DocMaster.Services
 
             var doc = new Document(name, format);
             var fullPath = GetFullPath(doc);
-            _createdDocuments.Add(fullPath);
-            SaveManifest();
+            if (!_createdDocuments.Contains(fullPath))
+            {
+                _createdDocuments.Add(fullPath);
+                SaveManifest();
+            }
+            else
+            {
+                throw new InvalidOperationException("Document with this name and format already exists.");
+            }
 
             return doc;
         }
@@ -58,7 +75,7 @@ namespace DocMaster.Services
         {
             var fullPath = GetFullPath(document);
             _fileService.Save(document, _storagePath);
-            _fileService.AddToManifest(_manifestPath, fullPath);
+            
         }
 
         public List<string> GetDocumentList()

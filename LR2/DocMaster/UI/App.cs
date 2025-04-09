@@ -335,14 +335,6 @@ namespace DocMaster.UI
                 Console.ReadKey();
                 return;
             }
-
-            if (_currentDocument.Format != DocumentFormat.TXT)
-            {
-                Console.WriteLine("Advanced editing supported only for TXT files");
-                Console.ReadKey();
-                return;
-            }
-
             var editor = new TextEditor(_currentDocument);
             editor.StartEditing();
 

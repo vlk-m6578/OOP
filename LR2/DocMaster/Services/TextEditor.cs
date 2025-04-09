@@ -14,9 +14,13 @@ namespace DocMaster.Services
         private int _selectionStart = -1;
         private readonly CommandHistory _history = new();
 
+        private bool _isPreviewMode = false;
+        private DocumentFormat _format;
+
         public TextEditor(Document doc)
         {
             _document = doc;
+            _format = doc.Format;
             _cursorPosition = doc.Content.Length;
         }
 
@@ -68,6 +72,17 @@ namespace DocMaster.Services
         }
         private void HandleKeyPress(ConsoleKeyInfo key)
         {
+            if (_format == DocumentFormat.Markdown && !_isPreviewMode)
+            {
+                HandleMarkdownShortcuts(key);
+            }
+            if (key.Key == ConsoleKey.F12)
+            {
+                TogglePreviewMode();
+                return;
+            }
+
+            if (_isPreviewMode) return;
             bool isShiftPressed = (key.Modifiers & ConsoleModifiers.Shift) != 0;
 
             // 1. Сначала обработать Control+Комбинации
@@ -274,8 +289,147 @@ namespace DocMaster.Services
             // Обеспечиваем корректные границы
             _cursorPosition = Math.Clamp(_cursorPosition, 0, _document.Content.Length);
         }
+        private void HandleMarkdownShortcuts(ConsoleKeyInfo key)
+        {
+            if ((key.Modifiers & ConsoleModifiers.Control) != 0)
+            {
+                int start = Math.Min(_selectionStart, _cursorPosition);
+                int end = Math.Max(_selectionStart, _cursorPosition);
 
+                if (key.Key == ConsoleKey.B && start != end)
+                {
+                    ApplyMarkdownFormatting(start, end, "**");
+                }
+                else if (key.Key == ConsoleKey.I && start != end)
+                {
+                    ApplyMarkdownFormatting(start, end, "*");
+                }
+            }
+            else if (key.Key == ConsoleKey.F12)
+            {
+                TogglePreviewMode();
+            }
+        }
+
+        private void ApplyMarkdownFormatting(int start, int end, string wrapper)
+        {
+            string selectedText = _document.Content.Substring(start+1, end - start-1);
+            string newText = $"{wrapper}{selectedText}{wrapper}";
+
+            var cmd = new TextReplaceCommand(
+                doc: _document,
+                start: start,
+                end: end,
+                newText: newText,
+                cursorBefore: _cursorPosition
+            );
+
+            cmd.Execute();
+            _history.Push(cmd);
+            _cursorPosition = end + wrapper.Length * 2;
+            _selectionStart = -1;
+        }
+
+        private void TogglePreviewMode()
+        {
+            _isPreviewMode = !_isPreviewMode;
+            RenderText();
+        }
         private void RenderText()
+        {
+            if (_isPreviewMode && _format == DocumentFormat.Markdown)
+            {
+                RenderMarkdownPreview();
+            }
+            else
+            {
+                RenderNormalText();
+            }
+        }
+        private void RenderMarkdownPreview()
+        {
+            Console.Clear();
+            Console.WriteLine("=== Preview Mode (F12 to exit) ===");
+
+            string content = _document.Content;
+            int pos = 0;
+
+            while (pos < content.Length)
+            {
+                if (pos < content.Length - 1 && content[pos] == '*' && content[pos + 1] == '*')
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    pos = ProcessBold(content, pos);
+                }
+                else if (content[pos] == '*')
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    pos = ProcessItalic(content, pos);
+                }
+                else
+                {
+                    Console.ResetColor();
+                    Console.Write(content[pos]);
+                    pos++;
+                }
+            }
+        }
+
+        private int ProcessBold(string content, int pos)
+        {
+            pos += 2;
+            while (pos < content.Length+1 && !(content[pos] == '*' && content[pos + 1] == '*'))
+            {
+                Console.Write(content[pos]);
+                pos++;
+            }
+            pos += 2;
+            Console.ResetColor();
+            return pos;
+        }
+
+        private int ProcessItalic(string content, int pos)
+        {
+            pos++;
+            while (pos < content.Length && content[pos] != '*')
+            {
+                Console.Write(content[pos]);
+                pos++;
+            }
+            pos++;
+            Console.ResetColor();
+            return pos;
+        }
+
+        private int ProcessToEndOfLine(string content, int pos)
+        {
+            // Пропускаем пробелы после #
+            while (pos < content.Length && char.IsWhiteSpace(content[pos]))
+                pos++;
+
+            // Запоминаем начало строки
+            int lineStart = pos;
+
+            // Ищем конец строки
+            while (pos < content.Length && content[pos] != '\n')
+                pos++;
+
+            // Выводим всю строку
+            if (lineStart < pos)
+            {
+                Console.Write(content.Substring(lineStart, pos - lineStart));
+            }
+
+            // Добавляем перенос строки
+            Console.WriteLine();
+
+            // Пропускаем символ \n если он есть
+            if (pos < content.Length && content[pos] == '\n')
+                pos++;
+
+            return pos;
+        }
+        private void RenderNormalText()
         {
             Console.Clear();
             Console.WriteLine("=== Editing Mode (ESC to exit) ===");
@@ -310,44 +464,80 @@ namespace DocMaster.Services
             // Устанавливаем курсор
             Console.SetCursorPosition(consoleColumn, consoleLine);
 
-            // Подсветка
-            //Console.BackgroundColor = ConsoleColor.Gray;
-            //Console.ForegroundColor = ConsoleColor.Black;
-            Console.Write(_cursorPosition < _document.Content.Length ? _document.Content[_cursorPosition] : ' ');
-            //Console.ResetColor();
+            // Отображение курсора
+            Console.Write(_cursorPosition < _document.Content.Length
+                ? _document.Content[_cursorPosition]
+                : ' ');
+
             Console.SetCursorPosition(consoleColumn, consoleLine);
         }
-        
     }
 
-    // Простой буфер обмена
-    public static class Clipboard
-    {
-        public static string Content { get; private set; } = string.Empty;
-        public static void SetText(string text)
-        {
-            try
-            {
-                // Используем системный буфер через TextCopy
-                TextCopy.ClipboardService.SetText(text);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Clipboard error: {ex.Message}");
-            }
-        }
+}
+public class TextReplaceCommand : ICommand
+{
+    private readonly Document _document;
+    private readonly int _start;
+    private readonly int _end;
+    private readonly string _newText;
+    private readonly string _oldText;
 
-        public static string GetText()
+    public int CursorPositionBefore { get; }
+    public int CursorPositionAfter { get; }
+
+    public TextReplaceCommand(Document doc, int start, int end, string newText, int cursorBefore)
+    {
+        _document = doc;
+        _start = start;
+        _end = end;
+        _newText = newText;
+        _oldText = doc.Content.Substring(start, end - start);
+        CursorPositionBefore = cursorBefore;
+        CursorPositionAfter = start + newText.Length;
+    }
+
+    public void Execute()
+    {
+        _document.Content = _document.Content
+            .Remove(_start, _end - _start)
+            .Insert(_start, _newText);
+    }
+
+    public void Undo()
+    {
+        _document.Content = _document.Content
+            .Remove(_start, _newText.Length)
+            .Insert(_start, _oldText);
+    }
+}
+
+// Простой буфер обмена
+public static class Clipboard
+{
+    public static string Content { get; private set; } = string.Empty;
+    public static void SetText(string text)
+    {
+        try
         {
-            try
-            {
-                return TextCopy.ClipboardService.GetText();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Clipboard error: {ex.Message}");
-                return string.Empty;
-            }
+            // Используем системный буфер через TextCopy
+            TextCopy.ClipboardService.SetText(text);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Clipboard error: {ex.Message}");
+        }
+    }
+
+    public static string GetText()
+    {
+        try
+        {
+            return TextCopy.ClipboardService.GetText();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Clipboard error: {ex.Message}");
+            return string.Empty;
         }
     }
 }
