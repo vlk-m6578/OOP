@@ -43,8 +43,6 @@ namespace DocMaster.Services
             {
                 if (_selectionStart == -1)
                     _selectionStart = _cursorPosition;
-                else
-                    CopyToSystemClipboard(); // Копируем при изменении выделения
             }
             else
             {
@@ -148,9 +146,40 @@ namespace DocMaster.Services
                     PasteText();
                     break;
 
+                case ConsoleKey.X:
+                    CutSelection();
+                    break;
             }
         }
+        private void CutSelection()
+        {
+            if (_selectionStart == -1 || _selectionStart == _cursorPosition)
+                return;
 
+            int start = Math.Min(_selectionStart, _cursorPosition);
+            int end = Math.Max(_selectionStart, _cursorPosition);
+            int length = end - start;
+
+            // Копирование в буфер
+            string selectedText = _document.Content.Substring(start, length);
+            try
+            {
+                TextCopy.ClipboardService.SetText(selectedText);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка буфера: {ex.Message}");
+            }
+
+            // Удаление текста
+            var cmd = new TextDeleteCommand(_document, start, length, _cursorPosition);
+            cmd.Execute();
+            _history.Push(cmd);
+            _cursorPosition = start; // Перемещаем курсор в начало удаленного фрагмента
+
+            // Сбрасываем выделение
+            _selectionStart = -1;
+        }
         private void InsertChar(char c)
         {
             var before = _cursorPosition;
@@ -207,25 +236,22 @@ namespace DocMaster.Services
         }
         private void CopySelection()
         {
-            // Добавляем проверку на валидное выделение
             if (_selectionStart == -1 || _selectionStart == _cursorPosition)
                 return;
 
-            // Явно указываем типы
             int start = Math.Min(_selectionStart, _cursorPosition);
             int end = Math.Max(_selectionStart, _cursorPosition);
-
-            // Проверка границ
-            if (start < 0) start = 0;
-            if (end > _document.Content.Length) end = _document.Content.Length;
-
-            // Копируем текст
             string selectedText = _document.Content.Substring(start, end - start);
-            Clipboard.SetText(selectedText);
 
-            // Визуальная обратная связь
-            Console.Beep(); // Звуковой сигнал
-            RenderText(); // Обновляем экран
+            try
+            {
+                TextCopy.ClipboardService.SetText(selectedText);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка буфера: {ex.Message}");
+            }
+            RenderText();
         }
 
         private void PasteText()
@@ -287,10 +313,10 @@ namespace DocMaster.Services
             Console.SetCursorPosition(consoleColumn, consoleLine);
 
             // Подсветка
-            Console.BackgroundColor = ConsoleColor.Gray;
-            Console.ForegroundColor = ConsoleColor.Black;
+            //Console.BackgroundColor = ConsoleColor.Gray;
+            //Console.ForegroundColor = ConsoleColor.Black;
             Console.Write(_cursorPosition < _document.Content.Length ? _document.Content[_cursorPosition] : ' ');
-            Console.ResetColor();
+            //Console.ResetColor();
             Console.SetCursorPosition(consoleColumn, consoleLine);
         }
         public void ApplyFormatting(string formatType)

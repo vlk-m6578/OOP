@@ -72,15 +72,15 @@ namespace DocMaster.Command
 
         public TextDeleteCommand(Document doc, int pos, int length, int cursorBefore)
         {
-            // Защита от некорректных значений
-            length = Math.Max(0, Math.Min(length, doc.Content.Length - pos));
-            pos = Math.Clamp(pos, 0, doc.Content.Length - length);
+            // Корректируем параметры, если они выходят за границы
+            pos = Math.Clamp(pos, 0, doc.Content.Length);
+            length = Math.Clamp(length, 0, doc.Content.Length - pos);
 
             _document = doc;
             _position = pos;
             _deletedText = doc.Content.Substring(pos, length);
             CursorPositionBefore = cursorBefore;
-            CursorPositionAfter = pos;
+            CursorPositionAfter = pos; // Курсор перемещается в начало удаленного фрагмента
         }
 
         public void Execute()

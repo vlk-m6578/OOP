@@ -98,8 +98,8 @@ namespace DocMaster.UI
 
                 if ((maxOption == 9 && choice == 9) || (maxOption == 7 && choice == 7) || (maxOption == 3 && choice == 3))
                 {
-                    Console.BackgroundColor = ConsoleColor.Black;
                     Console.ForegroundColor = ConsoleColor.White;
+                    Console.BackgroundColor = ConsoleColor.Black; 
                     _currentUser = null;
                     return;
                 }
@@ -131,6 +131,7 @@ namespace DocMaster.UI
                         case 8:
                             //system settings
                             break;
+  
                     }
                 }
                 else if (_roleContext.CurrentRole == UserRole.Editor)
@@ -390,9 +391,7 @@ namespace DocMaster.UI
             };
 
             AppStyleSettings.Instance.ChangeColors(bgColor, fgColor);
-            Console.WriteLine("\n-----> Style has been changed!");
-            Console.Write("Press any key...");
-            Console.ReadKey();
+            
         }
     }
 }

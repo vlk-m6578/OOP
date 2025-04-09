@@ -38,5 +38,6 @@ namespace DocMaster.Utilities
             Console.ForegroundColor = ForegroundColor;
             Console.Clear(); // Важно: очищаем консоль для применения фона
         }
+        
     }
 }
