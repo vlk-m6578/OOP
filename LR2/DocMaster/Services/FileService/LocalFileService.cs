@@ -4,17 +4,31 @@ namespace DocMaster.Services.FileService
 {
     public class LocalFileService : IFileService
     {
-        private readonly Dictionary<DocumentFormat, string> _extensions = new()
+        private readonly Dictionary<DocumentFormat, string> _visibleExtensions = new()
         {
-            {DocumentFormat.TXT, ".txt" },
-            {DocumentFormat.Markdown, ".md" },
+            {DocumentFormat.TXT, ".txt"},
+            {DocumentFormat.Markdown, ".md"}
         };
-        public void Save(Document document, string path)
+        private readonly Dictionary<DocumentFormat, string> _allExtensions = new()
         {
-            var fullPath = Path.Combine(path, $"{document.Name}{_extensions[document.Format]}");
-            File.WriteAllText(fullPath, document.Content);
+            {DocumentFormat.TXT, ".txt"},
+            {DocumentFormat.Markdown, ".md"},
+            {DocumentFormat.JSON, ".json"},
+            {DocumentFormat.XML, ".xml"}
+        };
+        public void Save(Document document, string path, DocumentFormat? targetFormat = null)
+        {
+            var format = targetFormat ?? document.Format;
+            var extension = _allExtensions[format];
+            var fullPath = Path.Combine(path, $"{document.Name}{extension}");
+            var content = format == document.Format
+                ? document.Content
+                : document.ConvertTo(format);
+
+            File.WriteAllText(fullPath, content);
         }
-        public Document Load(string fullPath)
+
+            public Document Load(string fullPath)
         {
             var content = File.ReadAllText(fullPath);
             var fileName = Path.GetFileNameWithoutExtension(fullPath);
@@ -29,7 +43,7 @@ namespace DocMaster.Services.FileService
         public List<string> GetAvailableDocuments(string directory)
         {
             var files = new List<string>();
-            foreach (var format in _extensions.Values)
+            foreach (var format in _visibleExtensions.Values)
             {
                 files.AddRange(Directory.GetFiles(directory, $"*{format}"));
             }
@@ -67,5 +81,6 @@ namespace DocMaster.Services.FileService
                 ? File.ReadAllLines(manifestPath).ToList()
                 : new List<string>();
         }
+        public string GetExtension(DocumentFormat format) => _allExtensions.TryGetValue(format, out var ext) ? ext : ".txt";
     }
 }

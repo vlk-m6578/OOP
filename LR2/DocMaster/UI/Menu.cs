@@ -35,8 +35,7 @@ namespace DocMaster.UI
                 Console.WriteLine("5. Save document");
                 Console.WriteLine("6. System settings");
                 Console.WriteLine("7. User management");
-                Console.WriteLine("8. sjsjsjsjsjsjsjs");
-                Console.WriteLine("9. Exit");
+                Console.WriteLine("8. Exit");
             }
 
             Console.Write("Choice: ");
@@ -46,14 +45,16 @@ namespace DocMaster.UI
             Console.WriteLine("\n=== Admin Dashboard ===");
             Console.WriteLine("1. Change user role");
             Console.WriteLine("2. View all users");
-            Console.WriteLine("3. Block document");
+            Console.WriteLine("3. Block document for user");
+            Console.WriteLine("4. Unblock document for user");
+            Console.WriteLine("5. View blocked documents");
             Console.Write("Choice: ");
         }
         public void ShowSaveMenu()
         {
-            Console.WriteLine("\n=== Save Dashboard ===");
+            Console.WriteLine("\n=== Save Options ===");
             Console.WriteLine("1. Save in current format");
-            Console.WriteLine("2. Convert and save in another format");
+            Console.WriteLine("2. Save in another format");
             Console.WriteLine("3. Select storage location");
             Console.Write("Choice: ");
 

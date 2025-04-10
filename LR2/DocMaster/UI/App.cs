@@ -96,7 +96,7 @@ namespace DocMaster.UI
                 int maxOption = GetMaxMenuOption();
                 int choice = InputValidator.GetIntInput(1, maxOption);
 
-                if ((maxOption == 9 && choice == 9) || (maxOption == 7 && choice == 7) || (maxOption == 3 && choice == 3))
+                if ((maxOption == 8 && choice == 8) || (maxOption == 7 && choice == 7) || (maxOption == 3 && choice == 3))
                 {
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.BackgroundColor = ConsoleColor.Black;
@@ -128,9 +128,6 @@ namespace DocMaster.UI
                         case 7 when _roleContext.CanManageUsers:
                             ManageUsers();
                             break;
-                        case 8:
-                            //system settings
-                            break;
 
                     }
                 }
@@ -151,7 +148,7 @@ namespace DocMaster.UI
                             EditDocument();
                             break;
                         case 5:
-                            //save
+                            SaveDocument();
                             break;
                         case 6:
                             ChooseColor();
@@ -174,7 +171,7 @@ namespace DocMaster.UI
         }
         private int GetMaxMenuOption() => _roleContext.CurrentRole switch
         {
-            UserRole.Admin => 9,
+            UserRole.Admin => 8,
             UserRole.Editor => 7,
             _ => 3
         };
@@ -184,7 +181,7 @@ namespace DocMaster.UI
             Console.Clear();
             _menu.ShowAdminMenu();
 
-            int choice = InputValidator.GetIntInput(1, 3);
+            int choice = InputValidator.GetIntInput(1, 5);
             if (choice == 1)
             {
                 Console.Write("\nEnter username: ");
@@ -225,6 +222,18 @@ namespace DocMaster.UI
                     Console.WriteLine($"| {user.Username} - {user.CurrentRole}");
                 }
             }
+            switch (choice)
+            {
+                case 3:
+                    BlockDocumentForUser();
+                    break;
+                case 4:
+                    UnblockDocumentForUser();
+                    break;
+                case 5:
+                    ShowBlockedDocuments();
+                    break;
+            }
         }
 
         private void CreateDocument()
@@ -251,7 +260,9 @@ namespace DocMaster.UI
 
         private void OpenDocument()
         {
-            var documents = _documentManager.GetDocumentList();
+            var documents = _documentManager.GetDocumentList(_currentUser.Username)
+                .Where(f => f.EndsWith(".txt") || f.EndsWith(".md"))
+                .ToList();
 
             if (documents.Count == 0)
             {
@@ -296,7 +307,7 @@ namespace DocMaster.UI
         }
         private void DeleteDocument()
         {
-            var documents = _documentManager.GetDocumentList();
+            var documents = _documentManager.GetDocumentList(_currentUser.Username);
 
             if (documents.Count == 0)
             {
@@ -373,19 +384,42 @@ namespace DocMaster.UI
         }
         private void SaveDocument()
         {
-            _menu.ShowSaveMenu();
-            int choice = InputValidator.GetIntInput(1, 3);
-
-            switch (choice)
+            var documents = _documentManager.GetDocumentList(_currentUser.Username);
+            if (documents.Count == 0)
             {
-                case 1:
-                    break;
-                case 2:
-                    ExportDocument();
-                    break;
-                case 3:
-                    break;
+                Console.WriteLine("No documents available!");
+                Console.ReadKey();
+                return;
             }
+
+            Console.WriteLine("\nAvailable documents:");
+            for (int i = 0; i < documents.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {Path.GetFileName(documents[i])}");
+            }
+
+            int choice = InputValidator.GetIntInput(1, documents.Count);
+            var selectedDoc = _documentManager.OpenDocument(documents[choice - 1]);
+
+            var allowedFormats = GetAllowedFormats(selectedDoc.Format);
+            Console.WriteLine("\nSelect format:");
+            for (int i = 0; i < allowedFormats.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {allowedFormats[i]}");
+            }
+
+            int formatChoice = InputValidator.GetIntInput(1, allowedFormats.Count);
+            DocumentFormat targetFormat = allowedFormats[formatChoice - 1];
+
+            _documentManager.SaveDocumentAs(selectedDoc, targetFormat);
+            Console.WriteLine("Document saved successfully!");
+            Console.ReadKey();
+        }
+        private List<DocumentFormat> GetAllowedFormats(DocumentFormat original)
+        {
+            var formats = new List<DocumentFormat> { original, DocumentFormat.JSON, DocumentFormat.XML };
+            if (original == DocumentFormat.Markdown) formats.Add(DocumentFormat.TXT);
+            return formats.Distinct().ToList();
         }
         private void ExportDocument()
         {
@@ -413,6 +447,52 @@ namespace DocMaster.UI
             _documentManager.ExportDocument(_currentDocument, format);
             Console.Write("Press any key...");
             Console.ReadKey();
+        }
+        private void BlockDocumentForUser()
+        {
+            var users = _userManager.GetAllUsers().Where(u => u.CurrentRole != UserRole.Admin).ToList();
+            var documents = _documentManager.GetDocumentList(_currentUser.Username);
+
+            Console.WriteLine("\nSelect user to block:");
+            users.ForEach(u => Console.WriteLine($"{users.IndexOf(u) + 1}. {u.Username}"));
+            int userChoice = InputValidator.GetIntInput(1, users.Count);
+
+            Console.WriteLine("\nSelect document to block:");
+            documents.ForEach(d => Console.WriteLine($"{documents.IndexOf(d) + 1}. {Path.GetFileName(d)}"));
+            int docChoice = InputValidator.GetIntInput(1, documents.Count);
+
+            _userManager.BlockDocumentForUser(documents[docChoice - 1], users[userChoice - 1].Username);
+            Console.WriteLine("Document blocked successfully!");
+        }
+
+        private void UnblockDocumentForUser()
+        {
+            var blocked = _userManager.GetBlockedDocuments();
+            if (!blocked.Any())
+            {
+                Console.WriteLine("No blocked documents found!");
+                return;
+            }
+
+            Console.WriteLine("\nSelect blocked entry:");
+            blocked.ForEach(b => Console.WriteLine($"{blocked.IndexOf(b) + 1}. {b.FilePath}"));
+            int choice = InputValidator.GetIntInput(1, blocked.Count);
+
+            var entry = blocked[choice - 1];
+            _userManager.UnblockDocumentForUser(entry.FilePath, entry.BlockedUsers.First());
+            Console.WriteLine("Document unblocked successfully!");
+        }
+
+        private void ShowBlockedDocuments()
+        {
+            var blocked = _userManager.GetBlockedDocuments();
+            Console.WriteLine("\nBlocked Documents:");
+            foreach (var block in blocked)
+            {
+                Console.WriteLine($"File: {Path.GetFileName(block.FilePath)}");
+                Console.WriteLine($"Blocked users: {string.Join(", ", block.BlockedUsers)}");
+                Console.WriteLine("-------------------");
+            }
         }
     }
 }

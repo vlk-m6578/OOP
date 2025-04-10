@@ -6,16 +6,18 @@ namespace DocMaster.Save
     {
         public string Convert(Document doc)
         {
-            var mdContent = new MarkdownObject(doc.Content);
             return $$"""
             {
-                "metadata": {
-                    "name": "{{doc.Name}}",
-                    "format": "{{doc.Format}}"
-                },
-                "content": {{mdContent.ToJson()}}
+                "name": "{{doc.Name}}",
+                "format": "{{doc.Format}}",
+                "content": "{{EscapeJson(doc.Content)}}"
             }
             """;
         }
+
+        private string EscapeJson(string content)
+            => content.Replace("\\", "\\\\")
+                      .Replace("\"", "\\\"")
+                      .Replace("\n", "\\n");
     }
 }

@@ -11,9 +11,11 @@ namespace DocMaster.Services
         private const string ManifestFileName = ".docmaster_manifest";
         private readonly List<string> _createdDocuments = new();
         private readonly string _manifestPath;
+        private readonly BlockedDocumentManager _blockManager;
 
         public DocumentManager(IFileService fileService, string storagePath)
         {
+            _blockManager = new BlockedDocumentManager();
             _fileService = fileService;
             _storagePath = storagePath;
             _manifestPath = Path.Combine(storagePath, ManifestFileName);
@@ -34,6 +36,13 @@ namespace DocMaster.Services
             File.WriteAllLines(manifestPath, _createdDocuments);
         }
 
+        public void SaveDocumentAs(Document document, DocumentFormat targetFormat)
+        {
+            // Сохраняем в новом формате без добавления в манифест
+            var extension = new LocalFileService().GetExtension(targetFormat);
+            var fullPath = Path.Combine(_storagePath, $"{document.Name}{extension}");
+            File.WriteAllText(fullPath, document.ConvertTo(targetFormat));
+        }
         public List<string> GetAvailableDocuments()
         {
             _createdDocuments.RemoveAll(path => !File.Exists(path));
@@ -75,11 +84,12 @@ namespace DocMaster.Services
             _fileService.Save(document, _storagePath);
         }
 
-        public List<string> GetDocumentList()
+        public List<string> GetDocumentList(string currentUser)
         {
             return _fileService.ReadManifest(_manifestPath)
-            .Where(File.Exists)
-            .ToList();
+             .Where(File.Exists)
+             .Where(path => !_blockManager.IsDocumentBlocked(path, currentUser))
+             .ToList();
         }
 
         public Document OpenDocument(string filePath)
