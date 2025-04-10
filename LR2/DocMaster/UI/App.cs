@@ -120,7 +120,7 @@ namespace DocMaster.UI
                             EditDocument();
                             break;
                         case 5:
-                            //save
+                            SaveDocument();
                             break;
                         case 6:
                             ChooseColor();
@@ -344,45 +344,75 @@ namespace DocMaster.UI
             Console.WriteLine("\nSelect background color:");
             Console.WriteLine("1. Black");
             Console.WriteLine("2. DarkBlue");
-            Console.WriteLine("3. DarkGreen");
-            Console.WriteLine("4. DarkRed");
-            Console.WriteLine("5. DarkYellow");
+            Console.WriteLine("3. Blue");
+            Console.WriteLine("4. DarkYellow");
+            Console.WriteLine("5. Yellow");
             Console.WriteLine("6. DarkCyan");
+            Console.WriteLine("7. Cyan");
+            Console.WriteLine("8. DarkMangenta");
+            Console.WriteLine("9. Mangenta");
             Console.Write("Choice: ");
 
-            int bgChoice = InputValidator.GetIntInput(1, 6);
+            int bgChoice = InputValidator.GetIntInput(1, 9);
             ConsoleColor bgColor = bgChoice switch
             {
                 1 => ConsoleColor.Black,
                 2 => ConsoleColor.DarkBlue,
-                3 => ConsoleColor.DarkGreen,
-                4 => ConsoleColor.DarkRed,
-                5 => ConsoleColor.DarkYellow,
+                3 => ConsoleColor.Blue,
+                4 => ConsoleColor.DarkYellow,
+                5 => ConsoleColor.Yellow,
                 6 => ConsoleColor.DarkCyan,
+                7 => ConsoleColor.Cyan,
+                8 => ConsoleColor.DarkMagenta,
+                9 => ConsoleColor.Magenta,
                 _ => ConsoleColor.Black
             };
 
-            //Console.WriteLine("\nSelect text color:");
-            //Console.WriteLine("1. White");
-            //Console.WriteLine("2. Yellow");
-            //Console.WriteLine("3. Cyan");
-            //Console.WriteLine("4. Magenta");
-            //Console.WriteLine("5. Green");
-            //Console.Write("Choice: ");
-
-            //int fgChoice = InputValidator.GetIntInput(1, 5);
-            //ConsoleColor fgColor = fgChoice switch
-            //{
-            //    1 => ConsoleColor.White,
-            //    2 => ConsoleColor.Yellow,
-            //    3 => ConsoleColor.Cyan,
-            //    4 => ConsoleColor.Magenta,
-            //    5 => ConsoleColor.Green,
-            //    _ => ConsoleColor.White
-            //};
-
             AppStyleSettings.Instance.ChangeColors(bgColor);
 
+        }
+        private void SaveDocument()
+        {
+            _menu.ShowSaveMenu();
+            int choice = InputValidator.GetIntInput(1, 3);
+
+            switch (choice)
+            {
+                case 1:
+                    break;
+                case 2:
+                    ExportDocument();
+                    break;
+                case 3:
+                    break;
+            }
+        }
+        private void ExportDocument()
+        {
+            if (_currentDocument == null)
+            {
+                Console.WriteLine("No document opened!");
+                return;
+            }
+
+            Console.WriteLine("Select target format:");
+            Console.WriteLine("1. TXT");
+            Console.WriteLine("2. JSON");
+            Console.WriteLine("3. XML");
+            Console.Write("Choice: ");
+
+            int choice = InputValidator.GetIntInput(1, 3);
+            var format = choice switch
+            {
+                1 => DocumentFormat.TXT,
+                2 => DocumentFormat.JSON,
+                3 => DocumentFormat.XML,
+                _ => DocumentFormat.TXT
+            };
+
+            _documentManager.ExportDocument(_currentDocument, format);
+            Console.Write("Press any key...");
+            Console.ReadKey();
         }
     }
 }

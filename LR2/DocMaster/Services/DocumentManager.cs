@@ -1,7 +1,6 @@
 ﻿using DocMaster.Services.FileService;
 using DocMaster.Models;
-using DocMaster.Services.StorageStrategies;
-
+using DocMaster.Save;
 
 namespace DocMaster.Services
 {
@@ -101,6 +100,34 @@ namespace DocMaster.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"[ERROR] Error deleting document: {ex.Message}");
+            }
+        }
+
+        public void ExportDocument(Document doc, DocumentFormat targetFormat)
+        {
+            try
+            {
+                string content = doc.ConvertTo(targetFormat);
+                string extension = targetFormat switch
+                {
+                    DocumentFormat.TXT => ".txt",
+                    DocumentFormat.JSON => ".json",
+                    DocumentFormat.XML => ".xml",
+                    _ => throw new NotSupportedException()
+                };
+
+                string fileName = $"{Path.GetFileNameWithoutExtension(doc.Name)}{extension}";
+                string path = Path.Combine(_storagePath, fileName);
+
+                File.WriteAllText(path, content);
+                _createdDocuments.Add(path);
+                SaveManifest();
+
+                Console.WriteLine($"Document exported to {targetFormat} successfully!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Export failed: {ex.Message}");
             }
         }
     }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace DocMaster.Utilities
 {
     public sealed class AppStyleSettings
@@ -13,14 +8,14 @@ namespace DocMaster.Utilities
 
         public static AppStyleSettings Instance => _instance.Value;
 
-        // Добавляем фоновый цвет
+        // Add background color 
         public ConsoleColor BackgroundColor { get; private set; }
 
         private AppStyleSettings()
         {
-            // Устанавливаем дефолтные цвета
+            // Default colors
             BackgroundColor = ConsoleColor.Black;
-            ApplyColors(); // Применяем сразу
+            ApplyColors();
         }
 
         public void ChangeColors(ConsoleColor background)
@@ -32,7 +27,7 @@ namespace DocMaster.Utilities
         private void ApplyColors()
         {
             Console.BackgroundColor = BackgroundColor;
-            Console.Clear(); // Важно: очищаем консоль для применения фона
+            Console.Clear(); // Clear for apply background
         }
         
     }

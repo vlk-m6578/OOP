@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using DocMaster.Models;
+﻿using DocMaster.Models;
 using DocMaster.Command;
 
 namespace DocMaster.Services
@@ -85,11 +81,11 @@ namespace DocMaster.Services
             if (_isPreviewMode) return;
             bool isShiftPressed = (key.Modifiers & ConsoleModifiers.Shift) != 0;
 
-            // 1. Сначала обработать Control+Комбинации
+            // Control + combinations
             if ((key.Modifiers & ConsoleModifiers.Control) != 0)
             {
                 HandleControlCombination(key.Key);
-                UpdateSelection(isShiftPressed); // Обновить выделение после обработки
+                UpdateSelection(isShiftPressed);
                 return;
             }
 
@@ -100,7 +96,7 @@ namespace DocMaster.Services
                     InsertText(Environment.NewLine);
                     break;
                 case ConsoleKey.Tab:
-                    InsertText("    "); // 4 пробела вместо табуляции
+                    InsertText("    ");
                     break;
                 case ConsoleKey.LeftArrow:
                     _cursorPosition = Math.Max(0, _cursorPosition - 1);
@@ -172,10 +168,8 @@ namespace DocMaster.Services
             int end = Math.Max(_selectionStart, _cursorPosition);
             int length = end - start;
 
-            // Копируем в буфер
             CopySelection();
 
-            // Создаем команду удаления диапазона
             var cmd = new TextDeleteCommand(
                 doc: _document,
                 pos: start,
@@ -186,11 +180,9 @@ namespace DocMaster.Services
             cmd.Execute();
             _history.Push(cmd);
 
-            // Перемещаем курсор и сбрасываем выделение
             _cursorPosition = start;
             _selectionStart = -1;
 
-            // Явно обновляем экран
             RenderText();
         }
         private void InsertChar(char c)
@@ -212,39 +204,30 @@ namespace DocMaster.Services
         }
         private void InsertText(string text)
         {
-            // Заменяем Environment.NewLine на \n
             text = text.Replace(Environment.NewLine, "\n");
 
-            // Сохраняем исходную позицию
             int originalPosition = _cursorPosition;
 
-            // Создаем и выполняем команду
             var cmd = new TextInsertCommand(_document, _cursorPosition, text, originalPosition);
             cmd.Execute();
             _history.Push(cmd);
 
-            // Обновляем позицию курсора
             _cursorPosition += text.Length;
 
-            // Специальная обработка для перевода строки
             if (text.Contains('\n'))
             {
-                // Находим позицию следующего перевода строки
                 int newLineIndex = _document.Content.IndexOf('\n', originalPosition);
 
                 if (newLineIndex != -1)
                 {
-                    // Устанавливаем курсор в начало новой строки
                     _cursorPosition = newLineIndex + 1;
                 }
                 else
                 {
-                    // Если это последняя строка, ставим курсор в конец
                     _cursorPosition = _document.Content.Length;
                 }
             }
 
-            // Гарантируем корректные границы
             _cursorPosition = Math.Clamp(_cursorPosition, 0, _document.Content.Length);
         }
         private void CopySelection()
@@ -272,7 +255,6 @@ namespace DocMaster.Services
             var text = Clipboard.GetText();
             if (string.IsNullOrEmpty(text)) return;
 
-            // Создаем команду с текущей позицией курсора
             var cmd = new TextInsertCommand(
                 doc: _document,
                 pos: _cursorPosition,
@@ -283,10 +265,8 @@ namespace DocMaster.Services
             cmd.Execute();
             _history.Push(cmd);
 
-            // Обновляем позицию курсора через свойство команды
             _cursorPosition = cmd.CursorPositionAfter;
 
-            // Обеспечиваем корректные границы
             _cursorPosition = Math.Clamp(_cursorPosition, 0, _document.Content.Length);
         }
         private void HandleMarkdownShortcuts(ConsoleKeyInfo key)
@@ -303,6 +283,10 @@ namespace DocMaster.Services
                 else if (key.Key == ConsoleKey.I && start != end)
                 {
                     ApplyMarkdownFormatting(start, end, "*");
+                }
+                else if (key.Key == ConsoleKey.U && start != end)
+                {
+                    ApplyMarkdownFormatting(start, end, "~~");
                 }
             }
             else if (key.Key == ConsoleKey.F12)
@@ -366,6 +350,12 @@ namespace DocMaster.Services
                     Console.ForegroundColor = ConsoleColor.Green;
                     pos = ProcessItalic(content, pos);
                 }
+                else if (content[pos] == '~' && content[pos + 1] == '~')
+                {
+
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    pos = ProcessUnderline(content, pos);
+                }
                 else
                 {
                     Console.ResetColor();
@@ -384,7 +374,20 @@ namespace DocMaster.Services
                 pos++;
             }
             pos += 2;
-            Console.ResetColor();
+            //Console.ResetColor();
+            return pos;
+        }
+
+        private int ProcessUnderline(string content, int pos)
+        {
+            pos += 2;
+            while (pos < content.Length + 1 && !(content[pos] == '~' && content[pos + 1] == '~'))
+            {
+                Console.Write(content[pos]);
+                pos++;
+            }
+            pos += 2;
+            //Console.ResetColor();
             return pos;
         }
 
@@ -397,7 +400,7 @@ namespace DocMaster.Services
                 pos++;
             }
             pos++;
-            Console.ResetColor();
+            //Console.ResetColor();
             return pos;
         }
 
@@ -435,8 +438,7 @@ namespace DocMaster.Services
             Console.WriteLine("=== Editing Mode (ESC to exit) ===");
             Console.Write(_document.Content);
 
-            // Рассчитываем позицию курсора в консоли
-            int consoleLine = 2; // Строка после заголовка
+            int consoleLine = 2; 
             int consoleColumn = 0;
             int contentPos = 0;
 
@@ -461,10 +463,8 @@ namespace DocMaster.Services
                 contentPos++;
             }
 
-            // Устанавливаем курсор
             Console.SetCursorPosition(consoleColumn, consoleLine);
 
-            // Отображение курсора
             Console.Write(_cursorPosition < _document.Content.Length
                 ? _document.Content[_cursorPosition]
                 : ' ');
@@ -510,8 +510,6 @@ public class TextReplaceCommand : ICommand
             .Insert(_start, _oldText);
     }
 }
-
-// Простой буфер обмена
 public static class Clipboard
 {
     public static string Content { get; private set; } = string.Empty;
@@ -519,7 +517,7 @@ public static class Clipboard
     {
         try
         {
-            // Используем системный буфер через TextCopy
+            // Use system buffer from TextCopy
             TextCopy.ClipboardService.SetText(text);
         }
         catch (Exception ex)
