@@ -421,66 +421,69 @@ namespace DocMaster.UI
             if (original == DocumentFormat.Markdown) formats.Add(DocumentFormat.TXT);
             return formats.Distinct().ToList();
         }
-        private void ExportDocument()
+        
+        private void BlockDocumentForUser()
         {
-            if (_currentDocument == null)
+            // Проверка наличия пользователей
+            var availableUsers = _userManager.GetAllUsers()
+                .Where(u => u.CurrentRole != UserRole.Admin)
+                .ToList();
+
+            if (availableUsers.Count == 0)
             {
-                Console.WriteLine("No document opened!");
+                Console.WriteLine("\n-----> No available users (Editors/Viewers) to block!");
+                Console.Write("Press any key...");
+                Console.ReadKey();
                 return;
             }
 
-            Console.WriteLine("Select target format:");
-            Console.WriteLine("1. TXT");
-            Console.WriteLine("2. JSON");
-            Console.WriteLine("3. XML");
-            Console.Write("Choice: ");
-
-            int choice = InputValidator.GetIntInput(1, 3);
-            var format = choice switch
-            {
-                1 => DocumentFormat.TXT,
-                2 => DocumentFormat.JSON,
-                3 => DocumentFormat.XML,
-                _ => DocumentFormat.TXT
-            };
-
-            _documentManager.ExportDocument(_currentDocument, format);
-            Console.Write("Press any key...");
-            Console.ReadKey();
-        }
-        private void BlockDocumentForUser()
-        {
-            var users = _userManager.GetAllUsers().Where(u => u.CurrentRole != UserRole.Admin).ToList();
+            // Проверка наличия документов
             var documents = _documentManager.GetDocumentList(_currentUser.Username);
+            if (documents.Count == 0)
+            {
+                Console.WriteLine("\n-----> No documents available to block!");
+                Console.Write("Press any key...");
+                Console.ReadKey();
+                return;
+            }
 
             Console.WriteLine("\nSelect user to block:");
-            users.ForEach(u => Console.WriteLine($"{users.IndexOf(u) + 1}. {u.Username}"));
-            int userChoice = InputValidator.GetIntInput(1, users.Count);
+            availableUsers.ForEach(u => Console.WriteLine($"{availableUsers.IndexOf(u) + 1}. {u.Username}"));
+            int userChoice = InputValidator.GetIntInput(1, availableUsers.Count);
 
             Console.WriteLine("\nSelect document to block:");
             documents.ForEach(d => Console.WriteLine($"{documents.IndexOf(d) + 1}. {Path.GetFileName(d)}"));
             int docChoice = InputValidator.GetIntInput(1, documents.Count);
 
-            _userManager.BlockDocumentForUser(documents[docChoice - 1], users[userChoice - 1].Username);
-            Console.WriteLine("Document blocked successfully!");
+            _userManager.BlockDocumentForUser(documents[docChoice - 1], availableUsers[userChoice - 1].Username);
+            Console.WriteLine("\n-----> Document blocked successfully!");
+            Console.Write("Press any key...");
+            Console.ReadKey();
         }
 
         private void UnblockDocumentForUser()
         {
             var blocked = _userManager.GetBlockedDocuments();
-            if (!blocked.Any())
+            if (blocked.Count == 0)
             {
-                Console.WriteLine("No blocked documents found!");
+                Console.WriteLine("\n-----> No blocked documents found!");
+                Console.Write("Press any key...");
+                Console.ReadKey();
                 return;
             }
 
-            Console.WriteLine("\nSelect blocked entry:");
-            blocked.ForEach(b => Console.WriteLine($"{blocked.IndexOf(b) + 1}. {b.FilePath}"));
-            int choice = InputValidator.GetIntInput(1, blocked.Count);
+            Console.WriteLine("\nSelect blocked entry to remove:");
+            blocked.ForEach(b =>
+                Console.WriteLine($"{blocked.IndexOf(b) + 1}. {Path.GetFileName(b.FilePath)} " +
+                                  $"(users: {string.Join(", ", b.BlockedUsers)})"));
 
+            int choice = InputValidator.GetIntInput(1, blocked.Count);
             var entry = blocked[choice - 1];
+
             _userManager.UnblockDocumentForUser(entry.FilePath, entry.BlockedUsers.First());
-            Console.WriteLine("Document unblocked successfully!");
+            Console.WriteLine("\n-----> Document unblocked successfully!");
+            Console.Write("Press any key...");
+            Console.ReadKey();
         }
 
         private void ShowBlockedDocuments()
@@ -493,6 +496,8 @@ namespace DocMaster.UI
                 Console.WriteLine($"Blocked users: {string.Join(", ", block.BlockedUsers)}");
                 Console.WriteLine("-------------------");
             }
+            Console.Write("Press any key...");
+            Console.ReadKey();
         }
     }
 }
