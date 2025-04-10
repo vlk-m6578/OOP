@@ -8,6 +8,7 @@ namespace DocMaster.Models
         public string Name { get; set; }
         public DocumentFormat Format { get; set; }
         public string Content { get; set; }
+
         public Document(string name, DocumentFormat format) 
         {
             Name = name;

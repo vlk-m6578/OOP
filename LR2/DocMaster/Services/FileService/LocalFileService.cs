@@ -16,6 +16,20 @@ namespace DocMaster.Services.FileService
             {DocumentFormat.JSON, ".json"},
             {DocumentFormat.XML, ".xml"}
         };
+        public Document LoadDocument(string fullPath)
+        {
+            var content = File.ReadAllText(fullPath);
+            var fileName = Path.GetFileNameWithoutExtension(fullPath);
+            var format = GetFormatFromExtension(Path.GetExtension(fullPath));
+
+            return new Document(fileName, format) { Content = content };
+        }
+        private DocumentFormat GetFormatFromExtension(string extension) => extension.ToLower() switch
+        {
+            ".txt" => DocumentFormat.TXT,
+            ".md" => DocumentFormat.Markdown,
+            _ => DocumentFormat.TXT
+        };
         public void Save(Document document, string path, DocumentFormat? targetFormat = null)
         {
             var format = targetFormat ?? document.Format;

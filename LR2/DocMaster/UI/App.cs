@@ -260,7 +260,7 @@ namespace DocMaster.UI
 
         private void OpenDocument()
         {
-            var documents = _documentManager.GetDocumentList(_currentUser.Username)
+            var documents = _documentManager.GetDocumentList()
                 .Where(f => f.EndsWith(".txt") || f.EndsWith(".md"))
                 .ToList();
 
@@ -307,7 +307,7 @@ namespace DocMaster.UI
         }
         private void DeleteDocument()
         {
-            var documents = _documentManager.GetDocumentList(_currentUser.Username);
+            var documents = _documentManager.GetDocumentList();
 
             if (documents.Count == 0)
             {
@@ -384,10 +384,10 @@ namespace DocMaster.UI
         }
         private void SaveDocument()
         {
-            var documents = _documentManager.GetDocumentList(_currentUser.Username);
+            var documents = _documentManager.GetDocumentList();
             if (documents.Count == 0)
             {
-                Console.WriteLine("No documents available!");
+                Console.WriteLine("\n-----> No documents available!");
                 Console.ReadKey();
                 return;
             }
@@ -412,7 +412,7 @@ namespace DocMaster.UI
             DocumentFormat targetFormat = allowedFormats[formatChoice - 1];
 
             _documentManager.SaveDocumentAs(selectedDoc, targetFormat);
-            Console.WriteLine("Document saved successfully!");
+            Console.WriteLine("\n-----> Document saved successfully!");
             Console.ReadKey();
         }
         private List<DocumentFormat> GetAllowedFormats(DocumentFormat original)
@@ -438,7 +438,7 @@ namespace DocMaster.UI
             }
 
             // Проверка наличия документов
-            var documents = _documentManager.GetDocumentList(_currentUser.Username);
+            var documents = _documentManager.GetDocumentList();
             if (documents.Count == 0)
             {
                 Console.WriteLine("\n-----> No documents available to block!");

@@ -11,5 +11,6 @@ namespace DocMaster.Services.FileService
         void AddToManifest(string manifestPath, string filePath);
         List<string> ReadManifest(string manifestPath);
         string GetExtension(DocumentFormat format);
+        Document LoadDocument(string fullPath);
     }
 }

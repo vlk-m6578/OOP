@@ -84,12 +84,11 @@ namespace DocMaster.Services
             _fileService.Save(document, _storagePath);
         }
 
-        public List<string> GetDocumentList(string currentUser)
+        public List<string> GetDocumentList()
         {
             return _fileService.ReadManifest(_manifestPath)
-             .Where(File.Exists)
-             .Where(path => !_blockManager.IsDocumentBlocked(path, currentUser))
-             .ToList();
+            .Where(File.Exists)
+            .ToList();
         }
 
         public Document OpenDocument(string filePath)

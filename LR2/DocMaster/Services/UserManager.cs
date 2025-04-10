@@ -8,11 +8,14 @@ namespace DocMaster.Services
         private readonly List<User> _users = new();
         private readonly RoleChangeNotifier _roleNotifier = new();
         private readonly BlockedDocumentManager _blockManager = new();
+        private readonly DocumentManager _documentManager;
+
         public void AddUser(User user)
         {
             _users.Add(user);
             _roleNotifier.Subscribe(user);
         }
+
         public void ChangeUserRole(string username, UserRole newRole)
         {
             var user = _users.FirstOrDefault(u => u.Username == username);
