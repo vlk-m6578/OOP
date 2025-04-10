@@ -2,7 +2,6 @@
 {
     TXT,
     Markdown,
-    RichText,
     JSON,
     XML
 }

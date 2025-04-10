@@ -208,7 +208,6 @@ namespace DocMaster.UI
                 int roleChoice = InputValidator.GetIntInput(1, 2);
 
                 _userManager.ChangeUserRole(username, (UserRole)(roleChoice - 1));
-                //Console.WriteLine($"\n-----> Role for {username} updated.");
             }
             else if (choice == 2)
             {
@@ -233,7 +232,7 @@ namespace DocMaster.UI
             Console.Write("Enter document name: ");
             string name = Console.ReadLine();
 
-            Console.WriteLine("Select document format:");
+            Console.WriteLine("Select document format: ");
             Console.WriteLine("1. TXT");
             Console.WriteLine("2. Markdown");
             Console.WriteLine("3. RichText");
@@ -262,14 +261,14 @@ namespace DocMaster.UI
                 return;
             }
 
-            Console.WriteLine("\nAvailable documents:");
+            Console.WriteLine("\nAvailable documents :");
             Console.WriteLine("--------------------");
             for (int i = 0; i < documents.Count; i++)
             {
                 Console.WriteLine($"{i + 1}.* {Path.GetFileName(documents[i])}");
             }
 
-            Console.Write("\nEnter file number or full path:");
+            Console.Write("\nEnter file number or full path: ");
             string input = Console.ReadLine();
 
             try
@@ -307,14 +306,14 @@ namespace DocMaster.UI
                 return;
             }
 
-            Console.WriteLine("\nAvailable documents:");
+            Console.WriteLine("\nAvailable documents: ");
             Console.WriteLine("--------------------");
             for (int i = 0; i < documents.Count; i++)
             {
                 Console.WriteLine($"{i + 1}.* {Path.GetFileName(documents[i])}");
             }
 
-            Console.Write("\nEnter file number:");
+            Console.Write("\nEnter file number: ");
             string input = Console.ReadLine();
 
 
@@ -331,7 +330,7 @@ namespace DocMaster.UI
         {
             if (_currentDocument == null)
             {
-                Console.WriteLine("No document opened!");
+                Console.WriteLine("-----> No document opened!");
                 Console.ReadKey();
                 return;
             }
@@ -363,26 +362,26 @@ namespace DocMaster.UI
                 _ => ConsoleColor.Black
             };
 
-            Console.WriteLine("\nSelect text color:");
-            Console.WriteLine("1. White");
-            Console.WriteLine("2. Yellow");
-            Console.WriteLine("3. Cyan");
-            Console.WriteLine("4. Magenta");
-            Console.WriteLine("5. Green");
-            Console.Write("Choice: ");
+            //Console.WriteLine("\nSelect text color:");
+            //Console.WriteLine("1. White");
+            //Console.WriteLine("2. Yellow");
+            //Console.WriteLine("3. Cyan");
+            //Console.WriteLine("4. Magenta");
+            //Console.WriteLine("5. Green");
+            //Console.Write("Choice: ");
 
-            int fgChoice = InputValidator.GetIntInput(1, 5);
-            ConsoleColor fgColor = fgChoice switch
-            {
-                1 => ConsoleColor.White,
-                2 => ConsoleColor.Yellow,
-                3 => ConsoleColor.Cyan,
-                4 => ConsoleColor.Magenta,
-                5 => ConsoleColor.Green,
-                _ => ConsoleColor.White
-            };
+            //int fgChoice = InputValidator.GetIntInput(1, 5);
+            //ConsoleColor fgColor = fgChoice switch
+            //{
+            //    1 => ConsoleColor.White,
+            //    2 => ConsoleColor.Yellow,
+            //    3 => ConsoleColor.Cyan,
+            //    4 => ConsoleColor.Magenta,
+            //    5 => ConsoleColor.Green,
+            //    _ => ConsoleColor.White
+            //};
 
-            AppStyleSettings.Instance.ChangeColors(bgColor, fgColor);
+            AppStyleSettings.Instance.ChangeColors(bgColor);
 
         }
     }

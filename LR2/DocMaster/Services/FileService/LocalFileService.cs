@@ -12,7 +12,6 @@ namespace DocMaster.Services.FileService
         {
             {DocumentFormat.TXT, ".txt" },
             {DocumentFormat.Markdown, ".md" },
-            {DocumentFormat.RichText, ".rtf" }
         };
         public void Save(Document document, string path)
         {
@@ -27,7 +26,6 @@ namespace DocMaster.Services.FileService
             {
                 ".txt" => DocumentFormat.TXT,
                 ".md" => DocumentFormat.Markdown,
-                ".rtf" => DocumentFormat.RichText,
                 _ => throw new NotSupportedException("-----> Unsupported file format")
             };
             return new Document(fileName, format) { Content = content };

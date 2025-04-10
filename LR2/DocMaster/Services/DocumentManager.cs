@@ -19,14 +19,14 @@ namespace DocMaster.Services
             _storagePath = storagePath;
             _manifestPath = Path.Combine(storagePath, ManifestFileName);
 
-            // Загрузка существующего манифеста
+            // Upload the manifest
             var existingEntries = _fileService.ReadManifest(_manifestPath);
             _createdDocuments.AddRange(existingEntries);
 
-            // Очистка от несуществующих файлов
+            // Clean non-existen files
             _createdDocuments.RemoveAll(path => !File.Exists(path));
 
-            // Сохраняем обновленный манифест
+            // Save updated manifest
             SaveManifest();
         }
         private void SaveManifest()
@@ -44,7 +44,7 @@ namespace DocMaster.Services
         public Document CreateDocument(string name, DocumentFormat format)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("-----> Document name cannot be empty");
+                throw new ArgumentException("-----> Document name cannot be empty.");
 
             var doc = new Document(name, format);
             var fullPath = GetFullPath(doc);
@@ -55,7 +55,7 @@ namespace DocMaster.Services
             }
             else
             {
-                throw new InvalidOperationException("Document with this name and format already exists.");
+                throw new InvalidOperationException("-----> Document with this name and format already exists.");
             }
 
             return doc;
@@ -66,8 +66,7 @@ namespace DocMaster.Services
             var extensions = new Dictionary<DocumentFormat, string>
             {
                 { DocumentFormat.TXT, ".txt" },
-                { DocumentFormat.Markdown, ".md" },
-                { DocumentFormat.RichText, ".rtf" }
+                { DocumentFormat.Markdown, ".md" }
             };
             return Path.Combine(_storagePath, $"{document.Name}{extensions[document.Format]}");
         }
@@ -75,7 +74,6 @@ namespace DocMaster.Services
         {
             var fullPath = GetFullPath(document);
             _fileService.Save(document, _storagePath);
-            
         }
 
         public List<string> GetDocumentList()
@@ -102,7 +100,7 @@ namespace DocMaster.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"------> Error deleting document: {ex.Message}");
+                Console.WriteLine($"[ERROR] Error deleting document: {ex.Message}");
             }
         }
     }

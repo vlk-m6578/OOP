@@ -31,8 +31,6 @@ namespace DocMaster.Command
             return (cmd.CursorPositionAfter, true);
         }
     }
-
-    // Конкретные команды
     public class TextInsertCommand : ICommand
     {
         private readonly Document _document;
@@ -42,6 +40,7 @@ namespace DocMaster.Command
         public int CursorPositionBefore { get; }
         public int CursorPositionAfter => _position + _text.Length;
 
+        //////////////////////////// Adding text to a doc ////////////////////////////
         public TextInsertCommand(Document doc, int pos, string text, int cursorBefore)
         {
             _document = doc;
@@ -61,6 +60,7 @@ namespace DocMaster.Command
         }
     }
 
+    //////////////////////////// Deleting text from a doc ////////////////////////////
     public class TextDeleteCommand : ICommand
     {
         private readonly Document _document;
@@ -72,7 +72,6 @@ namespace DocMaster.Command
 
         public TextDeleteCommand(Document doc, int pos, int length, int cursorBefore)
         {
-            // Корректируем параметры, если они выходят за границы
             pos = Math.Clamp(pos, 0, doc.Content.Length);
             length = Math.Clamp(length, 0, doc.Content.Length - pos);
 
@@ -80,7 +79,7 @@ namespace DocMaster.Command
             _position = pos;
             _deletedText = doc.Content.Substring(pos, length);
             CursorPositionBefore = cursorBefore;
-            CursorPositionAfter = pos; // Курсор перемещается в начало удаленного фрагмента
+            CursorPositionAfter = pos;
         }
 
         public void Execute()
