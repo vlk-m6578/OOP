@@ -30,13 +30,13 @@ namespace DocMaster.Models
                 Console.WriteLine($"[ADMIN NOTIFICATION] User {changedUser.Username} role changed to {newRole}");
             }
         }
-        public void Update(Document document, string action, string userName)
-        {
-            if (CurrentRole == UserRole.Admin || CurrentRole == UserRole.Editor)
-            {
-                Console.WriteLine($"[{DateTime.Now:T}] User {userName} performed: {action}");
-            }
-        }
+        //public void Update(Document document, string action, string userName)
+        //{
+        //    if (CurrentRole == UserRole.Admin || CurrentRole == UserRole.Editor)
+        //    {
+        //        Console.WriteLine($"[{DateTime.Now:T}] User {userName} performed: {action}");
+        //    }
+        //}
         public void OnDocumentChanged(Document document, string editedBy)
         {
             if (CurrentRole == UserRole.Editor || CurrentRole == UserRole.Admin)
