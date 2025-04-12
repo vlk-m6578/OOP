@@ -1,11 +1,31 @@
 ﻿
+using DocMaster.Services.FileService;
+using DocMaster.Models;
+
 namespace DocMaster.Services.StorageStrategies
 {
     public class LocalStorageStrategy : IStorageStrategy
     {
-        public void Save(string content, string path, string fileName)
+        private readonly string _storagePath;
+        public LocalStorageStrategy(string storagePath)
         {
-            File.WriteAllText(Path.Combine(path, fileName), content);
+            _storagePath = storagePath;
         }
+        public void Save(Document document, DocumentFormat targetFormat)
+        {
+            string content = document.ConvertTo(targetFormat);
+            string extension = GetExtension(targetFormat);
+            string fileName = $"{document.Name}{extension}";
+            string fullPath = Path.Combine(_storagePath, fileName);
+            File.WriteAllText(fullPath, content);
+        }
+        private string GetExtension(DocumentFormat format) => format switch
+        {
+            DocumentFormat.TXT => ".txt",
+            DocumentFormat.Markdown => ".md",
+            DocumentFormat.JSON => ".json",
+            DocumentFormat.XML => ".xml",
+            _ => ".txt"
+        };
     }
 }

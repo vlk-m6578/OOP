@@ -2,6 +2,7 @@
 using DocMaster.Models;
 using DocMaster.Save;
 using DocMaster.Roles.Observers;
+using DocMaster.Services.StorageStrategies;
 
 namespace DocMaster.Services
 {
@@ -139,6 +140,10 @@ namespace DocMaster.Services
             {
                 Console.WriteLine($"Export failed: {ex.Message}");
             }
+        }
+        public void SaveUsingStrategy(Document document, DocumentFormat format, IStorageStrategy strategy)
+        {
+            strategy.Save(document, format);
         }
     }
 }

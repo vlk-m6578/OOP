@@ -426,7 +426,18 @@ namespace DocMaster.UI
             int formatChoice = InputValidator.GetIntInput(1, allowedFormats.Count);
             DocumentFormat targetFormat = allowedFormats[formatChoice - 1];
 
-            _documentManager.SaveDocumentAs(selectedDoc, targetFormat);
+            Console.WriteLine("\nSelect storage location:");
+            Console.WriteLine("1. Local");
+            Console.WriteLine("2. Database");
+            Console.WriteLine("3. Cloud");
+            int storageChoice = InputValidator.GetIntInput(1, 3);
+
+            var strategy = StorageStrategyFactory.CreateStrategy(
+                type: (StorageType)(storageChoice - 1),
+                storagePath: Directory.GetCurrentDirectory(),
+                dbConnectionString: "YourConnectionString");
+
+            _documentManager.SaveUsingStrategy(selectedDoc, targetFormat, strategy);
             Console.WriteLine("\n-----> Document saved successfully!");
             Console.ReadKey();
         }
