@@ -17,7 +17,7 @@ namespace DocMaster.Services.StorageStrategies
             return type switch
             {
                 StorageType.Local => new LocalStorageStrategy(storagePath),
-                //StorageType.Database => new DatabaseStorageStrategy(dbConnectionString),
+                StorageType.Database => new DatabaseStorageStrategy(),
                 StorageType.Cloud => new CloudStorageStrategy(),
                 _ => throw new NotSupportedException()
             };

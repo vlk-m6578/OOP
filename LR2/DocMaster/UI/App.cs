@@ -18,6 +18,9 @@ namespace DocMaster.UI
         private readonly DocumentManager _documentManager = new DocumentManager(new LocalFileService(), Directory.GetCurrentDirectory());
         private Document _currentDocument;
 
+        private const string DatabaseConnectionString =
+        "Server=myServerAddress;Database=myDataBase;User Id=myUsername;Password=myPassword;";
+
         public void Run()
         {
             InitializeUsers();
@@ -412,7 +415,7 @@ namespace DocMaster.UI
             {
                 Console.WriteLine($"{i + 1}. {Path.GetFileName(documents[i])}");
             }
-
+            Console.Write("Choice: ");
             int choice = InputValidator.GetIntInput(1, documents.Count);
             var selectedDoc = _documentManager.OpenDocument(documents[choice - 1]);
 
@@ -422,7 +425,7 @@ namespace DocMaster.UI
             {
                 Console.WriteLine($"{i + 1}. {allowedFormats[i]}");
             }
-
+            Console.Write("Choice: ");
             int formatChoice = InputValidator.GetIntInput(1, allowedFormats.Count);
             DocumentFormat targetFormat = allowedFormats[formatChoice - 1];
 
@@ -430,12 +433,13 @@ namespace DocMaster.UI
             Console.WriteLine("1. Local");
             Console.WriteLine("2. Database");
             Console.WriteLine("3. Cloud");
+            Console.Write("Choice: ");
             int storageChoice = InputValidator.GetIntInput(1, 3);
 
             var strategy = StorageStrategyFactory.CreateStrategy(
                 type: (StorageType)(storageChoice - 1),
                 storagePath: Directory.GetCurrentDirectory(),
-                dbConnectionString: "YourConnectionString");
+                DatabaseConnectionString);
 
             _documentManager.SaveUsingStrategy(selectedDoc, targetFormat, strategy);
             Console.WriteLine("\n-----> Document saved successfully!");
