@@ -1,5 +1,7 @@
 ﻿using DocMaster.Models;
 using DocMaster.Command;
+using DocMaster.Roles.Observers;
+using DocMaster.Services;
 
 namespace DocMaster.Services
 {
@@ -13,11 +15,14 @@ namespace DocMaster.Services
         private bool _isPreviewMode = false;
         private DocumentFormat _format;
 
-        public TextEditor(Document doc)
+        private readonly User _currentUser;
+
+        public TextEditor(Document doc, User currentUser)
         {
             _document = doc;
             _format = doc.Format;
             _cursorPosition = doc.Content.Length;
+            _currentUser = currentUser;
         }
 
         public void StartEditing()
@@ -174,7 +179,8 @@ namespace DocMaster.Services
                 doc: _document,
                 pos: start,
                 length: length,
-                cursorBefore: _cursorPosition
+                cursorBefore: _cursorPosition,
+                editedBy: _currentUser.Username
             );
 
             cmd.Execute();
@@ -188,7 +194,7 @@ namespace DocMaster.Services
         private void InsertChar(char c)
         {
             var before = _cursorPosition;
-            var cmd = new TextInsertCommand(_document, _cursorPosition, c.ToString(), before);
+            var cmd = new TextInsertCommand(_document, _cursorPosition, c.ToString(), before, _currentUser.Username);
             cmd.Execute();
             _history.Push(cmd);
             _cursorPosition = cmd.CursorPositionAfter;
@@ -197,7 +203,7 @@ namespace DocMaster.Services
         private void DeleteChar(int pos)
         {
             var before = _cursorPosition;
-            var cmd = new TextDeleteCommand(_document, pos, 1, before);
+            var cmd = new TextDeleteCommand(_document, pos, 1, before, _currentUser.Username);
             cmd.Execute();
             _history.Push(cmd);
             _cursorPosition = cmd.CursorPositionAfter;
@@ -208,7 +214,7 @@ namespace DocMaster.Services
 
             int originalPosition = _cursorPosition;
 
-            var cmd = new TextInsertCommand(_document, _cursorPosition, text, originalPosition);
+            var cmd = new TextInsertCommand(_document, _cursorPosition, text, originalPosition, _currentUser.Username);
             cmd.Execute();
             _history.Push(cmd);
 
@@ -259,7 +265,8 @@ namespace DocMaster.Services
                 doc: _document,
                 pos: _cursorPosition,
                 text: text,
-                cursorBefore: _cursorPosition
+                cursorBefore: _cursorPosition,
+                editedBy: _currentUser.Username
             );
 
             cmd.Execute();
@@ -297,7 +304,7 @@ namespace DocMaster.Services
 
         private void ApplyMarkdownFormatting(int start, int end, string wrapper)
         {
-            string selectedText = _document.Content.Substring(start+1, end - start-1);
+            string selectedText = _document.Content.Substring(start + 1, end - start - 1);
             string newText = $"{wrapper}{selectedText}{wrapper}";
 
             var cmd = new TextReplaceCommand(
@@ -305,7 +312,8 @@ namespace DocMaster.Services
                 start: start,
                 end: end,
                 newText: newText,
-                cursorBefore: _cursorPosition
+                cursorBefore: _cursorPosition,
+                editedBy: _currentUser.Username
             );
 
             cmd.Execute();
@@ -368,7 +376,7 @@ namespace DocMaster.Services
         private int ProcessBold(string content, int pos)
         {
             pos += 2;
-            while (pos < content.Length+1 && !(content[pos] == '*' && content[pos + 1] == '*'))
+            while (pos < content.Length + 1 && !(content[pos] == '*' && content[pos + 1] == '*'))
             {
                 Console.Write(content[pos]);
                 pos++;
@@ -438,7 +446,7 @@ namespace DocMaster.Services
             Console.WriteLine("=== Editing Mode (ESC to exit) ===");
             Console.Write(_document.Content);
 
-            int consoleLine = 2; 
+            int consoleLine = 2;
             int consoleColumn = 0;
             int contentPos = 0;
 
@@ -481,11 +489,13 @@ public class TextReplaceCommand : ICommand
     private readonly int _end;
     private readonly string _newText;
     private readonly string _oldText;
+    private readonly string _editedBy;
+
 
     public int CursorPositionBefore { get; }
     public int CursorPositionAfter { get; }
 
-    public TextReplaceCommand(Document doc, int start, int end, string newText, int cursorBefore)
+    public TextReplaceCommand(Document doc, int start, int end, string newText, int cursorBefore, string editedBy)
     {
         _document = doc;
         _start = start;
@@ -494,6 +504,7 @@ public class TextReplaceCommand : ICommand
         _oldText = doc.Content.Substring(start, end - start);
         CursorPositionBefore = cursorBefore;
         CursorPositionAfter = start + newText.Length;
+        _editedBy = editedBy;
     }
 
     public void Execute()
@@ -501,6 +512,8 @@ public class TextReplaceCommand : ICommand
         _document.Content = _document.Content
             .Remove(_start, _end - _start)
             .Insert(_start, _newText);
+        //_document.NotifyChange(_editedBy);
+        DocumentHistoryService.AddRecord(_document, _editedBy, "replaced the text");
     }
 
     public void Undo()

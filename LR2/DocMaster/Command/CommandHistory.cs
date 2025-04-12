@@ -1,4 +1,6 @@
 ﻿using DocMaster.Models;
+using DocMaster.Roles.Observers;
+using DocMaster.Services;
 
 namespace DocMaster.Command
 {
@@ -36,22 +38,26 @@ namespace DocMaster.Command
         private readonly Document _document;
         private readonly int _position;
         private readonly string _text;
+        private readonly string _editedBy;
 
         public int CursorPositionBefore { get; }
         public int CursorPositionAfter => _position + _text.Length;
 
         //////////////////////////// Adding text to a doc ////////////////////////////
-        public TextInsertCommand(Document doc, int pos, string text, int cursorBefore)
+        public TextInsertCommand(Document doc, int pos, string text, int cursorBefore, string editedBy)
         {
             _document = doc;
             _position = pos;
             _text = text;
             CursorPositionBefore = cursorBefore;
+            _editedBy = editedBy;
         }
 
         public void Execute()
         {
             _document.Content = _document.Content.Insert(_position, _text);
+            _document.NotifyChange(_editedBy);
+            DocumentHistoryService.AddRecord(_document, _editedBy, "changed the text");
         }
 
         public void Undo()
@@ -66,11 +72,12 @@ namespace DocMaster.Command
         private readonly Document _document;
         private readonly int _position;
         private readonly string _deletedText;
+        private readonly string _editedBy;
 
         public int CursorPositionBefore { get; }
         public int CursorPositionAfter { get; }
 
-        public TextDeleteCommand(Document doc, int pos, int length, int cursorBefore)
+        public TextDeleteCommand(Document doc, int pos, int length, int cursorBefore, string editedBy)
         {
             pos = Math.Clamp(pos, 0, doc.Content.Length);
             length = Math.Clamp(length, 0, doc.Content.Length - pos);
@@ -80,6 +87,7 @@ namespace DocMaster.Command
             _deletedText = doc.Content.Substring(pos, length);
             CursorPositionBefore = cursorBefore;
             CursorPositionAfter = pos;
+            _editedBy = editedBy;
         }
 
         public void Execute()
@@ -88,6 +96,8 @@ namespace DocMaster.Command
             {
                 _document.Content = _document.Content.Remove(_position, _deletedText.Length);
             }
+            _document.NotifyChange(_editedBy);
+            DocumentHistoryService.AddRecord(_document, _editedBy, "deleted the text");
         }
 
         public void Undo()

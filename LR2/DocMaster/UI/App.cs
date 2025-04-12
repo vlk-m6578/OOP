@@ -4,6 +4,7 @@ using DocMaster.Utilities;
 using DocMaster.Models;
 using DocMaster.Services.FileService;
 using DocMaster.Services.StorageStrategies;
+using DocMaster.Roles.Observers;
 
 namespace DocMaster.UI
 {
@@ -96,7 +97,7 @@ namespace DocMaster.UI
                 int maxOption = GetMaxMenuOption();
                 int choice = InputValidator.GetIntInput(1, maxOption);
 
-                if ((maxOption == 8 && choice == 8) || (maxOption == 7 && choice == 7) || (maxOption == 3 && choice == 3))
+                if ((maxOption == 9 && choice == 9) || (maxOption == 8 && choice == 8) || (maxOption == 3 && choice == 3))
                 {
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.BackgroundColor = ConsoleColor.Black;
@@ -128,6 +129,9 @@ namespace DocMaster.UI
                         case 7 when _roleContext.CanManageUsers:
                             ManageUsers();
                             break;
+                        case 8:
+                            ShowChangeHistory();
+                            break;
 
                     }
                 }
@@ -153,6 +157,9 @@ namespace DocMaster.UI
                         case 6:
                             ChooseColor();
                             break;
+                        case 7:
+                            ShowChangeHistory();
+                            break;
                     }
                 }
                 else
@@ -171,8 +178,8 @@ namespace DocMaster.UI
         }
         private int GetMaxMenuOption() => _roleContext.CurrentRole switch
         {
-            UserRole.Admin => 8,
-            UserRole.Editor => 7,
+            UserRole.Admin => 9,
+            UserRole.Editor => 8,
             _ => 3
         };
 
@@ -287,10 +294,18 @@ namespace DocMaster.UI
                 if (int.TryParse(input, out int choice) && choice > 0 && choice <= documents.Count)
                 {
                     _currentDocument = _documentManager.OpenDocument(documents[choice - 1]);
+                    if (_currentUser.CurrentRole == UserRole.Editor || _currentUser.CurrentRole == UserRole.Admin)
+                    {
+                        _currentDocument.Subscribe(_currentUser);
+                    }
                 }
                 else
                 {
                     _currentDocument = _documentManager.OpenDocument(input);
+                    if (_currentUser.CurrentRole == UserRole.Editor || _currentUser.CurrentRole == UserRole.Admin)
+                    {
+                        _currentDocument.Subscribe(_currentUser);
+                    }
                 }
 
                 Console.WriteLine("\nDocument content:");
@@ -345,7 +360,7 @@ namespace DocMaster.UI
                 Console.ReadKey();
                 return;
             }
-            var editor = new TextEditor(_currentDocument);
+            var editor = new TextEditor(_currentDocument, _currentUser);
             editor.StartEditing();
 
             _documentManager.SaveDocument(_currentDocument);
@@ -421,7 +436,7 @@ namespace DocMaster.UI
             if (original == DocumentFormat.Markdown) formats.Add(DocumentFormat.TXT);
             return formats.Distinct().ToList();
         }
-        
+
         private void BlockDocumentForUser()
         {
             // Проверка наличия пользователей
@@ -497,6 +512,30 @@ namespace DocMaster.UI
                 Console.WriteLine("-------------------");
             }
             Console.Write("Press any key...");
+            Console.ReadKey();
+        }
+        private void ShowChangeHistory()
+        {
+            Console.Clear();
+            Console.WriteLine("=== History of changes ===");
+
+            IEnumerable<DocumentChangeRecord> records = _roleContext.CurrentRole == UserRole.Admin
+                ? DocumentHistoryService.GetFullHistory()
+                : DocumentHistoryService.GetUserHistory(_currentUser.Username);
+
+            if (!records.Any())
+            {
+                Console.WriteLine("-----> No changes were found.");
+            }
+            else
+            {
+                foreach (var record in records.OrderByDescending(r => r.ChangeTime))
+                {
+                    Console.WriteLine(record);
+                }
+            }
+
+            Console.WriteLine("\nPress any key...");
             Console.ReadKey();
         }
     }

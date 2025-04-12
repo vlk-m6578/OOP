@@ -23,7 +23,8 @@ namespace DocMaster.UI
                 Console.WriteLine("4. Edit document");
                 Console.WriteLine("5. Save document");
                 Console.WriteLine("6. System settings");
-                Console.WriteLine("7. Exit");
+                Console.WriteLine("7. History of changes");
+                Console.WriteLine("8. Exit");
             }
 
             if (role == UserRole.Admin)
@@ -35,7 +36,8 @@ namespace DocMaster.UI
                 Console.WriteLine("5. Save document");
                 Console.WriteLine("6. System settings");
                 Console.WriteLine("7. User management");
-                Console.WriteLine("8. Exit");
+                Console.WriteLine("8. History of changes");
+                Console.WriteLine("9. Exit");
             }
 
             Console.Write("Choice: ");

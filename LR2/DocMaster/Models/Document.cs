@@ -1,4 +1,5 @@
 ﻿
+using DocMaster.Roles.Observers;
 using DocMaster.Save;
 
 namespace DocMaster.Models
@@ -8,6 +9,8 @@ namespace DocMaster.Models
         public string Name { get; set; }
         public DocumentFormat Format { get; set; }
         public string Content { get; set; }
+
+        private List<IDocumentChangeObserver> _observers = new List<IDocumentChangeObserver>();
 
         public Document(string name, DocumentFormat format) 
         {
@@ -28,6 +31,24 @@ namespace DocMaster.Models
             };
 
             return adapter.Convert(this);
+        }
+        public void Subscribe(IDocumentChangeObserver observer)
+        {
+            if (!_observers.Contains(observer))
+                _observers.Add(observer);
+        }
+
+        public void Unsubscribe(IDocumentChangeObserver observer)
+        {
+            _observers.Remove(observer);
+        }
+
+        public void NotifyChange(string editedBy)
+        {
+            foreach (var observer in _observers)
+            {
+                observer.OnDocumentChanged(this, editedBy);
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using DocMaster.Services.FileService;
 using DocMaster.Models;
 using DocMaster.Save;
+using DocMaster.Roles.Observers;
 
 namespace DocMaster.Services
 {
