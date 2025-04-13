@@ -1,16 +1,20 @@
 ﻿using DocMaster.UI;
 using Microsoft.Data.Sqlite;
+using System.Runtime.InteropServices;
 public static class Program
 {
+    [DllImport("D:\\OOP\\LR2\\DocMaster\\bin\\Debug\\net8.0\\setfont.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void setFontSize(int fontSize);
+
     public static void InitializeDatabase()
     {
-        // Путь к файлу БД (можно изменить)
+        // Path to db
         string dbPath = Path.Combine(Environment.CurrentDirectory, "DocMaster.db");
 
         using var connection = new SqliteConnection($"Data Source={dbPath}");
         connection.Open();
 
-        // Создаем таблицу, если ее нет
+        // Create table
         var command = connection.CreateCommand();
         command.CommandText = @"
         CREATE TABLE IF NOT EXISTS Documents (
@@ -24,6 +28,7 @@ public static class Program
     }
     public static void Main(string[] args)
     {
+        setFontSize(1);
         InitializeDatabase();
         App app = new App();
         app.Run();
