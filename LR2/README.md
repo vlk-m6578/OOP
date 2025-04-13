@@ -104,15 +104,22 @@
 
 ## Class Diagram 🧩
 ###Command Pattern
+![CommandPattern](https://github.com/user-attachments/assets/0b55a21d-9231-4972-8c5a-8af91e076325)
 
 ###Strategy Pattern
+![StrategyPattern](https://github.com/user-attachments/assets/66c73036-837f-4d4c-8ec9-914debd522aa)
 
 ###Observer Pattern
+![ObserverPattern](https://github.com/user-attachments/assets/48454da0-c32b-4b84-aecc-b77cc305c51f)
 
 ###Adapter Pattern
+![AdapterPattern](https://github.com/user-attachments/assets/28133b53-0ad4-4da0-b86b-d09908117101)
 
 ###Singleton Pattern
+![SingletonPattern](https://github.com/user-attachments/assets/9125d69e-902c-4e2d-b9ae-376f66792905)
 
 ###Factory Pattern
+![FactoryPattern](https://github.com/user-attachments/assets/fb17d9db-0f88-40bf-93ac-a10344647201)
 
 ###Decorator Pattern
+![DecoratorPattern](https://github.com/user-attachments/assets/3de580e3-82c6-4b8c-9446-52e7b07ca494)
