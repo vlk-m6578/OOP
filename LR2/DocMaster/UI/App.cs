@@ -100,7 +100,7 @@ namespace DocMaster.UI
                 int maxOption = GetMaxMenuOption();
                 int choice = InputValidator.GetIntInput(1, maxOption);
 
-                if ((maxOption == 9 && choice == 9) || (maxOption == 8 && choice == 8) || (maxOption == 3 && choice == 3))
+                if ((maxOption == 10 && choice == 10) || (maxOption == 9 && choice == 9) || (maxOption == 3 && choice == 3))
                 {
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.BackgroundColor = ConsoleColor.Black;
@@ -124,18 +124,20 @@ namespace DocMaster.UI
                             EditDocument();
                             break;
                         case 5:
-                            SaveDocument();
+                            SearchDocument();
                             break;
                         case 6:
+                            SaveDocument();
+                            break;
+                        case 7:
                             ChooseColor();
                             break;
-                        case 7 when _roleContext.CanManageUsers:
+                        case 8 when _roleContext.CanManageUsers:
                             ManageUsers();
                             break;
-                        case 8:
+                        case 9:
                             ShowChangeHistory();
                             break;
-
                     }
                 }
                 else if (_roleContext.CurrentRole == UserRole.Editor)
@@ -155,12 +157,15 @@ namespace DocMaster.UI
                             EditDocument();
                             break;
                         case 5:
-                            SaveDocument();
+                            SearchDocument();
                             break;
                         case 6:
-                            ChooseColor();
+                            SaveDocument();
                             break;
                         case 7:
+                            ChooseColor();
+                            break;
+                        case 8:
                             ShowChangeHistory();
                             break;
                     }
@@ -181,8 +186,8 @@ namespace DocMaster.UI
         }
         private int GetMaxMenuOption() => _roleContext.CurrentRole switch
         {
-            UserRole.Admin => 9,
-            UserRole.Editor => 8,
+            UserRole.Admin => 10,
+            UserRole.Editor => 9,
             _ => 3
         };
 
@@ -552,6 +557,100 @@ namespace DocMaster.UI
 
             Console.WriteLine("\nPress any key...");
             Console.ReadKey();
+        }
+        private void SearchDocument()
+        {
+            var documents = _documentManager.GetDocumentList()
+                .Where(f => f.EndsWith(".txt") || f.EndsWith(".md"))
+                .ToList();
+
+            if (documents.Count == 0)
+            {
+                Console.WriteLine("-----> No documents found!");
+                Console.Write("Press any key...");
+                Console.ReadKey();
+                return;
+            }
+
+            Console.WriteLine("\nAvailable documents:");
+            for (int i = 0; i < documents.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {Path.GetFileName(documents[i])}");
+            }
+
+            Console.Write("Enter document number: ");
+            int docChoice = InputValidator.GetIntInput(1, documents.Count);
+            string filePath = documents[docChoice - 1];
+
+            Document doc;
+            try
+            {
+                doc = _documentManager.OpenDocument(filePath);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] Error opening document: {ex.Message}");
+                Console.ReadKey();
+                return;
+            }
+
+            Console.Write("Enter word to search: ");
+            string searchWord = Console.ReadLine().Trim();
+
+            if (string.IsNullOrEmpty(searchWord))
+            {
+                Console.WriteLine("Search word cannot be empty.");
+                Console.ReadKey();
+                return;
+            }
+
+            var matches = FindAllMatches(doc.Content, searchWord);
+
+            Console.WriteLine("\nSearch results:");
+            HighlightMatches(doc.Content, matches);
+            Console.WriteLine("\nPress any key to continue...");
+            Console.ReadKey();
+        }
+
+        private List<(int Start, int End)> FindAllMatches(string content, string searchWord)
+        {
+            var matches = new List<(int, int)>();
+            int currentIndex = 0;
+
+            while (currentIndex <= content.Length - searchWord.Length)
+            {
+                int foundIndex = content.IndexOf(searchWord, currentIndex, StringComparison.OrdinalIgnoreCase);
+                if (foundIndex == -1)
+                    break;
+
+                matches.Add((foundIndex, foundIndex + searchWord.Length - 1));
+                currentIndex = foundIndex + 1;
+            }
+
+            return matches;
+        }
+
+        private void HighlightMatches(string content, List<(int Start, int End)> matches)
+        {
+            int currentMatch = 0;
+            ConsoleColor originalColor = Console.ForegroundColor;
+
+            for (int i = 0; i < content.Length; i++)
+            {
+                if (currentMatch < matches.Count && i == matches[currentMatch].Start)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                }
+
+                Console.Write(content[i]);
+
+                if (currentMatch < matches.Count && i == matches[currentMatch].End)
+                {
+                    Console.ForegroundColor = originalColor;
+                    currentMatch++;
+                }
+            }
+            Console.ForegroundColor = originalColor;
         }
     }
 }
