@@ -1,7 +1,7 @@
 ﻿using DocMaster.Models;
 using Microsoft.Data.Sqlite;
 
-namespace DocMaster.Services.StorageStrategies
+namespace DocMaster.Data.StorageStrategies
 {
     public class DatabaseStorageStrategy : IStorageStrategy
     {

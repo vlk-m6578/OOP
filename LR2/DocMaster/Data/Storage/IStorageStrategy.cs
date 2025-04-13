@@ -1,6 +1,6 @@
 ﻿using DocMaster.Models;
 
-namespace DocMaster.Services.StorageStrategies
+namespace DocMaster.Data.StorageStrategies
 {
     public interface IStorageStrategy
     {

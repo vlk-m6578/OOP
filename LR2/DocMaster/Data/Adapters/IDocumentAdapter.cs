@@ -1,6 +1,6 @@
 ﻿using DocMaster.Models;
 
-namespace DocMaster.Save
+namespace DocMaster.Data.Adapters
 {
     public interface IDocumentAdapter
     {

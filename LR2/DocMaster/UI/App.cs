@@ -3,8 +3,8 @@ using DocMaster.Services;
 using DocMaster.Utilities;
 using DocMaster.Models;
 using DocMaster.Services.FileService;
-using DocMaster.Services.StorageStrategies;
 using DocMaster.Roles.Observers;
+using DocMaster.Data.StorageStrategies;
 
 namespace DocMaster.UI
 {

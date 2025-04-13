@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DocMaster.Services.StorageStrategies
+namespace DocMaster.Data.StorageStrategies
 {
     public class StorageStrategyFactory
     {

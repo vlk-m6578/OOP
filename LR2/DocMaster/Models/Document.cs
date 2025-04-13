@@ -1,6 +1,5 @@
-﻿
+﻿using DocMaster.Data.Adapters;
 using DocMaster.Roles.Observers;
-using DocMaster.Save;
 
 namespace DocMaster.Models
 {

@@ -1,5 +1,4 @@
-﻿
-using DocMaster.Models;
+﻿using DocMaster.Models;
 
 namespace DocMaster.Roles.Observers
 {

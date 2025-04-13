@@ -2,7 +2,7 @@
 using DocMaster.Services.FileService;
 using DocMaster.Models;
 
-namespace DocMaster.Services.StorageStrategies
+namespace DocMaster.Data.StorageStrategies
 {
     public class LocalStorageStrategy : IStorageStrategy
     {

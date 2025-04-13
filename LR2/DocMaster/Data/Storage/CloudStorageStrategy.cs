@@ -1,7 +1,7 @@
 ﻿using DocMaster.Models;
 using Microsoft.Win32;
 
-namespace DocMaster.Services.StorageStrategies
+namespace DocMaster.Data.StorageStrategies
 {
     public class CloudStorageStrategy : IStorageStrategy
     {
