@@ -1,27 +1,24 @@
 ﻿
 namespace DocMaster.Models
 {
-    public class MarkdownDecorator : TextDecorator
+    public class BoldDecorator : TextDecorator
     {
-        private readonly string _formatType;
+        public BoldDecorator(ITextComponent component) : base(component) { }
 
-        // Конструктор принимает контент и тип форматирования
-        public MarkdownDecorator(string content, string formatType)
-            : base(content)
-        {
-            _formatType = formatType.ToLower();
-        }
+        public override string GetFormattedText() => $"**{base.GetFormattedText()}**";
+    }
 
-        // Реализация форматирования
-        public override string GetFormattedContent()
-        {
-            return _formatType switch
-            {
-                "bold" => $"**{_content}**",
-                "italic" => $"*{_content}*",
-                "underline" => $"__{_content}__",
-                _ => _content // Возвращаем оригинал, если формат не распознан
-            };
-        }
+    public class ItalicDecorator : TextDecorator
+    {
+        public ItalicDecorator(ITextComponent component) : base(component) { }
+
+        public override string GetFormattedText() => $"*{base.GetFormattedText()}*";
+    }
+
+    public class UnderlineDecorator : TextDecorator
+    {
+        public UnderlineDecorator(ITextComponent component) : base(component) { }
+
+        public override string GetFormattedText() => $"__{base.GetFormattedText()}__";
     }
 }

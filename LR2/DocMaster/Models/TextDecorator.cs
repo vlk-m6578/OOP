@@ -1,9 +1,15 @@
 ﻿
-public abstract class TextDecorator
-{
-    protected string _content;
+using DocMaster.Models;
 
-    public TextDecorator(string content) => _content = content;
-    public abstract string GetFormattedContent();
+public abstract class TextDecorator : ITextComponent
+{
+    protected ITextComponent _component;
+
+    protected TextDecorator(ITextComponent component)
+    {
+        _component = component;
+    }
+
+    public virtual string GetFormattedText() => _component.GetFormattedText();
 }
 

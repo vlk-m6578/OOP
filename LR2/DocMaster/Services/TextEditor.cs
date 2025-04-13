@@ -17,9 +17,12 @@ namespace DocMaster.Services
 
         private readonly User _currentUser;
 
+        private ITextComponent _formattedDocument;
+
         public TextEditor(Document doc, User currentUser)
         {
             _document = doc;
+            _formattedDocument = doc;
             _format = doc.Format;
             _cursorPosition = doc.Content.Length;
             _currentUser = currentUser;

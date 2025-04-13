@@ -3,7 +3,7 @@ using DocMaster.Roles.Observers;
 
 namespace DocMaster.Models
 {
-    public class Document
+    public class Document : ITextComponent
     {
         public string Name { get; set; }
         public DocumentFormat Format { get; set; }
@@ -49,5 +49,6 @@ namespace DocMaster.Models
                 observer.OnDocumentChanged(this, editedBy);
             }
         }
+        public string GetFormattedText() => Content;
     }
 }

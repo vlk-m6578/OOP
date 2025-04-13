@@ -11,6 +11,8 @@ namespace DocMaster.Utilities
         // Add background color 
         public ConsoleColor BackgroundColor { get; private set; }
 
+        
+
         private AppStyleSettings()
         {
             // Default colors
