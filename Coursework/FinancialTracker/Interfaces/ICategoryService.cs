@@ -1,0 +1,12 @@
+﻿using FinancialTracker.Entities;
+
+namespace FinancialTracker.Interfaces
+{
+    public interface ICategoryService
+    {
+        Category CreateUserCategory(string name);
+        void DeleteCategory(int categoryId);
+        Category GetCategory(int categoryId);
+        List<Category> GetAllCategories();
+    }
+}

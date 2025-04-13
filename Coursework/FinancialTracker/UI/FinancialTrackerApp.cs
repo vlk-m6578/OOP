@@ -25,7 +25,7 @@ namespace FinancialTracker.UI
             while(isRun)
             {
                 _menu.ShowStartMenu();
-                var choice = InputValidator.GetIntInput(1, 3);
+                var choice = InputValidator.GetIntInput(1, 4);
 
                 switch(choice)
                 {
@@ -43,7 +43,7 @@ namespace FinancialTracker.UI
                         break;
                 }
             }
-            Console.WriteLine("\nGoodbye!");
+            Console.Write("\nGoodbye!");
             Console.ReadKey();
         }
         private void Registration()
