@@ -14,6 +14,7 @@ namespace FinancialTracker.UI
         private Menu _menu;
         private User _currentUser;
         private readonly PasswordRecoveryService _service = new PasswordRecoveryService();
+        private readonly AccountService _accountService = new AccountService();
         public FinancialTrackerApp()
         {
             _menu = new Menu();
@@ -61,7 +62,7 @@ namespace FinancialTracker.UI
                 User.Users.Add(newUser);
                 Console.WriteLine(" -----> Registration successful! Auto-login...");
                 _currentUser = newUser;
-                //ShowDashboard();
+                ShowDashboard();
             }
         }
         private void Login() 
@@ -125,6 +126,73 @@ namespace FinancialTracker.UI
             Console.WriteLine("\n -----> Password successfully reset.");
             Console.WriteLine(" -----> You can now login with your new password.");
             return;
+        }
+        private void ShowDashboard()
+        {
+            bool inDashboard = true;
+            while(inDashboard)
+            {
+                _menu.ShowDashboardMenu();
+                int choice = InputValidator.GetIntInput(1, 6);
+
+                switch (choice)
+                {
+                    case 1:
+                        ManageAccounts();
+                        break;
+                    case 2:
+
+                        break;
+                    case 3:
+
+                        break;
+                    case 4:
+
+                        break;
+                    case 5:
+
+                        break;
+                    case 6:
+                        _currentUser = null;
+                        Console.WriteLine("Successfully logged out.");
+                        inDashboard = false;
+                        break;
+                }
+            }
+        } 
+        private void ManageAccounts()
+        {
+            _menu.ShowAccountManagementMenu();
+            int choice = InputValidator.GetIntInput(0, 6);
+
+            switch (choice)
+            {
+                case 1:
+                    CreatePersonalAccount();
+                    break;
+                case 2:
+
+                    break;
+                case 0:
+                    break;
+            }
+
+        }
+        private void CreatePersonalAccount()
+        {
+            Console.Clear();
+            Console.WriteLine("=== CREATE PERSONAL ACCOUNT ===");
+
+            Console.Write("Enter account name: ");
+            var accountName = Console.ReadLine();
+
+            var newAccount = _accountService.CreatePersonalAccount(
+                name: accountName,
+                userId: _currentUser.Id
+                );
+            Console.WriteLine($"Account '{newAccount.Name}' created successfully!");
+            Console.Write("Press any key...");
+            Console.ReadKey();
         }
     }
 }

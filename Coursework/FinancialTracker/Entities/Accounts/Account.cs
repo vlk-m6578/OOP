@@ -1,6 +1,4 @@
 ﻿
-using System.Transactions;
-
 namespace FinancialTracker.Entities.Accounts
 {
     public abstract class Account
