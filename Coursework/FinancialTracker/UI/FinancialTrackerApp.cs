@@ -171,7 +171,7 @@ namespace FinancialTracker.UI
                     CreatePersonalAccount();
                     break;
                 case 2:
-
+                    EditPersonalAccount();
                     break;
                 case 0:
                     break;
@@ -193,6 +193,49 @@ namespace FinancialTracker.UI
             Console.WriteLine($"Account '{newAccount.Name}' created successfully!");
             Console.Write("Press any key...");
             Console.ReadKey();
+        }
+        private void EditPersonalAccount()
+        {
+            Console.Clear();
+            Console.WriteLine("=== EDIT PERSONAL ACCOUNT ===");
+
+            var accounts = _accountService.GetPersonalAccount(_currentUser.Id );
+            if(accounts.Count == 0)
+            {
+                Console.WriteLine("No personal accounts found!");
+                Console.Write("Press any key...");
+                Console.ReadKey();
+            }
+
+            foreach(var acc in accounts )
+            {
+                Console.WriteLine($"ID: {acc.Id} | Name: {acc.Name} | Balance: {acc.Balance:C}");
+            }
+
+            Console.Write("Enter account Id to edit: ");
+            int accountId = InputValidator.GetIntInput(1, int.MaxValue);
+
+            var account = accounts.FirstOrDefault(a => a.Id == accountId);
+            if(account == null )
+            {
+                HandleError("Account not found");
+                return;
+            }
+
+            Console.Write("Enter new sccount name: ");
+            string newName = Console.ReadLine().Trim();
+
+            if(_accountService.UpdatePersonalAccountName(accountId, newName, _currentUser.Id))
+            {
+                Console.WriteLine("Account updated successfully!");
+            }
+            else
+            {
+                HandleError("Failed to update account");
+            }
+
+            Console.WriteLine("No personal accounts found!");
+            Console.Write("Press any key...");
         }
     }
 }
