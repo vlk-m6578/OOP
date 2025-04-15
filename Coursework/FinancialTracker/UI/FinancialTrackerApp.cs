@@ -222,7 +222,7 @@ namespace FinancialTracker.UI
                 return;
             }
 
-            Console.Write("Enter new sccount name: ");
+            Console.Write("Enter new account name: ");
             string newName = Console.ReadLine().Trim();
 
             if(_accountService.UpdatePersonalAccountName(accountId, newName, _currentUser.Id))
