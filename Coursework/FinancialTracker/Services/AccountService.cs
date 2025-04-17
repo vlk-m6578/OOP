@@ -16,7 +16,7 @@ namespace FinancialTracker.Services
             _accounts.Add(account);
             return account;
         }
-        public List<PersonalAccount> GetPersonalAccount(int userId)
+        public List<PersonalAccount> GetPersonalAccounts(int userId)
         {
             return _accounts.OfType<PersonalAccount>()
                 .Where(a => a.UserId == userId)

@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FinancialTracker.Entities.Accounts;
+using System.Security.Principal;
 
 namespace FinancialTracker.UI
 {
@@ -173,6 +175,17 @@ namespace FinancialTracker.UI
                 case 2:
                     EditPersonalAccount();
                     break;
+                case 3:
+                    DeletePersonalAccount();
+                    break;
+                case 4:
+                    CreateSharedAccount();
+                    break;
+                case 5:
+                    ManageSharedAccounts();
+                    break;
+                case 6:
+                    //ViewOperationHistory();
                 case 0:
                     break;
             }
@@ -199,7 +212,7 @@ namespace FinancialTracker.UI
             Console.Clear();
             Console.WriteLine("=== EDIT PERSONAL ACCOUNT ===");
 
-            var accounts = _accountService.GetPersonalAccount(_currentUser.Id );
+            var accounts = _accountService.GetPersonalAccounts(_currentUser.Id );
             if(accounts.Count == 0)
             {
                 Console.WriteLine("No personal accounts found!");
@@ -228,6 +241,8 @@ namespace FinancialTracker.UI
             if(_accountService.UpdatePersonalAccountName(accountId, newName, _currentUser.Id))
             {
                 Console.WriteLine("Account updated successfully!");
+                Console.Write("Press any key...");
+                Console.ReadKey();
             }
             else
             {
@@ -236,6 +251,196 @@ namespace FinancialTracker.UI
 
             Console.WriteLine("No personal accounts found!");
             Console.Write("Press any key...");
+        }
+        private void DeletePersonalAccount()
+        {
+            Console.Clear();
+            Console.WriteLine("=== DELETE PERSONAL ACCOUNT ===");
+
+            var accounts = _accountService.GetPersonalAccounts(_currentUser.Id);
+            if (accounts.Count == 0) 
+            {
+                Console.WriteLine("No personal accounts found!");
+                Console.Write("Press any key...");
+                Console.ReadKey();
+            }
+
+            foreach(var a in accounts )
+            {
+                Console.WriteLine($"ID: {a.Id} | Name: {a.Name} | Balance: {a.Balance:C}");
+            }
+
+            Console.Write("Enter account ID to delete: ");
+            int accountId = InputValidator.GetIntInput(1, int.MaxValue);
+
+            if(_accountService.DeletePersonalAccount(accountId, _currentUser.Id))
+            {
+                Console.WriteLine("Account deleted successfully!");
+            }
+            else
+            {
+                HandleError("Failed to delete account. Check if balance is zero");
+            }
+            Console.Write("Press any key...");
+            Console.ReadKey();
+        }
+
+        private void CreateSharedAccount()
+        {
+            Console.Clear();
+            Console.WriteLine("=== CREATE SHARED ACCOUNT ===");
+
+            Console.Write("Enter account name: ");
+            var accountName = Console.ReadLine();
+
+            var newAccount = _accountService.CreateSharedAccount(accountName, _currentUser.Id);
+            newAccount.LogHistory(_currentUser.Id, "Account Created", $"Created by {_currentUser.Username}");
+            Console.WriteLine($"Shared account '{newAccount.Name}' created! ID: {newAccount.Id}");
+            Console.Write("Press any key...");
+            Console.ReadKey();
+        }
+        private void ManageSharedAccounts()
+        {
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("=== MANAGE SHARED ACCOUNTS ===");
+
+                var sharedAccounts = _accountService.GetSharedAccountsForUser(_currentUser.Id);
+                if(sharedAccounts.Count == 0)
+                {
+                    Console.WriteLine("No shared accounts found!");
+                    Console.Write("Press any key...");
+                    Console.ReadKey();
+                    return;
+                }
+
+                foreach (var acc in sharedAccounts)
+                {
+                    Console.WriteLine($"ID: {acc.Id} | Name: {acc.Name} | Members: {acc.MemberUserIds.Count}");
+                }
+
+                Console.Write("Enter account ID to manage (0 to back): ");
+                int accountId = InputValidator.GetIntInput(0, int.MaxValue);
+                if (accountId == 0) return;
+
+                var account = sharedAccounts.FirstOrDefault(a => a.Id == accountId) as SharedAccount;
+                if(account == null)
+                {
+                    HandleError("Account not found");
+                    continue;
+                }
+
+                ManageSharedAccount(account);
+            }
+        }
+        private void ManageSharedAccount(SharedAccount account)
+        {
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine($"=== MANAGING ACCOUNT {account.Name} ===");
+                Console.WriteLine("1. Invite Member");
+                Console.WriteLine("2. Remove Member");
+                Console.WriteLine("3. View Members");
+                Console.WriteLine("4. View History");
+                Console.WriteLine("0. Back");
+
+                int choice = InputValidator.GetIntInput(0, 4);
+                switch (choice)
+                {
+                    case 1:
+                        InviteMember(account);
+                        break;
+                    case 2:
+                        RemoveMember(account);
+                        break;
+                    case 3:
+                        ViewMembers(account);
+                        break;
+                    case 4:
+                        ViewSharedAccountHistory(account);
+                        break;
+                    case 0:
+                        return;
+                }
+            }
+        }
+        private void InviteMember(SharedAccount account)
+        {
+            Console.Write("Enter user email or username to invite: ");
+            string identifier = Console.ReadLine().Trim();
+
+            var user = User.Users.FirstOrDefault(u => u.Email == identifier || u.Username == identifier); 
+
+            if(user == null)
+            {
+                HandleError("User not found");
+                return;
+            }
+
+            account.AddMember(user.Id);
+            account.LogHistory(_currentUser.Id, "Member Invited", $"Invited user: {user.Username}");
+            Console.WriteLine($"User {user.Username} invited successfully!");
+            Console.Write("Press any key...");
+            Console.ReadKey();
+        }
+        private void ViewSharedAccountHistory(SharedAccount account)
+        {
+            Console.WriteLine("\n=== ACCOUNT HISTORY ===");
+            foreach (var entry in account.History)
+            {
+                Console.WriteLine($"[{entry.Timestamp}] {entry.Action}: {entry.Details}");
+            }
+            Console.ReadKey();
+        }
+        private void ViewOperationHistory()
+        {
+            Console.Clear();
+            Console.WriteLine("=== VIEW OPERATION HISTORY ===");
+
+            Console.Write("Enter account ID: ");
+            int accountId = InputValidator.GetIntInput(1, int.MaxValue);
+
+            var account = _accountService.GetAccountById(accountId);
+            if (account == null)
+            {
+                HandleError("Account not found");
+                return;
+            }
+
+            if (account is SharedAccount sharedAccount)
+            {
+                ViewSharedAccountHistory(sharedAccount);
+            }
+            else
+            {
+                Console.WriteLine("Personal accounts history not implemented yet");
+                Console.Write("Press any key...");
+                Console.ReadKey();
+            }
+        }
+        private void RemoveMember(SharedAccount account)
+        {
+            Console.Write("Enter user ID to remove: ");
+            int userId = InputValidator.GetIntInput(1, int.MaxValue);
+
+            if (account.RemoveMember(userId, _currentUser.Id))
+            {
+                Console.WriteLine($"User {userId} removed successfully!");
+            }
+            else
+            {
+                HandleError("Failed to remove member. Check permissions or user existence.");
+            }
+            Console.ReadKey();
+        }
+        private void ViewMembers(SharedAccount account)
+        {
+            Console.WriteLine("\n=== ACCOUNT MEMBERS ===");
+            account.ViewMembers(message => Console.WriteLine(message));
+            Console.WriteLine("\nPress any key to continue...");
+            Console.ReadKey();
         }
     }
 }

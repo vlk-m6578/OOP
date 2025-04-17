@@ -29,5 +29,33 @@ namespace FinancialTracker.Entities.Accounts
         {
             base.ApplyTransaction(transaction);
         }
+        public bool RemoveMember(int userId, int removerUserId)
+        {
+            if(userId == CreatorUserId)
+            {
+                return false;
+            }
+
+            if(removerUserId != CreatorUserId)
+            {
+                return false;
+            }
+
+            bool removed = MemberUserIds.Remove(userId);
+            if(removed)
+            {
+                LogHistory(removerUserId, "Member Removed", $"Removed user ID: {userId}");
+            }
+            return removed;
+        }
+        public void ViewMembers(Action<string> outputHandler)
+        {
+            outputHandler($"Creator: User ID: {CreatorUserId}");
+            outputHandler("Members:");
+            foreach (int memberId in MemberUserIds.Where(id => id != CreatorUserId))
+            {
+                outputHandler($"- User ID: {memberId}");
+            }
+        }
     }
 }
