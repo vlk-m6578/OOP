@@ -345,6 +345,7 @@ namespace FinancialTracker.UI
                 Console.WriteLine("3. View Members");
                 Console.WriteLine("4. View History");
                 Console.WriteLine("0. Back");
+                Console.Write("Action: ");
 
                 int choice = InputValidator.GetIntInput(0, 4);
                 switch (choice)

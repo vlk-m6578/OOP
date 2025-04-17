@@ -12,6 +12,7 @@ namespace FinancialTracker.Entities
         public string Description {  get; set; }
         public List<TransactionEditHistory> EditHistory { get; } = new List<TransactionEditHistory>();
         public TransactionType Type { get; set; }
+        public bool IsDeleted { get; set; }
         public Transaction(int id, decimal amount, int categoryId, int accountId, int userId, string description, TransactionType type) 
         {
             Id = id;

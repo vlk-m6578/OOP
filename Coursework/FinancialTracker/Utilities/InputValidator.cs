@@ -86,6 +86,30 @@ namespace FinancialTracker.Utilities
                 return password;
             }
         }
+        public static decimal GetDecimalInput(string prompt, decimal min, decimal max)
+        {
+            while (true)
+            {
+                Console.Write(prompt);
+                if (decimal.TryParse(Console.ReadLine(), out decimal result) && result >= min && result <= max)
+                {
+                    return result;
+                }
+                Console.WriteLine($"Invalid input. Enter value between {min} and {max}");
+            }
+        }
 
+        public static DateTime GetDateInput(string prompt)
+        {
+            while (true)
+            {
+                Console.Write(prompt);
+                if (DateTime.TryParse(Console.ReadLine(), out DateTime result))
+                {
+                    return result;
+                }
+                Console.WriteLine("Invalid date format. Use yyyy-MM-dd");
+            }
+        }
     }
 }

@@ -78,7 +78,7 @@ namespace FinancialTracker.UI
             Console.WriteLine("4. View Edit History");
             Console.WriteLine("5. Search Transaction");
             Console.WriteLine("0. Back");
-            Console.WriteLine("Action: ");
+            Console.Write("Action: ");
         }
         public void ShowTransactionTypeMenu()
         {
@@ -89,7 +89,7 @@ namespace FinancialTracker.UI
 
             Console.WriteLine("1. Income");
             Console.WriteLine("2. Expense");
-            Console.WriteLine("Type: ");
+            Console.Write("Type: ");
         }
         public void ShowCategoriesMenu()
         {
