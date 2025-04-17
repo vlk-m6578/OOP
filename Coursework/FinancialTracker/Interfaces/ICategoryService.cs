@@ -8,5 +8,7 @@ namespace FinancialTracker.Interfaces
         void DeleteCategory(int categoryId);
         Category GetCategory(int categoryId);
         List<Category> GetAllCategories();
+        List<Category> GetSystemCategories();
+        List<Category> GetUserCategories();
     }
 }
