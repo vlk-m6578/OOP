@@ -19,6 +19,6 @@ namespace DocMaster.Models
     {
         public UnderlineDecorator(ITextComponent component) : base(component) { }
 
-        public override string GetFormattedText() => $"__{base.GetFormattedText()}__";
+        public override string GetFormattedText() => $"~~{base.GetFormattedText()}~~";
     }
 }
