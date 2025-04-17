@@ -10,5 +10,9 @@ namespace FinancialTracker.Interfaces
         List<Transaction> GetTransactionsByAccount(int accountId);
         bool ValidateBalance(int accountId, decimal amount);
         List<Transaction> GetTransactionsByPeriod(DateTime startDate, DateTime endDate);
+        List<Transaction> GetTransactionsByUser(int userId);
+        List<Transaction> GetTransactionsByCategory(int categoryId);
+        List<Transaction> GetTransactionsByAmountRange(decimal min, decimal max);
+        List<Transaction> GetTransactionsByType(TransactionType type);
     }
 }
