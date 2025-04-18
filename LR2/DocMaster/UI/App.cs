@@ -259,7 +259,7 @@ namespace DocMaster.UI
             Console.WriteLine("Select document format: ");
             Console.WriteLine("1. TXT");
             Console.WriteLine("2. Markdown");
-            Console.WriteLine("3. RichText");
+            //Console.WriteLine("3. RichText");
             Console.Write("Choice: ");
 
             int formatChoice = InputValidator.GetIntInput(1, 3);
