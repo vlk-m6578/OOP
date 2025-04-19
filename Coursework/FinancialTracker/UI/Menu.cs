@@ -31,7 +31,7 @@ namespace FinancialTracker.UI
             Console.WriteLine("2. Transaction Management");
             Console.WriteLine("3. Categories & Budgets");
             Console.WriteLine("4. Reports");
-            Console.WriteLine("5. Profile Settings");
+            Console.WriteLine("5. Profile Settings"); //
             Console.WriteLine("6. Logout");
             Console.Write("Select section: ");
         }
@@ -47,7 +47,7 @@ namespace FinancialTracker.UI
             Console.WriteLine("3. Delete Personal Account");
             Console.WriteLine("4. Create Shared Account");
             Console.WriteLine("5. Manage Shared Accounts");
-            Console.WriteLine("6. View Operation History");
+            Console.WriteLine("6. View Operation History"); //
             Console.WriteLine("0. Back");
             Console.Write("Action: ");
         }
