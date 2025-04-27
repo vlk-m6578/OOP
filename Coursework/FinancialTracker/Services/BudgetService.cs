@@ -1,5 +1,6 @@
 ﻿using FinancialTracker.Interfaces;
 using FinancialTracker.Entities;
+using FinancialTracker.Data;
 
 namespace FinancialTracker.Services
 {
@@ -7,24 +8,31 @@ namespace FinancialTracker.Services
     {
         private static readonly List<Budget> _budgets = new List<Budget>();
         private readonly ITransactionService _transactionService;
+
+        private readonly AppDbContext _context;
+        public BudgetService(AppDbContext context)
+        {
+            _context = context;
+        }
         public BudgetService(ITransactionService transactionService)
         {
             _transactionService = transactionService;
         }
         public void SetBudgetLimit(int categoryId, decimal limit)
         {
-            var existing = _budgets.FirstOrDefault(b =>
-            b.CategoryId == categoryId &&
-            b.Month.Month == DateTime.Now.Month);
+            var currentMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            var budget = _context.Budgets
+                .FirstOrDefault(b => b.CategoryId == categoryId && b.Month == currentMonth);
 
-            if (existing != null)
+            if (budget != null)
             {
-                existing.UpdateLimit(limit);
+                budget.UpdateLimit(limit);
             }
             else
             {
-                _budgets.Add(new Budget(categoryId, limit));
+                _context.Budgets.Add(new Budget(categoryId, limit, currentMonth));
             }
+            _context.SaveChanges();
         }
         public List<Budget> GetCurrentBudgets()
         {

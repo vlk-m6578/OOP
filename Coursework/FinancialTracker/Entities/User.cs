@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.ComponentModel.DataAnnotations;
 using FinancialTracker.Interfaces;
 using FinancialTracker.Utilities;
 
@@ -6,17 +6,25 @@ namespace FinancialTracker.Entities
 {
     public class User : IAuthService
     {
-        private static int _lastId = 0;
-        public int Id { get; }
-        public string Username { get; private set; } 
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        [StringLength(20)]
+        public string Username { get; private set; }
+
+        [Required]
+        [EmailAddress]
         public string Email { get; private set; }
+
+        [Required]
         public string PasswordHash { get; private set; }
         public bool IsActive { get; private set; }
-        //List
-        //List
+
+
+        private User() { }
         public User(string username, string email)
         {
-            Id = ++_lastId;
             Username = username;
             Email = email;
             IsActive = true;
@@ -39,6 +47,6 @@ namespace FinancialTracker.Entities
         public void ActivateAccount() => IsActive = true;
         public void DeactivateAccount() => IsActive = false;
 
-        public static List<User> Users { get; } = new List<User>();
+        //public static List<User> Users { get; } = new List<User>();
     }
 }

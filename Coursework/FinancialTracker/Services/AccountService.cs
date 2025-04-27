@@ -1,4 +1,5 @@
-﻿using FinancialTracker.Entities.Accounts;
+﻿using FinancialTracker.Data;
+using FinancialTracker.Entities.Accounts;
 
 namespace FinancialTracker.Services
 {
@@ -6,30 +7,40 @@ namespace FinancialTracker.Services
     {
         private static int _accountId = 0;
         private static readonly List<Account> _accounts = new List<Account>();
+
+        private readonly AppDbContext _context;
+
+        public AccountService(AppDbContext context)
+        {
+            _context = context;
+        }
         public PersonalAccount CreatePersonalAccount(string name, int userId)
         {
-            var account = new PersonalAccount(
-                id: ++_accountId,
-                name: name,
-                userId: userId
-                );
-            _accounts.Add(account);
+            var account = new PersonalAccount(name, userId);
+            _context.Accounts.Add(account);
+            _context.SaveChanges(); // Сохраняем изменения
+
             return account;
         }
+
         public List<PersonalAccount> GetPersonalAccounts(int userId)
         {
-            return _accounts.OfType<PersonalAccount>()
+            return _context.Accounts
+                .OfType<PersonalAccount>()
                 .Where(a => a.UserId == userId)
                 .ToList();
         }
         public bool UpdatePersonalAccountName(int accountId, string newName, int userId)
         {
-            var account = _accounts.OfType<PersonalAccount>()
+            var account = _context.Accounts
+                .OfType<PersonalAccount>()
                 .FirstOrDefault(a => a.Id == accountId && a.UserId == userId);
 
             if (account == null) return false;
 
             account.Name = newName;
+            _context.SaveChanges(); // Важно сохранить изменения
+
             return true;
         }
         public bool DeletePersonalAccount(int accountId, int userId)

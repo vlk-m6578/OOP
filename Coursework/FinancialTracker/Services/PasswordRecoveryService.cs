@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FinancialTracker.Data;
+using System;
 using System.Collections.Generic;
 
 namespace FinancialTracker.Services
@@ -8,6 +9,19 @@ namespace FinancialTracker.Services
         private static readonly Dictionary<string, (string Code, DateTime Time)> _recoveryCodes = new();
         private const int CodeLength = 0;
         private const int CodeTimeMinutes = 5;
+
+        private readonly AppDbContext _context;
+
+        public PasswordRecoveryService() { }
+        public PasswordRecoveryService(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        public bool ValidateEmail(string email)
+        {
+            return _context.Users.Any(u => u.Email == email);
+        }
 
         public string GenerateRecoveryPassword(string email)
         {

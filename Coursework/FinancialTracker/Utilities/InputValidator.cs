@@ -1,10 +1,12 @@
 ﻿using System.Text.RegularExpressions;
+using FinancialTracker.Data;
 using FinancialTracker.Entities;
 
 namespace FinancialTracker.Utilities
 {
     public static class InputValidator
     {
+        static AppDbContext _context = new AppDbContext();
         public static int GetIntInput(int a, int b)
         {
             int output;
@@ -38,7 +40,7 @@ namespace FinancialTracker.Utilities
                     continue;
                 }
 
-                if(User.Users.Exists(u => u.Username == username))
+                if(_context.Users.Any(u => u.Username == username))
                 {
                     Console.WriteLine(" -----> Username already exists.");
                     continue;
@@ -58,7 +60,7 @@ namespace FinancialTracker.Utilities
 
                 if (!regex.IsMatch(email))
                     Console.WriteLine(" !!!!!> Invalid email format.");
-                else if (User.Users.Exists(u => u.Email == email))
+                else if (_context.Users.Any(u => u.Email == email))
                     Console.WriteLine(" -----> Email already exists.");
                 else
                     return email;

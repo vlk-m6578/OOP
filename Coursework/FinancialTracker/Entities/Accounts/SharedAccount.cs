@@ -8,9 +8,18 @@ namespace FinancialTracker.Entities.Accounts
 {
     public class SharedAccount : Account
     {
-        public int CreatorUserId { get; }
-        public List<int> MemberUserIds { get; } = new List<int>();
-        public List<AccountHistoryEntry> History { get; } = new List<AccountHistoryEntry>(); 
+        public int CreatorUserId { get; set; }
+        public List<int> MemberUserIds { get; set; } = new List<int>();
+        public int SharedAccountId { get; set; } // Для связи один-ко-многим
+        public List<AccountHistoryEntry> History { get; set; } = new List<AccountHistoryEntry>();
+
+        private SharedAccount() { }
+
+        public SharedAccount(string name, int creatorId) : base(name)
+        {
+            CreatorUserId = creatorId;
+            MemberUserIds.Add(creatorId);
+        }
         public SharedAccount(int id, string name, int creatorId) : base(id, name)
         {
             CreatorUserId = creatorId;

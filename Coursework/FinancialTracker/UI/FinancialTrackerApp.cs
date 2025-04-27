@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FinancialTracker.Entities.Accounts;
 using System.Security.Principal;
+using FinancialTracker.Data;
 
 namespace FinancialTracker.UI
 {
@@ -16,9 +17,14 @@ namespace FinancialTracker.UI
         private Menu _menu;
         private User _currentUser;
         private readonly PasswordRecoveryService _service = new PasswordRecoveryService();
-        private readonly AccountService _accountService = new AccountService();
+        private readonly AccountService _accountService;
+
+        private readonly AppDbContext _context;
         public FinancialTrackerApp()
         {
+            _context = new AppDbContext();
+            _context.Database.EnsureCreated(); // Создаст БД при первом запуске
+            _accountService = new AccountService(_context);
             _menu = new Menu();
         }
         public void Run()
@@ -61,7 +67,8 @@ namespace FinancialTracker.UI
             var newUser = new User(username, email);
             if (newUser.Register(password))
             {
-                User.Users.Add(newUser);
+                _context.Users.Add(newUser);
+                _context.SaveChanges(); // Сохраняем в БД
                 Console.WriteLine(" -----> Registration successful! Auto-login...");
                 _currentUser = newUser;
                 ShowDashboard();
@@ -77,12 +84,17 @@ namespace FinancialTracker.UI
             Console.Write("Enter password: ");
             string password = Console.ReadLine();
 
-            var user = User.Users.Find(u => (u.Username == login || u.Email ==  login) && u.PasswordHash == PasswordHasher.Hash(password));
+            var user = _context.Users
+            .FirstOrDefault(u => (u.Username == login || u.Email == login));
 
             if(user != null && user.IsActive) 
             {
                 _currentUser = user;
                 Console.WriteLine($"Welcome back {user.Username}!");
+                _currentUser = user;
+                Console.Write("Press any key...");
+                Console.ReadKey();
+                ShowDashboard();
             }
             else
             {
@@ -103,7 +115,7 @@ namespace FinancialTracker.UI
             Console.Write("Enter your email: ");
             var email = Console.ReadLine()?.Trim();
 
-            var user = User.Users.FirstOrDefault(u => u.Email == email);
+            var user = _context.Users.FirstOrDefault(u => u.Email == email);
             if(user == null)
             {
                 HandleError("Email not found in system.");
@@ -218,6 +230,7 @@ namespace FinancialTracker.UI
                 Console.WriteLine("No personal accounts found!");
                 Console.Write("Press any key...");
                 Console.ReadKey();
+                return;
             }
 
             foreach(var acc in accounts )
@@ -372,7 +385,7 @@ namespace FinancialTracker.UI
             Console.Write("Enter user email or username to invite: ");
             string identifier = Console.ReadLine().Trim();
 
-            var user = User.Users.FirstOrDefault(u => u.Email == identifier || u.Username == identifier); 
+            var user = _context.Users.FirstOrDefault(u => u.Email == identifier || u.Username == identifier); 
 
             if(user == null)
             {

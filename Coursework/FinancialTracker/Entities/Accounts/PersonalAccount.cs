@@ -3,15 +3,17 @@ namespace FinancialTracker.Entities.Accounts
 {
     public class PersonalAccount : Account
     {
-        public int UserId { get; }
+        public int UserId { get; set; }
+
+        private PersonalAccount() { }
         public PersonalAccount(int id, string name, int userId) : base(id, name)
         {
             UserId = userId;
         }
 
-        public override void ApplyTransaction(Transaction transaction)
+        public PersonalAccount(string name, int userId) : base(name)
         {
-
+            UserId = userId;
         }
     }
 }

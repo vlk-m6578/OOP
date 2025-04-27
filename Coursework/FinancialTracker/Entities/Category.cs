@@ -1,12 +1,31 @@
 ﻿
+using System.ComponentModel.DataAnnotations;
+
 namespace FinancialTracker.Entities
 {
     public class Category
     {
-        public int Id { get; }
-        public string Name { get; }
-        public decimal MonthlyBudgetLimit { get; private set; }
-        public bool IsSystemCategory { get; }
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        [StringLength(100)]
+        public string Name { get; set; }
+
+        public decimal MonthlyBudgetLimit { get; set; }
+
+        [Required]
+        public bool IsSystemCategory { get; set; }
+
+        // Конструктор для EF Core
+        private Category() { }
+
+        public Category(string name, bool isSystem = false)
+        {
+            Name = name;
+            IsSystemCategory = isSystem;
+            MonthlyBudgetLimit = 0;
+        }
         public Category(int id, string name, bool isSystem = false)
         {
             Id = id;

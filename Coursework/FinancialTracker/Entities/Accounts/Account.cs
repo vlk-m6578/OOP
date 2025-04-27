@@ -6,8 +6,15 @@ namespace FinancialTracker.Entities.Accounts
         public int Id { get; set; }
         public string Name { get; set; }
         public decimal Balance { get; set; }
-        public DateTime createdAt { get; set; }
+        public DateTime CreatedAt { get; set; }
         public List<Transaction> Transactions { get; } = new List<Transaction>();
+
+        protected Account() { } // Пустой конструктор для EF Core
+
+        protected Account(string name)
+        {
+            Name = name;
+        }
         protected Account(int id, string name)
         {
             Id = id;
