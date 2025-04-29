@@ -17,9 +17,20 @@ namespace FinancialTracker.Data
         public DbSet<RecoveryCode> RecoveryCodes { get; set; }
 
         public DbSet<AccountHistoryEntry> AccountHistoryEntries { get; set; }
-
         public DbSet<TransactionEditHistory> TransactionEditHistories { get; set; }
+        public DbSet<Invitation> Invitations { get; set; }
 
+        public AppDbContext()
+        {
+            try
+            {
+                Database.EnsureCreated();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Database creation error: {ex.Message}");
+            }
+        }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlite("Data Source=financial.db");
@@ -80,6 +91,21 @@ namespace FinancialTracker.Data
             modelBuilder.Entity<AccountHistoryEntry>()
                 .Property(e => e.Timestamp)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            modelBuilder.Entity<Invitation>()
+                .HasOne(i => i.SharedAccount)
+                .WithMany()
+                .HasForeignKey(i => i.SharedAccountId);
+
+            modelBuilder.Entity<Invitation>()
+                .HasOne(i => i.InvitedUser)
+                .WithMany()
+                .HasForeignKey(i => i.InvitedUserId);
+
+            modelBuilder.Entity<Invitation>()
+                .HasOne(i => i.InviterUser)
+                .WithMany()
+                .HasForeignKey(i => i.InviterUserId);
         }
     }
 }

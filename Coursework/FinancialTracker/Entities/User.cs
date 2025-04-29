@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using FinancialTracker.Entities.Accounts;
 using FinancialTracker.Interfaces;
 using FinancialTracker.Utilities;
 
@@ -29,6 +30,7 @@ namespace FinancialTracker.Entities
             Email = email;
             IsActive = true;
         }
+        public bool IsCreatorOf(SharedAccount account) => account.CreatorUserId == this.Id;
         public bool Register(string password)
         {
             PasswordHash = PasswordHasher.Hash(password);

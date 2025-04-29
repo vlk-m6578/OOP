@@ -10,6 +10,7 @@ using FinancialTracker.Entities.Accounts;
 using System.Security.Principal;
 using FinancialTracker.Data;
 using Microsoft.Identity.Client;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinancialTracker.UI
 {
@@ -98,6 +99,7 @@ namespace FinancialTracker.UI
             if(user != null && user.IsActive) 
             {
                 _currentUser = user;
+                CheckPendingInvitations();
                 Console.WriteLine($"Welcome back {user.Username}!");
                 _currentUser = user;
                 Console.Write("Press any key...");
@@ -108,6 +110,38 @@ namespace FinancialTracker.UI
             {
                 HandleError("Inactive account.");
             }
+        }
+        private void CheckPendingInvitations()
+        {
+            var pendingInvites = _context.Invitations
+                .Include(i => i.SharedAccount)  // Теперь должно работать
+                .Include(i => i.InviterUser)    // Добавляем загрузку пригласителя
+                .Where(i => i.InvitedUserId == _currentUser.Id && i.Status == InvitationStatus.Pending)
+                .ToList();
+
+            foreach (var invite in pendingInvites)
+            {
+                Console.WriteLine($"\nYou've been invited to shared account '{invite.SharedAccount.Name}' by {invite.InviterUser.Username}");
+                Console.Write("Accept invitation? (Y/N): ");
+                var response = Console.ReadLine().Trim().ToUpper();
+
+                var sharedAccount = _context.Accounts.OfType<SharedAccount>()
+                    .First(a => a.Id == invite.SharedAccountId);
+
+                if (response == "Y")
+                {
+                    invite.Status = InvitationStatus.Accepted;
+                    sharedAccount.MemberUserIds.Add(_currentUser.Id);
+                    sharedAccount.LogHistory(_currentUser.Id, "Member Joined", $"User {_currentUser.Username} accepted invitation");
+                }
+                else
+                {
+                    invite.Status = InvitationStatus.Declined;
+                    sharedAccount.LogHistory(invite.InviterUserId, "Invitation Declined", $"User {_currentUser.Username} declined invitation");
+                }
+            }
+
+            _context.SaveChanges();
         }
         private void HandleError(string message)
         {
@@ -362,55 +396,111 @@ namespace FinancialTracker.UI
         }
         private void ManageSharedAccount(SharedAccount account)
         {
+            bool isCreator = _currentUser.Id == account.CreatorUserId;
+
             while (true)
             {
                 Console.Clear();
                 Console.WriteLine($"=== MANAGING ACCOUNT {account.Name} ===");
-                Console.WriteLine("1. Invite Member");
-                Console.WriteLine("2. Remove Member");
-                Console.WriteLine("3. View Members");
-                Console.WriteLine("4. View History");
-                Console.WriteLine("0. Back");
-                Console.Write("Action: ");
 
-                int choice = InputValidator.GetIntInput(0, 4);
-                switch (choice)
+                if (isCreator)
                 {
-                    case 1:
-                        InviteMember(account);
-                        break;
-                    case 2:
-                        RemoveMember(account);
-                        break;
-                    case 3:
-                        ViewMembers(account);
-                        break;
-                    case 4:
-                        ViewSharedAccountHistory(account);
-                        break;
-                    case 0:
-                        return;
+                    Console.WriteLine("1. Invite Member");
+                    Console.WriteLine("2. Remove Member");
+                    Console.WriteLine("3. View Members");
+                    Console.WriteLine("4. View History");
+                    Console.WriteLine("5. View Pending Invitations");
+                    Console.WriteLine("0. Back");
+                    Console.Write("Action: ");
+
+                    int choice = InputValidator.GetIntInput(0, 5);
+                    switch (choice)
+                    {
+                        case 1:
+                            InviteMember(account);
+                            break;
+                        case 2:
+                            RemoveMember(account);
+                            break;
+                        case 3:
+                            ViewMembers(account);
+                            break;
+                        case 4:
+                            ViewSharedAccountHistory(account);
+                            break;
+                        case 5:
+                            ViewPendingInvitations(account);
+                            break;
+                        case 0:
+                            return;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("1. View Members");
+                    Console.WriteLine("2. View History");
+                    Console.WriteLine("3. View Pending Invitations");
+                    Console.WriteLine("0. Back");
+                    Console.Write("Action: ");
+
+                    int choice = InputValidator.GetIntInput(0, 3);
+                    switch (choice)
+                    {
+                        case 1:
+                            ViewMembers(account);
+                            break;
+                        case 2:
+                            ViewSharedAccountHistory(account);
+                            break;
+                        case 3:
+                            ViewPendingInvitations(account);
+                            break;
+                        case 0:
+                            return;
+                    }
                 }
             }
         }
         private void InviteMember(SharedAccount account)
         {
+            if (_currentUser.Id != account.CreatorUserId)
+            {
+                HandleError("Only creator can invite members");
+                return;
+            }
+
             Console.Write("Enter user email or username to invite (0 to back): ");
             string identifier = Console.ReadLine().Trim();
             if (identifier == "0") return;
 
-            var user = _context.Users.FirstOrDefault(u => u.Email == identifier || u.Username == identifier); 
+            var user = _context.Users.FirstOrDefault(u => u.Email == identifier || u.Username == identifier);
 
-            if(user == null)
+            if (user == null)
             {
                 HandleError("User not found");
                 return;
             }
 
-            account.AddMember(user.Id);
-            account.LogHistory(_currentUser.Id, "Member Invited", $"Invited user: {user.Username}");
-            Console.WriteLine($"User {user.Username} invited successfully!");
-            Console.Write("Press any key...");
+            if (_context.Invitations.Any(i => i.SharedAccountId == account.Id
+                                            && i.InvitedUserId == user.Id
+                                            && i.Status == InvitationStatus.Pending))
+            {
+                HandleError("User already has a pending invitation");
+                return;
+            }
+
+            var invitation = new Invitation
+            {
+                SharedAccountId = account.Id,
+                InvitedUserId = user.Id,
+                InviterUserId = _currentUser.Id
+            };
+
+            _context.Invitations.Add(invitation);
+            account.LogHistory(_currentUser.Id, "Invitation Sent", $"Invited user: {user.Username}");
+            _context.SaveChanges();
+
+            Console.WriteLine("Invitation sent successfully!");
             Console.ReadKey();
         }
         private void ViewSharedAccountHistory(SharedAccount account)
@@ -420,6 +510,18 @@ namespace FinancialTracker.UI
             {
                 Console.WriteLine($"[{entry.Timestamp}] {entry.Action}: {entry.Details}");
             }
+
+            // Показать отклоненные приглашения
+            var declinedInvites = _context.Invitations
+                .Where(i => i.SharedAccountId == account.Id && i.Status == InvitationStatus.Declined)
+                .ToList();
+
+            foreach (var invite in declinedInvites)
+            {
+                var user = _context.Users.Find(invite.InvitedUserId);
+                Console.WriteLine($"[{invite.Timestamp}] Invitation Declined: {user?.Username ?? "Unknown user"}");
+            }
+
             Console.ReadKey();
         }
         private void ViewOperationHistory()
@@ -451,8 +553,14 @@ namespace FinancialTracker.UI
         }
         private void RemoveMember(SharedAccount account)
         {
+            if (_currentUser.Id != account.CreatorUserId)
+            {
+                HandleError("Only creator can remove members");
+                return;
+            }
+
             Console.Write("Enter user ID to remove (0 to back): ");
-            int userId = InputValidator.GetIntInput(1, int.MaxValue);
+            int userId = InputValidator.GetIntInput(0, int.MaxValue);
             if (userId == 0) return;
 
             if (account.RemoveMember(userId, _currentUser.Id))
@@ -468,9 +576,45 @@ namespace FinancialTracker.UI
         private void ViewMembers(SharedAccount account)
         {
             Console.WriteLine("\n=== ACCOUNT MEMBERS ===");
-            account.ViewMembers(message => Console.WriteLine(message));
-            Console.WriteLine("\nPress any key to continue...");
+            account.ViewMembers(
+                message => Console.WriteLine(message),
+                userId => {
+                    var user = _context.Users.Find(userId);
+                    return user != null ? user.Username : "Unknown User";
+                }
+            );
             Console.ReadKey();
+        }
+        private void ViewPendingInvitations(SharedAccount account)
+        {
+            if (_currentUser.Id != account.CreatorUserId)
+            {
+                var userInvites = _context.Invitations
+                .Where(i => i.SharedAccountId == account.Id && i.InvitedUserId == _currentUser.Id)
+                .ToList();
+
+                Console.WriteLine("\n=== PENDING INVITATIONS ===");
+                foreach (var invite in userInvites)
+                {
+                    Console.WriteLine($"ID: {invite.Id} | User: {invite.InvitedUser.Username} | Sent: {invite.Timestamp}");
+                    
+                }
+                Console.ReadKey();
+            }
+            else
+            {
+                var pending = _context.Invitations
+                .Where(i => i.SharedAccountId == account.Id && i.Status == InvitationStatus.Pending)
+                .Include(i => i.InvitedUser)
+                .ToList();
+
+                Console.WriteLine("\n=== PENDING INVITATIONS ===");
+                foreach (var invite in pending)
+                {
+                    Console.WriteLine($"ID: {invite.Id} | User: {invite.InvitedUser.Username} | Sent: {invite.Timestamp}");
+                }
+                Console.ReadKey();
+            }
         }
     }
 }

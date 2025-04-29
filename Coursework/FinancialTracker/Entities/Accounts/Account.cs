@@ -7,7 +7,7 @@ namespace FinancialTracker.Entities.Accounts
         public string Name { get; set; }
         public decimal Balance { get; set; }
         public DateTime CreatedAt { get; set; }
-        public virtual ICollection<Transaction> Transactions { get; set; }
+       public virtual ICollection<Transaction> Transactions { get; set; }
 
         protected Account() { } // Пустой конструктор для EF Core
 

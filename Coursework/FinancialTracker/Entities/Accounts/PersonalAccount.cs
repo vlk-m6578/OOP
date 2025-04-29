@@ -6,6 +6,7 @@ namespace FinancialTracker.Entities.Accounts
         public int UserId { get; set; }
 
         private PersonalAccount() { }
+        
 
         public PersonalAccount(string name, int userId) : base(name)
         {

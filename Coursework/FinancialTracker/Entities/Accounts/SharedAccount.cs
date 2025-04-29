@@ -23,10 +23,15 @@ namespace FinancialTracker.Entities.Accounts
             CreatorUserId = creatorId;
             MemberUserIds.Add(creatorId);
         }
-        public void AddMember(int userId)
+        public bool IsCreator(int userId) => CreatorUserId == userId;
+        private void AddMember(int userId)
         {
             if (!MemberUserIds.Contains(userId))
                 MemberUserIds.Add(userId);
+        }
+        public void InviteMember(int inviterId, int invitedUserId)
+        {
+            LogHistory(inviterId, "Member Invited", $"Invited user: {invitedUserId}");
         }
         public void LogHistory(int userId, string action, string details)
         {
@@ -56,13 +61,13 @@ namespace FinancialTracker.Entities.Accounts
             }
             return removed;
         }
-        public void ViewMembers(Action<string> outputHandler)
+        public void ViewMembers(Action<string> outputHandler, Func<int, string> getUserName)
         {
-            outputHandler($"Creator: User ID: {CreatorUserId}");
+            outputHandler($"Creator: {getUserName(CreatorUserId)}");
             outputHandler("Members:");
             foreach (int memberId in MemberUserIds.Where(id => id != CreatorUserId))
             {
-                outputHandler($"- User ID: {memberId}");
+                outputHandler($"- {getUserName(memberId)} (ID: {memberId})");
             }
         }
 

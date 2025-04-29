@@ -1,5 +1,7 @@
 ﻿using FinancialTracker.Data;
+using FinancialTracker.Entities;
 using FinancialTracker.Entities.Accounts;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinancialTracker.Services
 {
@@ -77,5 +79,6 @@ namespace FinancialTracker.Services
             account.Balance += amount;
             _context.SaveChanges();
         }
+        
     }
 }
