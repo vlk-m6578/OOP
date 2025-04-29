@@ -95,15 +95,12 @@ namespace FinancialTracker.UI
         {
             Console.Clear();
             Console.WriteLine("-------------------------------------------------------------------------------------------------------------------------------------");
-            Console.WriteLine("--------------------------------------------------> Categories & Budgets <--------------------------------------------------------------");
+            Console.WriteLine("-------------------------------------------------------> Categories <----------------------------------------------------------------");
             Console.WriteLine("-------------------------------------------------------------------------------------------------------------------------------------");
 
             Console.WriteLine("1. Create Category");
             Console.WriteLine("2. Delete Category");
-            Console.WriteLine("3. Set Budget Limit");
-            Console.WriteLine("4. Edit Budget Limit");
-            Console.WriteLine("5. View Current Budgets");
-            Console.WriteLine("6. System Categories");
+            Console.WriteLine("3. View all categories");
             Console.WriteLine("0. Back");
             Console.Write("Action: ");
         }

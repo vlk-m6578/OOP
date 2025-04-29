@@ -32,7 +32,6 @@ namespace FinancialTracker.Utilities
             }
             return report;
         }
-
         private string GetCategoryName(int categoryId)
         {
             return _context.Categories

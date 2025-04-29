@@ -26,6 +26,7 @@ namespace FinancialTracker.Entities
             IsSystemCategory = isSystem;
             MonthlyBudgetLimit = 0;
         }
+        public Category(string name) : this(name, false) { }
         public void SetBudgetLimit(decimal limit) => MonthlyBudgetLimit = limit;
     }
 }

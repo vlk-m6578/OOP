@@ -1,15 +1,8 @@
 ﻿using FinancialTracker.Entities;
 using FinancialTracker.Utilities;
 using FinancialTracker.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FinancialTracker.Entities.Accounts;
-using System.Security.Principal;
 using FinancialTracker.Data;
-using Microsoft.Identity.Client;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinancialTracker.UI
@@ -20,6 +13,7 @@ namespace FinancialTracker.UI
         private User _currentUser;
         private readonly PasswordRecoveryService _service;
         private readonly AccountService _accountService;
+        private readonly CategoryService _categoryService;
 
         private readonly AppDbContext _context;
         public FinancialTrackerApp()
@@ -28,6 +22,7 @@ namespace FinancialTracker.UI
             _context.Database.EnsureCreated(); // Создаст БД при первом запуске
             _accountService = new AccountService(_context);
             _service = new PasswordRecoveryService(_context);
+            _categoryService = new CategoryService(_context);
             _menu = new Menu();
         }
         public void Run()
@@ -200,7 +195,7 @@ namespace FinancialTracker.UI
 
                         break;
                     case 3:
-
+                        ManageCategories();
                         break;
                     case 4:
 
@@ -615,6 +610,98 @@ namespace FinancialTracker.UI
                 }
                 Console.ReadKey();
             }
+        }
+
+        ///////////////////////////////////////////////////// CATEGORIES MANAGEMENT ////////////////////////////////////////////////
+        
+        private void ManageCategories()
+        {
+            while (true)
+            {
+                Console.Clear();
+                _menu.ShowCategoriesMenu();
+
+                var choice = InputValidator.GetIntInput(0, 3);
+
+                switch (choice)
+                {
+                    case 1:
+                        CreateUserCategory();
+                        break;
+                    case 2:
+                        DeleteUserCategory();
+                        break;
+                    case 3:
+                        ViewAllCategories();
+                        break;
+                    case 0:
+                        return;
+                }
+            }
+        }
+        private void CreateUserCategory()
+        {
+            Console.Write("Enter the name of the new category (0 to back): ");
+            var name = Console.ReadLine().Trim();
+            if (name == "0") return;
+
+            try
+            {
+                var category = _categoryService.CreateUserCategory(name);
+                Console.WriteLine($"Category '{category.Name}' has been created!");
+            }
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+            Console.ReadKey();
+        }
+
+        private void DeleteUserCategory()
+        {
+            var userCategories = _categoryService.GetUserCategories();
+
+            Console.WriteLine("Available categories to delete:");
+            foreach (var category in userCategories)
+            {
+                Console.WriteLine($"{category.Id}. {category.Name}");
+            }
+
+            Console.Write("Enter the category ID to delete (0 to back): ");
+            var categoryId = InputValidator.GetIntInput(0, int.MaxValue);
+
+            if (categoryId == 0) return;
+
+            try
+            {
+                _categoryService.DeleteCategory(categoryId);
+                Console.WriteLine("Category has been deleted!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+            Console.ReadKey();
+        }
+
+        private void ViewAllCategories()
+        {
+            var categories = _categoryService.GetAllCategories();
+
+            Console.WriteLine("\n=== ALL CATEGORIES ===");
+            Console.WriteLine("Системные категории:");
+            foreach (var category in categories.Where(c => c.IsSystemCategory))
+            {
+                Console.WriteLine($"- {category.Name}");
+            }
+
+            Console.WriteLine("\nCustom Categories:");
+            foreach (var category in categories.Where(c => !c.IsSystemCategory))
+            {
+                Console.WriteLine($"- {category.Name}");
+            }
+
+            Console.ReadKey();
         }
     }
 }

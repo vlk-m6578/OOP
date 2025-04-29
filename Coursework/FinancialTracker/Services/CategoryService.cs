@@ -37,19 +37,20 @@ namespace FinancialTracker.Services
         {
             if (!_context.Categories.Any())
             {
-                _context.Categories.AddRange(
+                var systemCategories = new List<Category>
+                {
                     new Category("Food", true),
                     new Category("Transport", true),
                     new Category("Housing", true),
-                    new Category("Services", true),
-                    new Category("Cafe", true),
-                    new Category("Entertainment", true)
-                );
+                    new Category("Utilities", true),
+                    new Category("Health", true),
+                    new Category("Education", true)
+                };
+
+                _context.Categories.AddRange(systemCategories);
                 _context.SaveChanges();
             }
         }
-
-        //private static int _categoryId = 6;
         public Category CreateUserCategory(string name)
         {
             if (_context.Categories.Any(c => c.Name == name))
@@ -63,8 +64,10 @@ namespace FinancialTracker.Services
         public void DeleteCategory(int categoryId)
         {
             var category = _context.Categories.FirstOrDefault(c => c.Id == categoryId);
-            if (category?.IsSystemCategory == true)
-                throw new InvalidOperationException("Cannot delete system category");
+
+            if (category == null) return;
+            if (category.IsSystemCategory)
+                throw new InvalidOperationException("You can't delete a system category.");
 
             _context.Categories.Remove(category);
             _context.SaveChanges();
@@ -72,13 +75,26 @@ namespace FinancialTracker.Services
         public Category GetCategory(int categoryId) =>
         _context.Categories.FirstOrDefault(c => c.Id == categoryId);
 
-        //public List<Category> GetAllCategories() => _categories;
+        public List<Category> GetAllCategories()
+        {
+            return _context.Categories.OrderBy(c => c.Name).ToList();
+        }
 
-        //public List<Category> GetSystemCategories() =>
-        //    _categories.Where(c => c.IsSystemCategory).ToList();
+        public List<Category> GetSystemCategories()
+        {
+            return _context.Categories
+                .Where(c => c.IsSystemCategory)
+                .OrderBy(c => c.Name)
+                .ToList();
+        }
 
-        //public List<Category> GetUserCategories() =>
-        //    _categories.Where(c => !c.IsSystemCategory).ToList();
+        public List<Category> GetUserCategories()
+        {
+            return _context.Categories
+                .Where(c => !c.IsSystemCategory)
+                .OrderBy(c => c.Name)
+                .ToList();
+        }
 
     }
 }
