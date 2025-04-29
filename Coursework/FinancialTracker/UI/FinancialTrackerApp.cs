@@ -277,7 +277,7 @@ namespace FinancialTracker.UI
             }
 
             Console.Write("Enter account Id to edit (0 to back): ");
-            int accountId = InputValidator.GetIntInput(1, int.MaxValue);
+            int accountId = InputValidator.GetIntInput(0, int.MaxValue);
             if (accountId == 0) return;
 
             var account = accounts.FirstOrDefault(a => a.Id == accountId);
@@ -689,7 +689,7 @@ namespace FinancialTracker.UI
             var categories = _categoryService.GetAllCategories();
 
             Console.WriteLine("\n=== ALL CATEGORIES ===");
-            Console.WriteLine("Системные категории:");
+            Console.WriteLine("System categories:");
             foreach (var category in categories.Where(c => c.IsSystemCategory))
             {
                 Console.WriteLine($"- {category.Name}");
