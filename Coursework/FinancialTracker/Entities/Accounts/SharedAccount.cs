@@ -1,4 +1,6 @@
-﻿using System;
+﻿using FinancialTracker.Data;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,16 +13,12 @@ namespace FinancialTracker.Entities.Accounts
         public int CreatorUserId { get; set; }
         public List<int> MemberUserIds { get; set; } = new List<int>();
         public int SharedAccountId { get; set; } // Для связи один-ко-многим
+        private readonly AppDbContext _context;
         public List<AccountHistoryEntry> History { get; set; } = new List<AccountHistoryEntry>();
 
         private SharedAccount() { }
 
         public SharedAccount(string name, int creatorId) : base(name)
-        {
-            CreatorUserId = creatorId;
-            MemberUserIds.Add(creatorId);
-        }
-        public SharedAccount(int id, string name, int creatorId) : base(id, name)
         {
             CreatorUserId = creatorId;
             MemberUserIds.Add(creatorId);
@@ -33,6 +31,7 @@ namespace FinancialTracker.Entities.Accounts
         public void LogHistory(int userId, string action, string details)
         {
             History.Add(new AccountHistoryEntry(userId, action, details));
+            _context.SaveChanges();
         }
         public override void ApplyTransaction(Transaction transaction)
         {
@@ -65,6 +64,11 @@ namespace FinancialTracker.Entities.Accounts
             {
                 outputHandler($"- User ID: {memberId}");
             }
+        }
+
+        public bool CanEditTransaction(int userId)
+        {
+            return MemberUserIds.Contains(userId);
         }
     }
 }

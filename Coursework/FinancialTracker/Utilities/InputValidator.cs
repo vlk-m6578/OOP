@@ -31,10 +31,12 @@ namespace FinancialTracker.Utilities
 
             while (true)
             {
-                Console.Write("Enter username (min 6 chars): ");
+                Console.Write("Enter username (min 6 chars)/(0 to back): ");
                 username = Console.ReadLine()?.Trim();
 
-                if(string.IsNullOrEmpty(username) || !regex.IsMatch(username))
+                if (username == "0") return "0";
+
+                if (string.IsNullOrEmpty(username) || !regex.IsMatch(username))
                 {
                     Console.WriteLine(" !!!!!> Invalid username. Must be at least 6 characters (letters, numbers, '_'). ");
                     continue;

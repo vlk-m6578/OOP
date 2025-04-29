@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using FinancialTracker.Entities.Accounts;
 using System.Security.Principal;
 using FinancialTracker.Data;
+using Microsoft.Identity.Client;
 
 namespace FinancialTracker.UI
 {
@@ -16,7 +17,7 @@ namespace FinancialTracker.UI
     {
         private Menu _menu;
         private User _currentUser;
-        private readonly PasswordRecoveryService _service = new PasswordRecoveryService();
+        private readonly PasswordRecoveryService _service;
         private readonly AccountService _accountService;
 
         private readonly AppDbContext _context;
@@ -25,6 +26,7 @@ namespace FinancialTracker.UI
             _context = new AppDbContext();
             _context.Database.EnsureCreated(); // Создаст БД при первом запуске
             _accountService = new AccountService(_context);
+            _service = new PasswordRecoveryService(_context);
             _menu = new Menu();
         }
         public void Run()
@@ -61,14 +63,17 @@ namespace FinancialTracker.UI
             Console.WriteLine("========================================================= REGISTRATION ==============================================================");
 
             var username = InputValidator.GetValidUsername();
+            if (username == "0") return;
             var email = InputValidator.GetValidEmail();
+            if (email == "0") return;
             var password = InputValidator.GetValidPassword();
+            if (password == "0") return;
 
             var newUser = new User(username, email);
             if (newUser.Register(password))
             {
                 _context.Users.Add(newUser);
-                _context.SaveChanges(); // Сохраняем в БД
+                _context.SaveChanges();
                 Console.WriteLine(" -----> Registration successful! Auto-login...");
                 _currentUser = newUser;
                 ShowDashboard();
@@ -79,10 +84,13 @@ namespace FinancialTracker.UI
             Console.Clear();
             Console.WriteLine("================================================================ LOGIN ==============================================================");
 
-            Console.Write("Enter username/email: ");
+            Console.Write("Enter username/email (0 to back): ");
             string login = Console.ReadLine();
+            if (login == "0") return;
+
             Console.Write("Enter password: ");
             string password = Console.ReadLine();
+            if (password == "0") return;
 
             var user = _context.Users
             .FirstOrDefault(u => (u.Username == login || u.Email == login));
@@ -208,8 +216,9 @@ namespace FinancialTracker.UI
             Console.Clear();
             Console.WriteLine("=== CREATE PERSONAL ACCOUNT ===");
 
-            Console.Write("Enter account name: ");
+            Console.Write("Enter account name (0 to back): ");
             var accountName = Console.ReadLine();
+            if (accountName == "0") return;
 
             var newAccount = _accountService.CreatePersonalAccount(
                 name: accountName,
@@ -238,8 +247,9 @@ namespace FinancialTracker.UI
                 Console.WriteLine($"ID: {acc.Id} | Name: {acc.Name} | Balance: {acc.Balance:C}");
             }
 
-            Console.Write("Enter account Id to edit: ");
+            Console.Write("Enter account Id to edit (0 to back): ");
             int accountId = InputValidator.GetIntInput(1, int.MaxValue);
+            if (accountId == 0) return;
 
             var account = accounts.FirstOrDefault(a => a.Id == accountId);
             if(account == null )
@@ -250,8 +260,9 @@ namespace FinancialTracker.UI
 
             Console.Write("Enter new account name: ");
             string newName = Console.ReadLine().Trim();
+            if (newName == "0") return;
 
-            if(_accountService.UpdatePersonalAccountName(accountId, newName, _currentUser.Id))
+            if (_accountService.UpdatePersonalAccountName(accountId, newName, _currentUser.Id))
             {
                 Console.WriteLine("Account updated successfully!");
                 Console.Write("Press any key...");
@@ -283,10 +294,11 @@ namespace FinancialTracker.UI
                 Console.WriteLine($"ID: {a.Id} | Name: {a.Name} | Balance: {a.Balance:C}");
             }
 
-            Console.Write("Enter account ID to delete: ");
+            Console.Write("Enter account ID to delete (0 to back): ");
             int accountId = InputValidator.GetIntInput(1, int.MaxValue);
+            if (accountId == 0) return;
 
-            if(_accountService.DeletePersonalAccount(accountId, _currentUser.Id))
+            if (_accountService.DeletePersonalAccount(accountId, _currentUser.Id))
             {
                 Console.WriteLine("Account deleted successfully!");
             }
@@ -303,8 +315,9 @@ namespace FinancialTracker.UI
             Console.Clear();
             Console.WriteLine("=== CREATE SHARED ACCOUNT ===");
 
-            Console.Write("Enter account name: ");
+            Console.Write("Enter account name (0 to back): ");
             var accountName = Console.ReadLine();
+            if (accountName == "0") return;
 
             var newAccount = _accountService.CreateSharedAccount(accountName, _currentUser.Id);
             newAccount.LogHistory(_currentUser.Id, "Account Created", $"Created by {_currentUser.Username}");
@@ -382,8 +395,9 @@ namespace FinancialTracker.UI
         }
         private void InviteMember(SharedAccount account)
         {
-            Console.Write("Enter user email or username to invite: ");
+            Console.Write("Enter user email or username to invite (0 to back): ");
             string identifier = Console.ReadLine().Trim();
+            if (identifier == "0") return;
 
             var user = _context.Users.FirstOrDefault(u => u.Email == identifier || u.Username == identifier); 
 
@@ -413,8 +427,9 @@ namespace FinancialTracker.UI
             Console.Clear();
             Console.WriteLine("=== VIEW OPERATION HISTORY ===");
 
-            Console.Write("Enter account ID: ");
+            Console.Write("Enter account ID (0 to back): ");
             int accountId = InputValidator.GetIntInput(1, int.MaxValue);
+            if (accountId == 0) return;
 
             var account = _accountService.GetAccountById(accountId);
             if (account == null)
@@ -436,8 +451,9 @@ namespace FinancialTracker.UI
         }
         private void RemoveMember(SharedAccount account)
         {
-            Console.Write("Enter user ID to remove: ");
+            Console.Write("Enter user ID to remove (0 to back): ");
             int userId = InputValidator.GetIntInput(1, int.MaxValue);
+            if (userId == 0) return;
 
             if (account.RemoveMember(userId, _currentUser.Id))
             {

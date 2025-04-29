@@ -14,35 +14,42 @@ namespace FinancialTracker.Services
             InitializeSystemCategories();
         }
 
+        //private void InitializeSystemCategories()
+        //{
+        //    if (!_context.Categories.Any())
+        //    {
+        //        var systemCategories = new List<Category>
+        //    {
+        //        new Category("Food", true),
+        //        new Category("Transport", true),
+        //        new Category("Housing", true),
+        //        new Category("Services", true),
+        //        new Category("Cafe", true),
+        //        new Category("Entertainment", true)
+        //    };
+
+        //        _context.Categories.AddRange(systemCategories);
+        //        _context.SaveChanges();
+        //    }
+        //}
+
         private void InitializeSystemCategories()
         {
             if (!_context.Categories.Any())
             {
-                var systemCategories = new List<Category>
-            {
-                new Category("Food", true),
-                new Category("Transport", true),
-                new Category("Housing", true),
-                new Category("Services", true),
-                new Category("Cafe", true),
-                new Category("Entertainment", true)
-            };
-
-                _context.Categories.AddRange(systemCategories);
+                _context.Categories.AddRange(
+                    new Category("Food", true),
+                    new Category("Transport", true),
+                    new Category("Housing", true),
+                    new Category("Services", true),
+                    new Category("Cafe", true),
+                    new Category("Entertainment", true)
+                );
                 _context.SaveChanges();
             }
         }
 
-        private static readonly List<Category> _categories = new List<Category>
-        {
-            new Category(1, "Food", true),
-            new Category(2, "Transport", true),
-            new Category(3, "Housing", true),
-            new Category(4, "Servicees", true),
-            new Category(5, "Cafe", true),
-            new Category(6, "Entertainment", true)
-        };
-        private static int _categoryId = 6;
+        //private static int _categoryId = 6;
         public Category CreateUserCategory(string name)
         {
             if (_context.Categories.Any(c => c.Name == name))
@@ -55,26 +62,23 @@ namespace FinancialTracker.Services
         }
         public void DeleteCategory(int categoryId)
         {
-            var category = _categories.FirstOrDefault(c => c.Id == categoryId);
-            if (category == null) return;
+            var category = _context.Categories.FirstOrDefault(c => c.Id == categoryId);
+            if (category?.IsSystemCategory == true)
+                throw new InvalidOperationException("Cannot delete system category");
 
-            if (category.IsSystemCategory)
-            {
-                throw new InvalidOperationException("Cannot delete system categories");
-            }
-
-            _categories.Remove(category);
+            _context.Categories.Remove(category);
+            _context.SaveChanges();
         }
         public Category GetCategory(int categoryId) =>
-        _categories.FirstOrDefault(c => c.Id == categoryId);
+        _context.Categories.FirstOrDefault(c => c.Id == categoryId);
 
-        public List<Category> GetAllCategories() => _categories;
+        //public List<Category> GetAllCategories() => _categories;
 
-        public List<Category> GetSystemCategories() =>
-            _categories.Where(c => c.IsSystemCategory).ToList();
+        //public List<Category> GetSystemCategories() =>
+        //    _categories.Where(c => c.IsSystemCategory).ToList();
 
-        public List<Category> GetUserCategories() =>
-            _categories.Where(c => !c.IsSystemCategory).ToList();
+        //public List<Category> GetUserCategories() =>
+        //    _categories.Where(c => !c.IsSystemCategory).ToList();
 
     }
 }

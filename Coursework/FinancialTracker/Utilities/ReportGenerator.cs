@@ -1,5 +1,7 @@
 ﻿using FinancialTracker.Interfaces;
 using FinancialTracker.Entities;
+using Microsoft.EntityFrameworkCore;
+using FinancialTracker.Data;
 
 namespace FinancialTracker.Utilities
 {
@@ -7,8 +9,10 @@ namespace FinancialTracker.Utilities
     {
         private readonly ITransactionService _transactionService;
         private readonly ICategoryService _categoryService;
-        public ReportGenerator(ITransactionService transactionService, ICategoryService categoryService)
+        private readonly AppDbContext _context;
+        public ReportGenerator(AppDbContext context, ITransactionService transactionService, ICategoryService categoryService)
         {
+            _context = context;
             _transactionService = transactionService;
             _categoryService = categoryService;
         }
@@ -17,17 +21,23 @@ namespace FinancialTracker.Utilities
             var report = new Report(startDate, endDate);
             var transactions = _transactionService.GetTransactionsByPeriod(startDate, endDate);
 
-            foreach(var transaction in transactions )
+            foreach (var transaction in transactions)
             {
-                var category = _categoryService.GetCategory(transaction.CategoryId);
-                var amount = transaction.Type == TransactionType.Income ? transaction.Amount : -transaction.Amount;
+                var category = _context.Categories.FirstOrDefault(c => c.Id == transaction.CategoryId);
                 report.AddCategoryData(
-                        transaction.CategoryId,
-                        transaction.Type == TransactionType.Income ? transaction.Amount : 0,
-                        transaction.Type == TransactionType.Expense ? Math.Abs(transaction.Amount) : 0
-                        );
+                    transaction.CategoryId,
+                    transaction.Type == TransactionType.Income ? transaction.Amount : 0,
+                    transaction.Type == TransactionType.Expense ? Math.Abs(transaction.Amount) : 0
+                );
             }
             return report;
+        }
+
+        private string GetCategoryName(int categoryId)
+        {
+            return _context.Categories
+                .FirstOrDefault(c => c.Id == categoryId)?
+                .Name ?? "Unknown";
         }
     }
 }

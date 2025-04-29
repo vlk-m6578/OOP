@@ -6,13 +6,13 @@ namespace FinancialTracker.Services
 {
     public class PasswordRecoveryService
     {
-        private static readonly Dictionary<string, (string Code, DateTime Time)> _recoveryCodes = new();
+        
         private const int CodeLength = 0;
         private const int CodeTimeMinutes = 5;
 
         private readonly AppDbContext _context;
 
-        public PasswordRecoveryService() { }
+        //public PasswordRecoveryService() { }
         public PasswordRecoveryService(AppDbContext context)
         {
             _context = context;
@@ -25,17 +25,31 @@ namespace FinancialTracker.Services
 
         public string GenerateRecoveryPassword(string email)
         {
-            var random = new Random();
-            var code = random.Next(100000, 999999).ToString();
-            _recoveryCodes[email] = (code, DateTime.Now.AddMinutes(CodeTimeMinutes));
-
+            var code = new Random().Next(100000, 999999).ToString();
+            _context.RecoveryCodes.Add(new RecoveryCode
+            {
+                Email = email,
+                Code = code,
+                ExpiresAt = DateTime.Now.AddMinutes(15)
+            });
+            _context.SaveChanges();
             return code;
         }
         public bool ValidateCode(string email, string code)
         {
-            if(!_recoveryCodes.TryGetValue(email, out var codeAndTime)) return false;
-            if(DateTime.Now > codeAndTime.Time) return false;
-            return codeAndTime.Code == code;
+            return _context.RecoveryCodes.Any(rc =>
+            rc.Email == email &&
+            rc.Code == code &&
+            rc.ExpiresAt > DateTime.Now
+            );
         }
+    }
+
+    public class RecoveryCode
+    {
+        public int Id { get; set; }
+        public string Email { get; set; }
+        public string Code { get; set; }
+        public DateTime ExpiresAt { get; set; }
     }
 }

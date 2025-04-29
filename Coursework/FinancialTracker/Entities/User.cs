@@ -46,7 +46,5 @@ namespace FinancialTracker.Entities
         }
         public void ActivateAccount() => IsActive = true;
         public void DeactivateAccount() => IsActive = false;
-
-        //public static List<User> Users { get; } = new List<User>();
     }
 }

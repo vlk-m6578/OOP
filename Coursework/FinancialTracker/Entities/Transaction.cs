@@ -47,17 +47,6 @@ namespace FinancialTracker.Entities
             Description = description;
             Type = type;
         }
-        public Transaction(int id, decimal amount, int categoryId, int accountId, int userId, string description, TransactionType type) 
-        {
-            Id = id;
-            Date = DateTime.Now;
-            CategoryId = categoryId;
-            AccountId = accountId;
-            Amount = amount;
-            CreatedByUserId = userId;
-            Description = description;
-            Type = type;
-        }
         public void Update(decimal newAmount, int newCategoryId, string newDescription, int editorId)
         {
             EditHistory.Add(new TransactionEditHistory(

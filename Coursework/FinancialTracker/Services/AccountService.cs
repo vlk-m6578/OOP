@@ -5,8 +5,6 @@ namespace FinancialTracker.Services
 {
     public class AccountService
     {
-        private static int _accountId = 0;
-        private static readonly List<Account> _accounts = new List<Account>();
 
         private readonly AppDbContext _context;
 
@@ -18,7 +16,7 @@ namespace FinancialTracker.Services
         {
             var account = new PersonalAccount(name, userId);
             _context.Accounts.Add(account);
-            _context.SaveChanges(); // Сохраняем изменения
+            _context.SaveChanges();
 
             return account;
         }
@@ -45,33 +43,39 @@ namespace FinancialTracker.Services
         }
         public bool DeletePersonalAccount(int accountId, int userId)
         {
-            var account = _accounts.OfType<PersonalAccount>()
+            var account = _context.Accounts
+                .OfType<PersonalAccount>()
                 .FirstOrDefault(a => a.Id == accountId && a.UserId == userId);
 
             if (account == null || account.Balance != 0) return false;
 
-            _accounts.Remove(account);
+            _context.Accounts.Remove(account);
+            _context.SaveChanges();
             return true;
         }
         public SharedAccount CreateSharedAccount(string name, int creatorId)
         {
-            var account = new SharedAccount(
-                id: ++_accountId,
-                name: name,
-                creatorId: creatorId
-                );
-            _accounts.Add(account);
+            var account = new SharedAccount(name, creatorId);
+            _context.Accounts.Add(account);
+            _context.SaveChanges();
             return account;
         }
         public List<SharedAccount> GetSharedAccountsForUser(int userId)
         {
-            return _accounts.OfType<SharedAccount>()
-                .Where(a => a.CreatorUserId == userId && a.MemberUserIds.Contains(userId))
+            return _context.Accounts
+                .OfType<SharedAccount>()
+                .Where(a => a.MemberUserIds.Contains(userId))
                 .ToList();
         }
         public Account GetAccountById(int accountId)
         {
-            return _accounts.FirstOrDefault(a => a.Id == accountId);
+            return _context.Accounts.FirstOrDefault(a => a.Id == accountId);
+        }
+        public void UpdateAccountBalance(int accountId, decimal amount)
+        {
+            var account = _context.Accounts.Find(accountId);
+            account.Balance += amount;
+            _context.SaveChanges();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using FinancialTracker.Entities;
 using FinancialTracker.Entities.Accounts;
+using FinancialTracker.Services;
 
 namespace FinancialTracker.Data
 {
@@ -13,8 +14,11 @@ namespace FinancialTracker.Data
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Budget> Budgets { get; set; }
+        public DbSet<RecoveryCode> RecoveryCodes { get; set; }
 
         public DbSet<AccountHistoryEntry> AccountHistoryEntries { get; set; }
+
+        public DbSet<TransactionEditHistory> TransactionEditHistories { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -49,6 +53,11 @@ namespace FinancialTracker.Data
                 .HasOne<SharedAccount>()
                 .WithMany(a => a.History)
                 .HasForeignKey("SharedAccountId");
+
+            modelBuilder.Entity<TransactionEditHistory>()
+                .HasOne<Transaction>()
+                .WithMany(t => t.EditHistory)
+                .HasForeignKey(e => e.Id);
 
             modelBuilder.Entity<Budget>()
             .HasOne<Category>()

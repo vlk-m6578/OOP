@@ -4,14 +4,12 @@ namespace FinancialTracker.Entities
 {
     public class Report : IReportService
     {
-        private static int _lastId = 0;
-        public int Id { get;}
+        public int Id { get; set; }
         public DateTime StartDate { get; }
         public DateTime EndDate { get; }
         public Dictionary<int, CategoryTotal> CategoryTotals { get; } = new Dictionary<int, CategoryTotal>();
         public Report(DateTime startDate, DateTime endDate) 
         {
-            Id = ++_lastId;
             StartDate = startDate;
             EndDate = endDate;
         }
