@@ -1,5 +1,6 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FinancialTracker.Entities
 {
@@ -7,6 +8,9 @@ namespace FinancialTracker.Entities
     {
         [Key]
         public int Id { get; set; }
+
+        [Required]
+        public int TransactionId { get; set; }
 
         [Required]
         public DateTime EditedAt { get; set; }
@@ -30,13 +34,17 @@ namespace FinancialTracker.Entities
 
         public string NewDescription { get; set; }
 
-        // Конструктор для EF Core
-        private TransactionEditHistory() { }
+        [ForeignKey("TransactionId")]
+        public virtual Transaction Transaction { get; set; }
 
-        public TransactionEditHistory(int editorId, decimal oldAmount, decimal newAmount,
+        // Конструктор для EF Core
+        public TransactionEditHistory() { }
+
+        public TransactionEditHistory(int transactionId, int editorId, decimal oldAmount, decimal newAmount,
                                      int oldCategory, int newCategory,
                                      string oldDesc, string newDesc)
         {
+            TransactionId = transactionId;
             EditedAt = DateTime.Now;
             EditedByUserId = editorId;
             OldAmount = oldAmount;

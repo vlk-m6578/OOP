@@ -1,5 +1,7 @@
 ﻿
+using FinancialTracker.Entities.Accounts;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FinancialTracker.Entities
 {
@@ -33,8 +35,12 @@ namespace FinancialTracker.Entities
 
         public bool IsDeleted { get; set; }
 
+        [ForeignKey("CategoryId")]
+        public virtual Category Category { get; set; }
+
+        public Account Account { get; set; }
         // Конструктор для EF Core
-        private Transaction() { }
+        public Transaction() { }
 
         public Transaction(decimal amount, int categoryId, int accountId, int userId,
                           string description, TransactionType type)
@@ -50,11 +56,16 @@ namespace FinancialTracker.Entities
         public void Update(decimal newAmount, int newCategoryId, string newDescription, int editorId)
         {
             EditHistory.Add(new TransactionEditHistory(
-                editorId,
-                Amount, newAmount,
-                CategoryId, newCategoryId,
-                Description, newDescription
-                ));
+                transactionId: this.Id,      // Добавляем ID текущей транзакции
+                editorId: editorId,          // ID редактора
+                oldAmount: this.Amount,
+                newAmount: newAmount,
+                oldCategory: this.CategoryId,
+                newCategory: newCategoryId,
+                oldDesc: this.Description,
+                newDesc: newDescription      // Добавляем недостающий параметр
+        ));
+
             Amount = newAmount;
             CategoryId = newCategoryId;
             Description = newDescription;

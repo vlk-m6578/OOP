@@ -66,7 +66,8 @@ namespace FinancialTracker.Services
         {
             return _context.Accounts
                 .OfType<SharedAccount>()
-                .Where(a => a.MemberUserIds.Contains(userId))
+                .AsEnumerable()
+                .Where(a => a.MemberUserIdsList.Contains(userId))
                 .ToList();
         }
         public Account GetAccountById(int accountId)

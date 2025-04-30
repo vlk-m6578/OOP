@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +13,15 @@ namespace FinancialTracker.Entities.Accounts
     public class SharedAccount : Account
     {
         public int CreatorUserId { get; set; }
-        public List<int> MemberUserIds { get; set; } = new List<int>();
+        [Required]
+        public string MemberUserIds { get; set; }  // Храним ID через запятую
+
+        [NotMapped]
+        public List<int> MemberUserIdsList
+        {
+            get => MemberUserIds.Split(',').Select(int.Parse).ToList();
+            set => MemberUserIds = string.Join(",", value);
+        }
         public int SharedAccountId { get; set; } // Для связи один-ко-многим
         private readonly AppDbContext _context;
         public List<AccountHistoryEntry> History { get; set; } = new List<AccountHistoryEntry>();
@@ -21,13 +31,13 @@ namespace FinancialTracker.Entities.Accounts
         public SharedAccount(string name, int creatorId) : base(name)
         {
             CreatorUserId = creatorId;
-            MemberUserIds.Add(creatorId);
+            MemberUserIds = creatorId.ToString();
         }
         public bool IsCreator(int userId) => CreatorUserId == userId;
         private void AddMember(int userId)
         {
-            if (!MemberUserIds.Contains(userId))
-                MemberUserIds.Add(userId);
+            if (!MemberUserIdsList.Contains(userId))
+                MemberUserIdsList.Add(userId);
         }
         public void InviteMember(int inviterId, int invitedUserId)
         {
@@ -54,7 +64,7 @@ namespace FinancialTracker.Entities.Accounts
                 return false;
             }
 
-            bool removed = MemberUserIds.Remove(userId);
+            bool removed = MemberUserIdsList.Remove(userId);
             if(removed)
             {
                 LogHistory(removerUserId, "Member Removed", $"Removed user ID: {userId}");
@@ -73,7 +83,7 @@ namespace FinancialTracker.Entities.Accounts
 
         public bool CanEditTransaction(int userId)
         {
-            return MemberUserIds.Contains(userId);
+            return MemberUserIdsList.Contains(userId);
         }
     }
 }

@@ -14,6 +14,7 @@ namespace FinancialTracker.UI
         private readonly PasswordRecoveryService _service;
         private readonly AccountService _accountService;
         private readonly CategoryService _categoryService;
+        private readonly TransactionService _transactionService;
 
         private readonly AppDbContext _context;
         public FinancialTrackerApp()
@@ -23,18 +24,19 @@ namespace FinancialTracker.UI
             _accountService = new AccountService(_context);
             _service = new PasswordRecoveryService(_context);
             _categoryService = new CategoryService(_context);
+            _transactionService = new TransactionService(_context);
             _menu = new Menu();
         }
         public void Run()
         {
             bool isRun = true;
 
-            while(isRun)
+            while (isRun)
             {
                 _menu.ShowStartMenu();
                 var choice = InputValidator.GetIntInput(1, 4);
 
-                switch(choice)
+                switch (choice)
                 {
                     case 1:
                         Login();
@@ -75,7 +77,7 @@ namespace FinancialTracker.UI
                 ShowDashboard();
             }
         }
-        private void Login() 
+        private void Login()
         {
             Console.Clear();
             Console.WriteLine("================================================================ LOGIN ==============================================================");
@@ -91,7 +93,7 @@ namespace FinancialTracker.UI
             var user = _context.Users
             .FirstOrDefault(u => (u.Username == login || u.Email == login));
 
-            if(user != null && user.IsActive) 
+            if (user != null && user.IsActive)
             {
                 _currentUser = user;
                 CheckPendingInvitations();
@@ -109,24 +111,26 @@ namespace FinancialTracker.UI
         private void CheckPendingInvitations()
         {
             var pendingInvites = _context.Invitations
-                .Include(i => i.SharedAccount)  // Теперь должно работать
-                .Include(i => i.InviterUser)    // Добавляем загрузку пригласителя
+                .Include(i => i.SharedAccount)
+                .Include(i => i.InviterUser)
                 .Where(i => i.InvitedUserId == _currentUser.Id && i.Status == InvitationStatus.Pending)
                 .ToList();
 
             foreach (var invite in pendingInvites)
             {
-                Console.WriteLine($"\nYou've been invited to shared account '{invite.SharedAccount.Name}' by {invite.InviterUser.Username}");
-                Console.Write("Accept invitation? (Y/N): ");
-                var response = Console.ReadLine().Trim().ToUpper();
-
                 var sharedAccount = _context.Accounts.OfType<SharedAccount>()
                     .First(a => a.Id == invite.SharedAccountId);
+
+                Console.WriteLine($"\nYou've been invited to shared account '{sharedAccount.Name}' by {invite.InviterUser.Username}");
+                Console.Write("Accept invitation? (Y/N): ");
+                var response = Console.ReadLine().Trim().ToUpper();
 
                 if (response == "Y")
                 {
                     invite.Status = InvitationStatus.Accepted;
-                    sharedAccount.MemberUserIds.Add(_currentUser.Id);
+                    var members = sharedAccount.MemberUserIdsList;
+                    members.Add(_currentUser.Id);
+                    sharedAccount.MemberUserIds = string.Join(",", members.Distinct());
                     sharedAccount.LogHistory(_currentUser.Id, "Member Joined", $"User {_currentUser.Username} accepted invitation");
                 }
                 else
@@ -153,7 +157,7 @@ namespace FinancialTracker.UI
             var email = Console.ReadLine()?.Trim();
 
             var user = _context.Users.FirstOrDefault(u => u.Email == email);
-            if(user == null)
+            if (user == null)
             {
                 HandleError("Email not found in system.");
                 return;
@@ -164,7 +168,7 @@ namespace FinancialTracker.UI
             Console.Write("Enter the 6-digit code: ");
             var inputCode = Console.ReadLine();
 
-            if(!_service.ValidateCode(email, inputCode))
+            if (!_service.ValidateCode(email, inputCode))
             {
                 HandleError("Invalid code.");
                 return;
@@ -181,7 +185,7 @@ namespace FinancialTracker.UI
         private void ShowDashboard()
         {
             bool inDashboard = true;
-            while(inDashboard)
+            while (inDashboard)
             {
                 _menu.ShowDashboardMenu();
                 int choice = InputValidator.GetIntInput(1, 6);
@@ -192,7 +196,7 @@ namespace FinancialTracker.UI
                         ManageAccounts();
                         break;
                     case 2:
-
+                        ManageTransactions();
                         break;
                     case 3:
                         ManageCategories();
@@ -210,7 +214,7 @@ namespace FinancialTracker.UI
                         break;
                 }
             }
-        } 
+        }
         private void ManageAccounts()
         {
             _menu.ShowAccountManagementMenu();
@@ -234,7 +238,7 @@ namespace FinancialTracker.UI
                     ManageSharedAccounts();
                     break;
                 case 6:
-                    //ViewOperationHistory();
+                //ViewOperationHistory();
                 case 0:
                     break;
             }
@@ -262,8 +266,8 @@ namespace FinancialTracker.UI
             Console.Clear();
             Console.WriteLine("=== EDIT PERSONAL ACCOUNT ===");
 
-            var accounts = _accountService.GetPersonalAccounts(_currentUser.Id );
-            if(accounts.Count == 0)
+            var accounts = _accountService.GetPersonalAccounts(_currentUser.Id);
+            if (accounts.Count == 0)
             {
                 Console.WriteLine("No personal accounts found!");
                 Console.Write("Press any key...");
@@ -271,7 +275,7 @@ namespace FinancialTracker.UI
                 return;
             }
 
-            foreach(var acc in accounts )
+            foreach (var acc in accounts)
             {
                 Console.WriteLine($"ID: {acc.Id} | Name: {acc.Name} | Balance: {acc.Balance:C}");
             }
@@ -281,7 +285,7 @@ namespace FinancialTracker.UI
             if (accountId == 0) return;
 
             var account = accounts.FirstOrDefault(a => a.Id == accountId);
-            if(account == null )
+            if (account == null)
             {
                 HandleError("Account not found");
                 return;
@@ -311,14 +315,14 @@ namespace FinancialTracker.UI
             Console.WriteLine("=== DELETE PERSONAL ACCOUNT ===");
 
             var accounts = _accountService.GetPersonalAccounts(_currentUser.Id);
-            if (accounts.Count == 0) 
+            if (accounts.Count == 0)
             {
                 Console.WriteLine("No personal accounts found!");
                 Console.Write("Press any key...");
                 Console.ReadKey();
             }
 
-            foreach(var a in accounts )
+            foreach (var a in accounts)
             {
                 Console.WriteLine($"ID: {a.Id} | Name: {a.Name} | Balance: {a.Balance:C}");
             }
@@ -362,7 +366,7 @@ namespace FinancialTracker.UI
                 Console.WriteLine("=== MANAGE SHARED ACCOUNTS ===");
 
                 var sharedAccounts = _accountService.GetSharedAccountsForUser(_currentUser.Id);
-                if(sharedAccounts.Count == 0)
+                if (sharedAccounts.Count == 0)
                 {
                     Console.WriteLine("No shared accounts found!");
                     Console.Write("Press any key...");
@@ -372,7 +376,7 @@ namespace FinancialTracker.UI
 
                 foreach (var acc in sharedAccounts)
                 {
-                    Console.WriteLine($"ID: {acc.Id} | Name: {acc.Name} | Members: {acc.MemberUserIds.Count}");
+                    Console.WriteLine($"ID: {acc.Id} | Name: {acc.Name} | Members: {acc.MemberUserIdsList.Count}");
                 }
 
                 Console.Write("Enter account ID to manage (0 to back): ");
@@ -380,7 +384,7 @@ namespace FinancialTracker.UI
                 if (accountId == 0) return;
 
                 var account = sharedAccounts.FirstOrDefault(a => a.Id == accountId) as SharedAccount;
-                if(account == null)
+                if (account == null)
                 {
                     HandleError("Account not found");
                     continue;
@@ -573,7 +577,8 @@ namespace FinancialTracker.UI
             Console.WriteLine("\n=== ACCOUNT MEMBERS ===");
             account.ViewMembers(
                 message => Console.WriteLine(message),
-                userId => {
+                userId =>
+                {
                     var user = _context.Users.Find(userId);
                     return user != null ? user.Username : "Unknown User";
                 }
@@ -592,7 +597,7 @@ namespace FinancialTracker.UI
                 foreach (var invite in userInvites)
                 {
                     Console.WriteLine($"ID: {invite.Id} | User: {invite.InvitedUser.Username} | Sent: {invite.Timestamp}");
-                    
+
                 }
                 Console.ReadKey();
             }
@@ -613,7 +618,7 @@ namespace FinancialTracker.UI
         }
 
         ///////////////////////////////////////////////////// CATEGORIES MANAGEMENT ////////////////////////////////////////////////
-        
+
         private void ManageCategories()
         {
             while (true)
@@ -702,6 +707,386 @@ namespace FinancialTracker.UI
             }
 
             Console.ReadKey();
+        }
+
+        ///////////////////////////////////////////////////// TRANSACTIONS MANAGEMENT ////////////////////////////////////////////////
+
+        private void ManageTransactions()
+        {
+            while (true)
+            {
+                _menu.ShowTransactionMenu();
+                int choice = InputValidator.GetIntInput(0, 5);
+
+                switch (choice)
+                {
+                    case 1:
+                        AddTransaction();
+                        break;
+                    case 2:
+                        EditTransaction();
+                        break;
+                    case 3:
+                        DeleteTransaction();
+                        break;
+                    case 4:
+                        ViewEditHistory();
+                        break;
+                    case 5:
+                        SearchTransactions();
+                        break;
+                    case 0:
+                        return;
+                }
+            }
+        }
+
+        private void AddTransaction()
+        {
+            //var personalAccounts = _accountService.GetPersonalAccounts(_currentUser.Id);
+            //var sharedAccounts = _accountService.GetSharedAccountsForUser(_currentUser.Id);
+            //if (sharedAccounts.Count == 0 || personalAccounts.Count == 0)
+            //{
+            //    Console.WriteLine("No accounts found!");
+            //    Console.Write("Press any key...");
+            //    Console.ReadKey();
+            //    return;
+            //}
+            try
+            {
+                // Получаем все счета пользователя
+                var accounts = _accountService.GetPersonalAccounts(_currentUser.Id)
+                    .Cast<Account>()
+                    .Concat(_accountService.GetSharedAccountsForUser(_currentUser.Id))
+                    .ToList();
+
+
+                // Выводим список счетов с типами
+                Console.WriteLine("Available accounts:");
+                foreach (var acc in accounts)
+                {
+                    var type = acc is SharedAccount ? "Shared" : "Personal";
+                    Console.WriteLine($"{acc.Id}. {acc.Name} ({type}) - {acc.Balance}");
+                }
+
+                Console.Write("Select an account: ");
+                int accountId = InputValidator.GetIntInput(1, int.MaxValue);
+
+                // Выбор типа
+                Console.WriteLine("1. Income\n2. Expense");
+                var typeT = InputValidator.GetIntInput(1, 2) == 1
+                    ? TransactionType.Income
+                    : TransactionType.Expense;
+
+                // Выбор категории
+                var categories = _categoryService.GetAllCategories()
+                    .OrderBy(c => c.Id)
+                    .ToList();
+                Console.WriteLine("Available categories:");
+                foreach (var cat in categories)
+                {
+                    Console.WriteLine($"{cat.Id}. {cat.Name}");
+                }
+                Console.Write("Select a category: ");
+                int categoryId = InputValidator.GetIntInput(1, int.MaxValue);
+
+                // Ввод суммы
+                Console.Write("Sum: ");
+                decimal amount = InputValidator.GetDecimalInput("", 0.01m, 1000000m);
+
+                // Описание
+                Console.Write("Description: ");
+                string desc = Console.ReadLine();
+
+                _transactionService.AddTransaction(amount, categoryId, accountId,
+                    _currentUser.Id, desc, typeT);
+
+                Console.WriteLine("Transaction added!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+            Console.ReadKey();
+        }
+
+        private void EditTransaction()
+        {
+            //var personalAccounts = _accountService.GetPersonalAccounts(_currentUser.Id);
+            //var sharedAccounts = _accountService.GetSharedAccountsForUser(_currentUser.Id);
+            //if (sharedAccounts.Count == 0 || personalAccounts.Count == 0)
+            //{
+            //    Console.WriteLine("No accounts found!");
+            //    Console.Write("Press any key...");
+            //    Console.ReadKey();
+            //    return;
+            //}
+            try
+            {
+                using var context = new AppDbContext();
+                var transactions = _context.Transactions
+                    .AsNoTracking()
+                    .Include(t => t.Category)
+                    .Where(t => t.CreatedByUserId == _currentUser.Id && !t.IsDeleted)
+                    .ToList();
+
+                Console.WriteLine("\nYour transactions:");
+                foreach (var t in transactions)
+                {
+                    Console.WriteLine($"{t.Id}. {t.Date:dd.MM.yyyy} | " +
+                $"{(t.Type == TransactionType.Income ? "+" : "-")}{Math.Abs(t.Amount)} | " +
+                $"{t.Category?.Name ?? "Without a category"} | " +
+                $"{t.Description}");
+                }
+
+                Console.Write("\nSelect the transaction ID (0 to back): ");
+                int transId = InputValidator.GetIntInput(0, int.MaxValue);
+                if (transId == 0) return;
+
+                // Ввод новых данных
+                Console.Write("New sum: ");
+                decimal amount = InputValidator.GetDecimalInput("", 0.01m, 1000000m);
+
+                // Выбор категории
+                Console.Write("New ID category: ");
+                int newCategoryId = SelectCategory();
+
+                Console.Write("New description: ");
+                string desc = Console.ReadLine();
+
+                // Используем новый контекст для операции
+                var transactionService = new TransactionService(new AppDbContext());
+                transactionService.UpdateTransaction(transId, amount, newCategoryId, desc, _currentUser.Id);
+
+                Console.WriteLine("The transaction has been updated!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error details: {ex.Message}");
+                if (ex.InnerException != null)
+                    Console.WriteLine($"Database error: {ex.InnerException.Message}");
+            }
+            Console.ReadKey();
+        }
+        private int SelectCategory()
+        {
+            var categories = _categoryService.GetAllCategories()
+                .OrderBy(c => c.Id)
+                .ToList();
+
+            Console.WriteLine("\nAvailable categories:");
+            foreach (var cat in categories)
+            {
+                Console.WriteLine($"{cat.Id}. {cat.Name}");
+            }
+
+            while (true)
+            {
+                Console.Write("Select the category ID: ");
+                if (int.TryParse(Console.ReadLine(), out int id) && categories.Any(c => c.Id == id))
+                    return id;
+
+                Console.WriteLine("Invalid category ID! Try again.");
+            }
+        }
+        private void DeleteTransaction()
+        {
+            //var personalAccounts = _accountService.GetPersonalAccounts(_currentUser.Id);
+            //var sharedAccounts = _accountService.GetSharedAccountsForUser(_currentUser.Id);
+            //if (sharedAccounts.Count == 0 || personalAccounts.Count == 0)
+            //{
+            //    Console.WriteLine("No accounts found!");
+            //    Console.Write("Press any key...");
+            //    Console.ReadKey();
+            //    return;
+            //}
+            try
+            {
+                var transactions = _transactionService.GetTransactionsByUser(_currentUser.Id)
+                    .Where(t => !t.IsDeleted)
+                    .ToList();
+
+                Console.WriteLine("Ваши транзакции:");
+                foreach (var t in transactions)
+                {
+                    Console.WriteLine($"{t.Id}. {t.Date:d} | {t.Amount} | {t.Category.Name}");
+                }
+
+                Console.Write("Выберите ID транзакции для удаления (0 для отмены): ");
+                int transId = InputValidator.GetIntInput(0, int.MaxValue);
+                if (transId == 0) return;
+
+                _transactionService.DeleteTransaction(transId, _currentUser.Id);
+                Console.WriteLine("Транзакция удалена!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка: {ex.Message}");
+            }
+            Console.ReadKey();
+        }
+
+        private void ViewEditHistory()
+        {
+            //var personalAccounts = _accountService.GetPersonalAccounts(_currentUser.Id);
+            //var sharedAccounts = _accountService.GetSharedAccountsForUser(_currentUser.Id);
+            //if (sharedAccounts.Count == 0 || personalAccounts.Count == 0)
+            //{
+            //    Console.WriteLine("No accounts found!");
+            //    Console.Write("Press any key...");
+            //    Console.ReadKey();
+            //    return;
+            //}
+            try
+            {
+                Console.WriteLine("\nYour transactions:");
+                var transactions = _transactionService.GetTransactionsByUser(_currentUser.Id);
+
+                foreach (var t in transactions)
+                {
+                    Console.WriteLine($"{t.Id}. {t.Date:dd.MM.yyyy} | " +
+                        $"{(t.Type == TransactionType.Income ? "+" : "-")}{Math.Abs(t.Amount)} | " +
+                        $"{GetCategoryName(t.CategoryId)} | " +
+                        $"{t.Description}");
+                }
+
+                Console.Write("Enter transaction ID: ");
+                int transactionId = InputValidator.GetIntInput(1, int.MaxValue);
+
+                using (var context = new AppDbContext())
+                {
+                    var history = context.TransactionEditHistories
+                        .Where(h => h.TransactionId == transactionId)
+                        .OrderByDescending(h => h.EditedAt)
+                        .ToList();
+
+                    Console.WriteLine("\n=== EDIT HISTORY ===");
+                    foreach (var entry in history) 
+                    {
+                        Console.WriteLine($"[{entry.EditedAt:dd.MM.yyyy HH:mm}] Edited by user {_currentUser.Username}:");
+                        Console.WriteLine($"Amount: {entry.OldAmount} -> {entry.NewAmount}");
+                        Console.WriteLine($"Category ID: {GetCategoryName(entry.OldCategoryId)} -> {GetCategoryName(entry.NewCategoryId)}");
+                        Console.WriteLine($"Description: '{entry.OldDescription}' -> '{entry.NewDescription}'");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+            Console.ReadKey();
+        }
+        private string GetCategoryName(int categoryId)
+        {
+            using var context = new AppDbContext();
+            return context.Categories
+                .FirstOrDefault(c => c.Id == categoryId)?
+                .Name ?? "Unknown category";
+        }
+
+        private void SearchTransactions()
+        {
+            //var personalAccounts = _accountService.GetPersonalAccounts(_currentUser.Id);
+            //var sharedAccounts = _accountService.GetSharedAccountsForUser(_currentUser.Id);
+            //if (sharedAccounts.Count == 0 || personalAccounts.Count == 0)
+            //{
+            //    Console.WriteLine("No accounts found!");
+            //    Console.Write("Press any key...");
+            //    Console.ReadKey();
+            //    return;
+            //}
+            try
+            {
+                // Базовый запрос с загрузкой категорий
+                var query = _context.Transactions
+                    .Include(t => t.Category)
+                    .Where(t => t.CreatedByUserId == _currentUser.Id && !t.IsDeleted)
+                    .AsQueryable();
+
+                // Фильтр по дате начала
+                Console.Write("Search FROM date (yyyy-MM-dd, empty - skip): ");
+                if (DateTime.TryParse(Console.ReadLine(), out DateTime startDate))
+                {
+                    query = query.Where(t => t.Date >= startDate.Date);
+                }
+
+                // Фильтр по дате окончания
+                Console.Write("Search TO date (yyyy-MM-dd, empty - skip): ");
+                if (DateTime.TryParse(Console.ReadLine(), out DateTime endDate))
+                {
+                    query = query.Where(t => t.Date <= endDate.Date.AddDays(1));
+                }
+
+                // Фильтр по категории
+                var categories = _categoryService.GetAllCategories();
+                Console.Write("Category ID (0 - all): ");
+                if (int.TryParse(Console.ReadLine(), out int categoryId) && categoryId > 0)
+                {
+                    if (categories.Any(c => c.Id == categoryId))
+                    {
+                        query = query.Where(t => t.CategoryId == categoryId);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid category ID, no filter applied.");
+                    }
+                }
+
+                // Фильтр по минимальной сумме (без Math.Abs)
+                Console.Write("Min sum (empty - skip): ");
+                if (decimal.TryParse(Console.ReadLine(), out decimal minAmount))
+                {
+                    query = query.Where(t =>
+                        t.Type == TransactionType.Income && t.Amount >= minAmount ||
+                        t.Type == TransactionType.Expense && t.Amount <= -minAmount);
+                }
+
+                // Фильтр по максимальной сумме (без Math.Abs)
+                Console.Write("Max sum (empty - skip): ");
+                if (decimal.TryParse(Console.ReadLine(), out decimal maxAmount))
+                {
+                    query = query.Where(t =>
+                        t.Type == TransactionType.Income && t.Amount <= maxAmount ||
+                        t.Type == TransactionType.Expense && t.Amount >= -maxAmount);
+                }
+
+                // Фильтр по типу транзакции
+                Console.Write("Type (1-Income, 2-Expense, 0-All): ");
+                var typeChoice = InputValidator.GetIntInput(0, 2);
+                if (typeChoice != 0)
+                {
+                    var selectedType = (TransactionType)(typeChoice - 1);
+                    query = query.Where(t => t.Type == selectedType);
+                }
+
+                // Выполнение запроса и преобразование в список
+                var results = query
+                    .OrderByDescending(t => t.Date)
+                    .ToList();
+
+                // Вывод результатов
+                Console.WriteLine("\n=== SEARCH RESULTS ===");
+                foreach (var t in results)
+                {
+                    var categoryName = _context.Categories
+                        .FirstOrDefault(c => c.Id == t.CategoryId)?.Name ?? "Without a category";
+
+                    Console.WriteLine($"{t.Id}. {t.Date:dd.MM.yyyy} | " +
+                        $"{(t.Type == TransactionType.Income ? "+" : "-")}{Math.Abs(t.Amount)} | " +
+                        $"{categoryName} | " +
+                        $"{t.Description}");
+                }
+
+                Console.WriteLine($"\nTransactions found: {results.Count}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Search error: {ex.Message}");
+            }
+            finally
+            {
+                Console.ReadKey();
+            }
         }
     }
 }

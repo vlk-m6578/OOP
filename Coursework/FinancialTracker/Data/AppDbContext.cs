@@ -56,8 +56,9 @@ namespace FinancialTracker.Data
 
             // Настройка SharedAccount
             modelBuilder.Entity<SharedAccount>()
-                .Property(s => s.CreatorUserId)
-                .IsRequired();
+                    .Property(s => s.MemberUserIds)
+                    .IsRequired()
+                    .HasDefaultValue("");
 
             // Настройка истории
             modelBuilder.Entity<AccountHistoryEntry>()
@@ -66,15 +67,16 @@ namespace FinancialTracker.Data
                 .HasForeignKey("SharedAccountId");
 
             modelBuilder.Entity<TransactionEditHistory>()
-                .HasOne<Transaction>()
+                .HasOne(h => h.Transaction)
                 .WithMany(t => t.EditHistory)
-                .HasForeignKey(e => e.Id);
+                .HasForeignKey(h => h.TransactionId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Budget>()
-            .HasOne<Category>()
-            .WithMany()
-            .HasForeignKey(b => b.CategoryId)
-            .OnDelete(DeleteBehavior.Cascade);
+                .HasOne<Category>()
+                .WithMany()
+                .HasForeignKey(b => b.CategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Category>()
                 .Property(c => c.Name)
@@ -83,9 +85,10 @@ namespace FinancialTracker.Data
 
             // Настройка Transaction
             modelBuilder.Entity<Transaction>()
-                .HasMany(t => t.EditHistory)
-                .WithOne()
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasOne(t => t.Category)
+                .WithMany()
+                .HasForeignKey(t => t.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Настройка AccountHistoryEntry
             modelBuilder.Entity<AccountHistoryEntry>()
