@@ -62,11 +62,20 @@ namespace FinancialTracker.Services
             _context.SaveChanges();
             return account;
         }
+        public List<Transaction> GetTransactionsByUser(int userId)
+        {
+            return _context.Transactions
+                .Include(t => t.Category)
+                .Include(t => t.Account) // Добавляем загрузку счета
+                .Where(t => t.CreatedByUserId == userId && !t.IsDeleted)
+                .ToList();
+        }
+
         public List<SharedAccount> GetSharedAccountsForUser(int userId)
         {
             return _context.Accounts
                 .OfType<SharedAccount>()
-                .AsEnumerable()
+                .AsEnumerable() // Фильтрация в памяти
                 .Where(a => a.MemberUserIdsList.Contains(userId))
                 .ToList();
         }

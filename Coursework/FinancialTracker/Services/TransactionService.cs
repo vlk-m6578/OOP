@@ -149,11 +149,30 @@ namespace FinancialTracker.Services
         }
         public List<Transaction> GetTransactionsByAccount(int accountId)
         {
-            return _context.Transactions
-                .Where(t => t.AccountId == accountId)
-                .ToList();
+            var account = _context.Accounts
+                .Include(a => a.Transactions)
+                .FirstOrDefault(a => a.Id == accountId);
+
+            if (account is SharedAccount)
+            {
+                // Для общего счета берем все транзакции
+                return _context.Transactions
+                    .Include(t => t.Category)
+                    .Include(t => t.Account)
+                    .Where(t => t.AccountId == accountId)
+                    .ToList();
+            }
+            else
+            {
+                // Для личного счета только текущего пользователя
+                return _context.Transactions
+                    .Include(t => t.Category)
+                    .Include(t => t.Account)
+                    .Where(t => t.AccountId == accountId)
+                    .ToList();
+            }
         }
-        
+
         public List<Transaction> GetTransactionsByPeriod(DateTime startDate, DateTime endDate)
         {
             return _context.Transactions

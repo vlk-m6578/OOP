@@ -4,6 +4,7 @@ using FinancialTracker.Services;
 using FinancialTracker.Entities.Accounts;
 using FinancialTracker.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 
 namespace FinancialTracker.UI
 {
@@ -963,6 +964,12 @@ namespace FinancialTracker.UI
                     Console.WriteLine("\n=== EDIT HISTORY ===");
                     foreach (var entry in history) 
                     {
+                        var transaction = _context.Transactions
+                            .Include(t => t.Account)
+                            .First(t => t.Id == entry.TransactionId);
+
+                        Console.WriteLine($"Account: {transaction.Account.Name} ({transaction.Account.GetType().Name})");
+                        Console.WriteLine($"[{entry.EditedAt:dd.MM.yyyy HH:mm}] Edited by: {GetUserName(entry.EditedByUserId)}");
                         Console.WriteLine($"[{entry.EditedAt:dd.MM.yyyy HH:mm}] Edited by user {_currentUser.Username}:");
                         Console.WriteLine($"Amount: {entry.OldAmount} -> {entry.NewAmount}");
                         Console.WriteLine($"Category ID: {GetCategoryName(entry.OldCategoryId)} -> {GetCategoryName(entry.NewCategoryId)}");
@@ -997,10 +1004,17 @@ namespace FinancialTracker.UI
             //}
             try
             {
-                // Базовый запрос с загрузкой категорий
+                // Базовый запрос только для доступных счетов
+                var userAccounts = _accountService.GetPersonalAccounts(_currentUser.Id)
+                    .Cast<Account>()
+                    .Concat(_accountService.GetSharedAccountsForUser(_currentUser.Id))
+                    .Select(a => a.Id)
+                    .ToList();
+
                 var query = _context.Transactions
                     .Include(t => t.Category)
-                    .Where(t => t.CreatedByUserId == _currentUser.Id && !t.IsDeleted)
+                    .Include(t => t.Account)
+                    .Where(t => userAccounts.Contains(t.AccountId)) // Фильтр по доступным счетам
                     .AsQueryable();
 
                 // Фильтр по дате начала
@@ -1068,13 +1082,22 @@ namespace FinancialTracker.UI
                 Console.WriteLine("\n=== SEARCH RESULTS ===");
                 foreach (var t in results)
                 {
+                    var accountType = t.Account switch
+                    {
+                        PersonalAccount _ => "Personal",
+                        SharedAccount _ => "Shared",
+                        _ => "Unknown"
+                    };
+
                     var categoryName = _context.Categories
                         .FirstOrDefault(c => c.Id == t.CategoryId)?.Name ?? "Without a category";
 
+                    Console.WriteLine($"[{accountType}] {t.Account.Name}");
                     Console.WriteLine($"{t.Id}. {t.Date:dd.MM.yyyy} | " +
                         $"{(t.Type == TransactionType.Income ? "+" : "-")}{Math.Abs(t.Amount)} | " +
                         $"{categoryName} | " +
                         $"{t.Description}");
+                    Console.WriteLine($"Created by: {GetUserName(t.CreatedByUserId)}\n");
                 }
 
                 Console.WriteLine($"\nTransactions found: {results.Count}");
@@ -1087,6 +1110,11 @@ namespace FinancialTracker.UI
             {
                 Console.ReadKey();
             }
+        }
+        private string GetUserName(int userId)
+        {
+            var user = _context.Users.Find(userId);
+            return user?.Username ?? "Unknown User";
         }
     }
 }
