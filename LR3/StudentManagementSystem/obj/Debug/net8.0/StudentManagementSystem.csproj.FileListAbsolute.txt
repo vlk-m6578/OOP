@@ -1,0 +1,15 @@
+D:\OOP\LR3\StudentManagementSystem\bin\Debug\net8.0\StudentManagementSystem.exe
+D:\OOP\LR3\StudentManagementSystem\bin\Debug\net8.0\StudentManagementSystem.deps.json
+D:\OOP\LR3\StudentManagementSystem\bin\Debug\net8.0\StudentManagementSystem.runtimeconfig.json
+D:\OOP\LR3\StudentManagementSystem\bin\Debug\net8.0\StudentManagementSystem.dll
+D:\OOP\LR3\StudentManagementSystem\bin\Debug\net8.0\StudentManagementSystem.pdb
+D:\OOP\LR3\StudentManagementSystem\obj\Debug\net8.0\StudentManagementSystem.GeneratedMSBuildEditorConfig.editorconfig
+D:\OOP\LR3\StudentManagementSystem\obj\Debug\net8.0\StudentManagementSystem.AssemblyInfoInputs.cache
+D:\OOP\LR3\StudentManagementSystem\obj\Debug\net8.0\StudentManagementSystem.AssemblyInfo.cs
+D:\OOP\LR3\StudentManagementSystem\obj\Debug\net8.0\StudentManagementSystem.csproj.CoreCompileInputs.cache
+D:\OOP\LR3\StudentManagementSystem\obj\Debug\net8.0\StudentManagementSystem.sourcelink.json
+D:\OOP\LR3\StudentManagementSystem\obj\Debug\net8.0\StudentManagementSystem.dll
+D:\OOP\LR3\StudentManagementSystem\obj\Debug\net8.0\refint\StudentManagementSystem.dll
+D:\OOP\LR3\StudentManagementSystem\obj\Debug\net8.0\StudentManagementSystem.pdb
+D:\OOP\LR3\StudentManagementSystem\obj\Debug\net8.0\StudentManagementSystem.genruntimeconfig.cache
+D:\OOP\LR3\StudentManagementSystem\obj\Debug\net8.0\ref\StudentManagementSystem.dll
