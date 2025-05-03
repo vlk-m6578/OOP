@@ -1,12 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using StudentManagementSystem.Domain.DTOs;
 
 namespace StudentManagementSystem.Domain.Factories
 {
-    internal class QuoteFactory
+    public static class QuoteFactory
     {
+        public static QuoteDTO CreateQuote(string content, string author)
+        {
+            return new QuoteDTO
+            {
+                Content = content,
+                Author = author
+            };
+        }
     }
 }

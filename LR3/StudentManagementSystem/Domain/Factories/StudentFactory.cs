@@ -1,12 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using StudentManagementSystem.Domain.DTOs;
+using StudentManagementSystem.Domain.Models;
 
 namespace StudentManagementSystem.Domain.Factories
 {
-    internal class StudentFactory
+    public static class StudentFactory
     {
+        public static Student CreateStudent(int id, StudentDTO dto)
+        {
+            return new Student
+            {
+                Id = id,
+                Name = dto.Name,
+                Grade = dto.Grade
+            };
+        }
     }
 }

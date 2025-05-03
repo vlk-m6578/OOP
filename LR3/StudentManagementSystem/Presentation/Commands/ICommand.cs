@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace StudentManagementSystem.Presentation.Commands
 {
-    internal interface ICommand
+    public interface ICommand
     {
+        Task ExecuteAsync();
     }
 }

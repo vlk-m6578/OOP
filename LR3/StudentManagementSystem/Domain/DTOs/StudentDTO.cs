@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace StudentManagementSystem.Domain.DTOs
 {
-    internal class StudentDTO
+    public class StudentDTO
     {
+        public string Name { get; set; }
+        public int Grade {  get; set; }
     }
 }

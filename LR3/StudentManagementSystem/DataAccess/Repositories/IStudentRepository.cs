@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using StudentManagementSystem.Domain.Models;
 
 namespace StudentManagementSystem.DataAccess.Repositories
 {
-    internal interface IStudentRepository
+    public interface IStudentRepository
     {
+        IEnumerable<Student> GetAll();
+        Student Add(Student student);
+        void Update(Student student);
+        Student GetById(int id);
+        int GetNextId();
     }
 }

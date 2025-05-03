@@ -1,12 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using StudentManagementSystem.Domain.DTOs;
 
 namespace StudentManagementSystem.Infrastructure.Api
 {
-    internal class QuoteApiAdapter
+    public class QuoteApiAdapter
     {
+        private readonly IQuoteApiClient _client;
+
+        public QuoteApiAdapter(IQuoteApiClient client)
+        {
+            _client = client;
+        }
+        public async Task<QuoteDTO> FetchMotivationalQuoteAsync()
+        {
+            return await _client.GetRandomQuoteAsync();
+        }
     }
 }

@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using StudentManagementSystem.Domain.DTOs;
 
 namespace StudentManagementSystem.Infrastructure.Api
 {
-    internal interface IQuoteApiClient
+    public interface IQuoteApiClient
     {
+        Task<QuoteDTO> GetRandomQuoteAsync();
     }
 }

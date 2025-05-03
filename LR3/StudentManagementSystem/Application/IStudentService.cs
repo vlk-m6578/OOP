@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using StudentManagementSystem.Domain.DTOs;
+using StudentManagementSystem.Domain.Models;
 
-namespace StudentManagementSystem.Application.Interfaces
+namespace StudentManagementSystem.Application
 {
-    internal interface IStudentService
+    public interface IStudentService
     {
+        Student AddStudent(StudentDTO studentDTO);
+        void UpdateStudent(int id, StudentDTO studentDTO);
+        IEnumerable<Student> GetAllStudents();
+        Student GetStudent(int id);
     }
 }
