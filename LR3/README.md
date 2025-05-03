@@ -45,7 +45,7 @@
 
 ## Class Diagram 🧩
 ### Command Pattern
+![CommandPattern](https://github.com/user-attachments/assets/293b62b7-3567-4109-b19c-c59bd3cc5688)
 
 ### Adapter Pattern
-
-### Factory Method Pattern
+![AdapterPattern](https://github.com/user-attachments/assets/2471bd79-ce01-4a9b-b00d-24a0b02afa8d)
