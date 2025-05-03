@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "HMic/alxGotOQUoXW0FsS33xEyXBbHSl168lDN/Gt90mUXfkRAnEy0QCOjog09LL4e3JjeAa0zSiRwU16+yd+A==",
+  "dgSpecHash": "6pACgN+eox1l9hH0hnnIdHF/0Ceg6U2ik2R4yDJSeyMmpf0tl85RXJAg6KNCa3XosE6rV1zR4jy+Rpn5IgTyQA==",
   "success": true,
   "projectFilePath": "D:\\OOP\\LR3\\StudentManagementSystem\\StudentManagementSystem.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\lebed\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512"
+  ],
   "logs": []
 }
