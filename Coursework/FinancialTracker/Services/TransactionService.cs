@@ -8,16 +8,19 @@ namespace FinancialTracker.Services
 {
     public class TransactionService : ITransactionService
     {
-        public virtual ICollection<Transaction> Transactions { get; set; }
+        //public virtual ICollection<Transaction> Transactions { get; set; }
         private readonly AppDbContext _context;
+        private readonly IBudgetService _budgetService;
 
-        public TransactionService(AppDbContext context)
+        public TransactionService(AppDbContext context, IBudgetService budgetService)
         {
             _context = context;
+            _budgetService = budgetService;
         }
         public Transaction AddTransaction(decimal amount, int categoryId, int accountId, int userId,
                          string description, TransactionType type)
         {
+            //var transaction = _context.Database.BeginTransaction();
             var account = _context.Accounts
                 .FirstOrDefault(a => a.Id == accountId);
 
@@ -48,6 +51,16 @@ namespace FinancialTracker.Services
             _context.Transactions.Add(transaction);
             _context.SaveChanges();
 
+
+            if (type == TransactionType.Expense)
+            {
+                _budgetService.UpdateSpending(
+                    transaction.CreatedByUserId,
+                    transaction.CategoryId,
+                    Math.Abs(transaction.Amount)
+                );
+            }
+
             return transaction;
         }
         public bool ValidateBalance(int accountId, decimal amount)
@@ -55,32 +68,33 @@ namespace FinancialTracker.Services
             var account = _context.Accounts.Find(accountId);
             return account?.Balance + amount >= 0;
         }
+
         public void UpdateTransaction(int transactionId, decimal newAmount, int newCategoryId, string newDescription, int editorId)
-{
-    using (var freshContext = new AppDbContext())
-    {
-        var transaction = freshContext.Database.BeginTransaction();
-        try
         {
-            var existing = freshContext.Transactions
-                .AsNoTracking()
-                .FirstOrDefault(t => t.Id == transactionId);
-
-            if (existing == null) throw new Exception("Transaction not found");
-
-            // Создаем новый объект для обновления
-            var updatedTransaction = new Transaction
+            using (var freshContext = new AppDbContext())
             {
-                Id = existing.Id,
-                Amount = existing.Type == TransactionType.Income ? newAmount : -newAmount,
-                CategoryId = newCategoryId,
-                Description = newDescription,
-                Date = existing.Date,
-                Type = existing.Type,
-                AccountId = existing.AccountId,
-                CreatedByUserId = existing.CreatedByUserId,
-                IsDeleted = existing.IsDeleted
-            };
+                var transaction = freshContext.Database.BeginTransaction();
+                try
+                {
+                    var existing = freshContext.Transactions
+                        .AsNoTracking()
+                        .FirstOrDefault(t => t.Id == transactionId);
+
+                    if (existing == null) throw new Exception("Transaction not found");
+
+                    // Создаем новый объект для обновления
+                    var updatedTransaction = new Transaction
+                    {
+                        Id = existing.Id,
+                        Amount = existing.Type == TransactionType.Income ? newAmount : -newAmount,
+                        CategoryId = newCategoryId,
+                        Description = newDescription,
+                        Date = existing.Date,
+                        Type = existing.Type,
+                        AccountId = existing.AccountId,
+                        CreatedByUserId = existing.CreatedByUserId,
+                        IsDeleted = existing.IsDeleted
+                    };
 
                     // Обновляем баланс счета
                     var account = freshContext.Accounts.Find(existing.AccountId);
@@ -88,63 +102,101 @@ namespace FinancialTracker.Services
                         throw new Exception("No permission to edit");
                     account.Balance += (updatedTransaction.Amount - existing.Amount);
 
-            // Добавляем запись в историю
-            freshContext.TransactionEditHistories.Add(new TransactionEditHistory
-            {
-                TransactionId = existing.Id,
-                EditedByUserId = editorId,
-                OldAmount = existing.Amount,
-                NewAmount = updatedTransaction.Amount,
-                OldCategoryId = existing.CategoryId,
-                NewCategoryId = newCategoryId,
-                OldDescription = existing.Description,
-                NewDescription = newDescription,
-                EditedAt = DateTime.Now
-            });
+                    // Добавляем запись в историю
+                    freshContext.TransactionEditHistories.Add(new TransactionEditHistory
+                    {
+                        TransactionId = existing.Id,
+                        EditedByUserId = editorId,
+                        OldAmount = existing.Amount,
+                        NewAmount = updatedTransaction.Amount,
+                        OldCategoryId = existing.CategoryId,
+                        NewCategoryId = newCategoryId,
+                        OldDescription = existing.Description,
+                        NewDescription = newDescription,
+                        EditedAt = DateTime.Now
+                    });
 
-            // Обновляем транзакцию
-            freshContext.Entry(updatedTransaction).State = EntityState.Modified;
-            freshContext.SaveChanges();
-            transaction.Commit();
+                    if (existing.Type == TransactionType.Expense)
+                    {
+                        // Откатываем старую сумму
+                        _budgetService.UpdateSpending(
+                        existing.CreatedByUserId,
+                        existing.CategoryId,
+                        -Math.Abs(existing.Amount)
+                        );
+
+                        // Применяем новую сумму
+                        _budgetService.UpdateSpending(
+                        existing.CreatedByUserId,
+                        newCategoryId,
+                        Math.Abs(newAmount)
+                        );
+                    }
+
+                    // Обновляем транзакцию
+                    freshContext.Entry(updatedTransaction).State = EntityState.Modified;
+                    freshContext.SaveChanges();
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception($"Update failed: {ex.Message}");
+                }
+            }
         }
-        catch (Exception ex)
-        {
-            transaction.Rollback();
-            throw new Exception($"Update failed: {ex.Message}");
-        }
-    }
-}
+
         public void DeleteTransaction(int transactionId, int userId)
         {
-            using var freshContext = new AppDbContext();
-            using var transaction = freshContext.Database.BeginTransaction();
-
+            using var dbTransaction = _context.Database.BeginTransaction();
             try
             {
-                // Получаем транзакцию без отслеживания
-                var existing = freshContext.Transactions
-                    .AsNoTracking()
+                // Получаем транзакцию с актуальными данными
+                var existing = _context.Transactions
+                    .Include(t => t.Account)
                     .FirstOrDefault(t => t.Id == transactionId);
 
-                if (existing == null || existing.CreatedByUserId != userId)
-                    throw new Exception("Транзакция не найдена или нет прав доступа");
+                if (existing == null || existing.IsDeleted)
+                    throw new Exception("Transaction not found");
 
-                // Создаем новый объект для удаления
-                var transactionToDelete = new Transaction { Id = existing.Id };
-                freshContext.Transactions.Attach(transactionToDelete);
-                freshContext.Transactions.Remove(transactionToDelete);
+                // Проверка прав доступа
+                if (existing.Account is SharedAccount shared &&
+                    !shared.MemberUserIdsList.Contains(userId))
+                {
+                    throw new Exception("No permission to delete this transaction");
+                }
 
-                // Корректируем баланс
-                var account = freshContext.Accounts.Find(existing.AccountId);
-                account.Balance -= existing.Amount;
+                // Корректируем баланс с учетом типа транзакции
+                if (existing.Type == TransactionType.Income)
+                {
+                    existing.Account.Balance -= existing.Amount; // Уменьшаем на положительную сумму
+                }
+                else
+                {
+                    existing.Account.Balance += Math.Abs(existing.Amount); // Увеличиваем на абсолютное значение
+                }
 
-                freshContext.SaveChanges();
-                transaction.Commit();
+                // Обновляем бюджеты
+                if (existing.Type == TransactionType.Expense)
+                {
+                    _budgetService.UpdateSpending(
+                        existing.CreatedByUserId,
+                        existing.CategoryId,
+                        -Math.Abs(existing.Amount)
+                    );
+                }
+
+                // Помечаем как удаленную
+                existing.IsDeleted = true;
+                existing.Description = $"[DELETED] {existing.Description}";
+
+                _context.SaveChanges();
+                dbTransaction.Commit();
             }
-            catch
+            catch (Exception ex)
             {
-                transaction.Rollback();
-                throw;
+                dbTransaction.Rollback();
+                throw new Exception($"Delete failed: {ex.Message}");
             }
         }
         public List<Transaction> GetTransactionsByAccount(int accountId)

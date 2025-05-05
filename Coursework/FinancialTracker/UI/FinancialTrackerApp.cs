@@ -5,6 +5,7 @@ using FinancialTracker.Entities.Accounts;
 using FinancialTracker.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
+using FinancialTracker.Interfaces;
 
 namespace FinancialTracker.UI
 {
@@ -16,6 +17,7 @@ namespace FinancialTracker.UI
         private readonly AccountService _accountService;
         private readonly CategoryService _categoryService;
         private readonly TransactionService _transactionService;
+        private readonly BudgetService _budgetService;
 
         private readonly AppDbContext _context;
         public FinancialTrackerApp()
@@ -25,7 +27,8 @@ namespace FinancialTracker.UI
             _accountService = new AccountService(_context);
             _service = new PasswordRecoveryService(_context);
             _categoryService = new CategoryService(_context);
-            _transactionService = new TransactionService(_context);
+            _budgetService = new BudgetService(_context);
+            _transactionService = new TransactionService(_context, _budgetService);
             _menu = new Menu();
         }
         public void Run()
@@ -203,7 +206,7 @@ namespace FinancialTracker.UI
                         ManageCategories();
                         break;
                     case 4:
-
+                        ManageBudgets();
                         break;
                     case 5:
 
@@ -324,6 +327,7 @@ namespace FinancialTracker.UI
                 Console.WriteLine("No personal accounts found!");
                 Console.Write("Press any key...");
                 Console.ReadKey();
+                return;
             }
 
             foreach (var a in accounts)
@@ -758,6 +762,14 @@ namespace FinancialTracker.UI
             //}
             try
             {
+                // Проверка наличия счетов
+                if (!_accountService.UserHasAccounts(_currentUser.Id))
+                {
+                    Console.WriteLine("You don't have any accounts. Create an account first.");
+                    Console.ReadKey();
+                    return;
+                }
+
                 // Получаем все счета пользователя
                 var accounts = _accountService.GetPersonalAccounts(_currentUser.Id)
                     .Cast<Account>()
@@ -774,7 +786,8 @@ namespace FinancialTracker.UI
                 }
 
                 Console.Write("Select an account: ");
-                int accountId = InputValidator.GetIntInput(1, int.MaxValue);
+                int accountId = InputValidator.GetIntInput(0, int.MaxValue);
+                if (accountId == 0) return;
 
                 // Выбор типа
                 Console.WriteLine("1. Income\n2. Expense");
@@ -827,6 +840,14 @@ namespace FinancialTracker.UI
             //}
             try
             {
+                // Проверка наличия счетов
+                if (!_accountService.UserHasAccounts(_currentUser.Id))
+                {
+                    Console.WriteLine("You don't have any accounts. Create an account first.");
+                    Console.ReadKey();
+                    return;
+                }
+
                 using var context = new AppDbContext();
                 var transactions = _context.Transactions
                     .AsNoTracking()
@@ -859,7 +880,7 @@ namespace FinancialTracker.UI
                 string desc = Console.ReadLine();
 
                 // Используем новый контекст для операции
-                var transactionService = new TransactionService(new AppDbContext());
+                var transactionService = new TransactionService(new AppDbContext(), new BudgetService(new AppDbContext()));
                 transactionService.UpdateTransaction(transId, amount, newCategoryId, desc, _currentUser.Id);
 
                 Console.WriteLine("The transaction has been updated!");
@@ -906,26 +927,34 @@ namespace FinancialTracker.UI
             //}
             try
             {
+                // Проверка наличия счетов
+                if (!_accountService.UserHasAccounts(_currentUser.Id))
+                {
+                    Console.WriteLine("You don't have any accounts. Create an account first.");
+                    Console.ReadKey();
+                    return;
+                }
+
                 var transactions = _transactionService.GetTransactionsByUser(_currentUser.Id)
                     .Where(t => !t.IsDeleted)
                     .ToList();
 
-                Console.WriteLine("Ваши транзакции:");
+                Console.WriteLine("Your transactions:");
                 foreach (var t in transactions)
                 {
                     Console.WriteLine($"{t.Id}. {t.Date:d} | {t.Amount} | {t.Category.Name}");
                 }
 
-                Console.Write("Выберите ID транзакции для удаления (0 для отмены): ");
+                Console.Write("Enter transaction ID (0 to cancel): ");
                 int transId = InputValidator.GetIntInput(0, int.MaxValue);
                 if (transId == 0) return;
 
                 _transactionService.DeleteTransaction(transId, _currentUser.Id);
-                Console.WriteLine("Транзакция удалена!");
+                Console.WriteLine("Transaction deleted successfully!");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ошибка: {ex.Message}");
+                Console.WriteLine($"Error: {ex.Message}");
             }
             Console.ReadKey();
         }
@@ -943,6 +972,14 @@ namespace FinancialTracker.UI
             //}
             try
             {
+                // Проверка наличия счетов
+                if (!_accountService.UserHasAccounts(_currentUser.Id))
+                {
+                    Console.WriteLine("You don't have any accounts. Create an account first.");
+                    Console.ReadKey();
+                    return;
+                }
+
                 Console.WriteLine("\nYour transactions:");
                 var transactions = _transactionService.GetTransactionsByUser(_currentUser.Id);
 
@@ -1007,6 +1044,14 @@ namespace FinancialTracker.UI
             //}
             try
             {
+                // Проверка наличия счетов
+                if (!_accountService.UserHasAccounts(_currentUser.Id))
+                {
+                    Console.WriteLine("You don't have any accounts. Create an account first.");
+                    Console.ReadKey();
+                    return;
+                }
+
                 // Базовый запрос только для доступных счетов
                 var userAccounts = _accountService.GetPersonalAccounts(_currentUser.Id)
                     .Cast<Account>()
@@ -1121,5 +1166,89 @@ namespace FinancialTracker.UI
         }
 
         ////////////////////////////////////////////////////////
+        ///
+        private void ManageBudgets()
+        {
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("=== BUDGET MANAGEMENT ===");
+                Console.WriteLine("1. Set Budget Limit");
+                Console.WriteLine("2. View Current Budgets");
+                Console.WriteLine("3. View Notifications");
+                Console.WriteLine("0. Back");
+                Console.Write("Choice: ");
+
+                var choice = InputValidator.GetIntInput(0, 3);
+                switch (choice)
+                {
+                    case 1:
+                        SetBudgetLimit();
+                        break;
+                    case 2:
+                        ViewCurrentBudgets();
+                        break;
+                    case 3:
+                        ViewNotifications();
+                        break;
+                    case 0:
+                        return;
+                }
+            }
+        }
+
+        private void SetBudgetLimit()
+        {
+            var categories = _categoryService.GetAllCategories();
+
+            Console.WriteLine("Available categories:");
+            foreach (var cat in categories)
+            {
+                Console.WriteLine($"{cat.Id}. {cat.Name}");
+            }
+
+            Console.Write("Select category ID: ");
+            int categoryId = InputValidator.GetIntInput(1, int.MaxValue);
+
+            Console.Write("Enter monthly limit: ");
+            decimal limit = InputValidator.GetDecimalInput("", 0.01m, 1000000m);
+
+            _budgetService.SetBudgetLimit(_currentUser.Id, categoryId, limit);
+            Console.WriteLine("Budget limit updated!");
+            Console.ReadKey();
+        }
+
+        private void ViewCurrentBudgets()
+        {
+            var budgets = _budgetService.GetCurrentBudgets(_currentUser.Id);
+
+            Console.WriteLine("\n=== CURRENT BUDGETS ===");
+            foreach (var budget in budgets)
+            {
+                var category = _categoryService.GetCategory(budget.CategoryId);
+                Console.WriteLine($"{category.Name}:");
+                Console.WriteLine($"  Limit: {budget.Limit:C}");
+                Console.WriteLine($"  Spent: {budget.CurrentSpending:C}");
+                Console.WriteLine($"  Progress: {budget.CurrentSpending / budget.Limit * 100}%");
+            }
+            Console.ReadKey();
+        }
+
+        private void ViewNotifications()
+        {
+            var notifications = _context.Notifications
+                .Where(n => n.UserId == _currentUser.Id && !n.IsRead)
+                .OrderByDescending(n => n.CreatedAt)
+                .ToList();
+
+            Console.WriteLine("\n=== NOTIFICATIONS ===");
+            foreach (var n in notifications)
+            {
+                Console.WriteLine($"[{n.CreatedAt:g}] {n.Message}");
+                n.IsRead = true;
+            }
+            _context.SaveChanges();
+            Console.ReadKey();
+        }
     }
 }

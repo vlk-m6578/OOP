@@ -89,6 +89,11 @@ namespace FinancialTracker.Services
             account.Balance += amount;
             _context.SaveChanges();
         }
-        
+        public bool UserHasAccounts(int userId)
+        {
+            var personal = GetPersonalAccounts(userId).Count;
+            var shared = GetSharedAccountsForUser(userId).Count;
+            return personal + shared > 0;
+        }
     }
 }

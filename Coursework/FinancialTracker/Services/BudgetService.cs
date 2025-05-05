@@ -1,58 +1,91 @@
 ﻿using FinancialTracker.Interfaces;
 using FinancialTracker.Entities;
 using FinancialTracker.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinancialTracker.Services
 {
     public class BudgetService : IBudgetService
     {
-        private readonly ITransactionService _transactionService;
+        //private readonly ITransactionService _transactionService;
 
         private readonly AppDbContext _context;
-        public BudgetService(AppDbContext context, ITransactionService transactionService)
+        public BudgetService(AppDbContext context)
         {
             _context = context;
-            _transactionService = transactionService;
         }
-        public void SetBudgetLimit(int categoryId, decimal limit)
+        public void SetBudgetLimit(int userId, int categoryId, decimal limit)
         {
             var currentMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
             var budget = _context.Budgets
-                .FirstOrDefault(b => b.CategoryId == categoryId && b.Month == currentMonth);
+                .FirstOrDefault(b => b.UserId == userId &&
+                                    b.CategoryId == categoryId &&
+                                    b.Month == currentMonth);
 
             if (budget != null)
             {
-                budget.UpdateLimit(limit);
+                budget.Limit = limit;
             }
             else
             {
-                _context.Budgets.Add(new Budget(categoryId, limit, currentMonth));
+                _context.Budgets.Add(new Budget(userId, categoryId, limit, currentMonth));
             }
             _context.SaveChanges();
         }
-        public List<Budget> GetCurrentBudgets()
+        public List<Budget> GetCurrentBudgets(int userId)
         {
             var currentMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
             return _context.Budgets
-                .Where(b => b.Month == currentMonth)
+                .Where(b => b.UserId == userId && b.Month == currentMonth)
+                .Include(b => b.Category)
                 .ToList();
         }
 
-        public void UpdateBudgetSpending()
+
+        public void UpdateSpending(int userId, int categoryId, decimal amount)
         {
-            var currentMonthStart = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-            var transactions = _transactionService.GetTransactionsByPeriod(
-                currentMonthStart,
-                currentMonthStart.AddMonths(1).AddDays(-1));
+            var currentMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            var budget = _context.Budgets
+                .FirstOrDefault(b => b.UserId == userId &&
+                                   b.CategoryId == categoryId &&
+                                   b.Month == currentMonth);
 
-            foreach (var budget in _context.Budgets)
+            if (budget != null)
             {
-                var categorySpending = transactions
-                    .Where(t => t.CategoryId == budget.CategoryId && t.Type == TransactionType.Expense)
-                    .Sum(t => t.Amount);
-
-                budget.UpdateSpending(Math.Abs(categorySpending));
+                budget.UpdateSpending(amount);
+                CheckAndNotify(budget);
+                _context.SaveChanges();
             }
+        }
+        private void CheckAndNotify(Budget budget)
+        {
+            if (budget.IsLimitReached())
+            {
+                CreateNotification(budget.UserId,
+                    $"Лимит категории '{GetCategoryName(budget.CategoryId)}' достигнут! ({budget.CurrentSpending}/{budget.Limit})");
+            }
+            else if (budget.IsWarningThresholdReached())
+            {
+                CreateNotification(budget.UserId,
+                    $"Лимит категории '{GetCategoryName(budget.CategoryId)}' достиг 80%! ({budget.CurrentSpending}/{budget.Limit})");
+            }
+        }
+        private string GetCategoryName(int categoryId)
+        {
+            return _context.Categories
+                .FirstOrDefault(c => c.Id == categoryId)?
+                .Name ?? "Unknown Category";
+        }
+
+        private void CreateNotification(int userId, string message)
+        {
+            _context.Notifications.Add(new Notification
+            {
+                UserId = userId,
+                Message = message,
+                CreatedAt = DateTime.Now,
+                IsRead = false
+            });
         }
 
         public List<Budget> GetExpiredBudgets()

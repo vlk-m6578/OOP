@@ -1,5 +1,6 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FinancialTracker.Entities
 {
@@ -11,6 +12,11 @@ namespace FinancialTracker.Entities
         [Required]
         public int CategoryId { get; set; }
 
+        [ForeignKey("CategoryId")]
+        public virtual Category Category { get; set; }
+
+        [Required]
+        public int UserId { get; set; }
         public decimal CurrentSpending { get; set; }
 
         [Required]
@@ -23,23 +29,18 @@ namespace FinancialTracker.Entities
         // Конструктор для EF Core
         private Budget() { }
 
-        public Budget(int categoryId, decimal limit, DateTime month)
+        public Budget(int userId, int categoryId, decimal limit, DateTime month)
         {
+            UserId = userId;
             CategoryId = categoryId;
             Limit = limit;
             Month = month;
             CurrentSpending = 0;
         }
-        public Budget(int categoryId, decimal limit) 
-        {
-            CategoryId = categoryId;
-            Limit = limit;
-            Month = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-        }
 
         public void UpdateLimit(decimal newLimit) => Limit = newLimit;
         public void UpdateSpending(decimal amount) => CurrentSpending += amount;
-        public bool isLimitReached() => CurrentSpending >= Limit;
+        public bool IsLimitReached() => CurrentSpending >= Limit;
         public bool IsWarningThresholdReached() => CurrentSpending >= Limit * 0.8m;
     }
 }

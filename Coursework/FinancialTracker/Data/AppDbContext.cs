@@ -19,6 +19,8 @@ namespace FinancialTracker.Data
         public DbSet<AccountHistoryEntry> AccountHistoryEntries { get; set; }
         public DbSet<TransactionEditHistory> TransactionEditHistories { get; set; }
         public DbSet<Invitation> Invitations { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+
 
         public AppDbContext()
         {
@@ -73,10 +75,11 @@ namespace FinancialTracker.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Budget>()
-                .HasOne<Category>()
+                .HasOne(b => b.Category)
                 .WithMany()
                 .HasForeignKey(b => b.CategoryId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
+
 
             modelBuilder.Entity<Category>()
                 .Property(c => c.Name)

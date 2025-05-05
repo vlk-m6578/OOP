@@ -18,8 +18,23 @@ namespace FinancialTracker.Entities.Accounts
         
         public virtual void ApplyTransaction(Transaction transaction)
         {
-            Balance += transaction.Amount;
-            Transactions.Add(transaction);
+            if (transaction.Type == TransactionType.Income)
+            {
+                Balance += Math.Abs(transaction.Amount);
+                Transactions.Add(transaction);
+            }
+            else
+            {
+                Balance -= Math.Abs(transaction.Amount);
+                Transactions.Add(transaction);
+            }
+
+            // Защита от отрицательного баланса для личных счетов
+            if (this is PersonalAccount && Balance < 0)
+            {
+                throw new InvalidOperationException("Insufficient funds");
+            }
+            
         }
     }
 }
