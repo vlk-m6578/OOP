@@ -189,7 +189,7 @@ namespace FinancialTracker.UI
             while (inDashboard)
             {
                 _menu.ShowDashboardMenu();
-                int choice = InputValidator.GetIntInput(1, 6);
+                int choice = InputValidator.GetIntInput(1, 7);
 
                 switch (choice)
                 {
@@ -209,6 +209,9 @@ namespace FinancialTracker.UI
 
                         break;
                     case 6:
+                        
+                        break;
+                    case 7:
                         _currentUser = null;
                         Console.WriteLine("Successfully logged out.");
                         inDashboard = false;
@@ -239,7 +242,7 @@ namespace FinancialTracker.UI
                     ManageSharedAccounts();
                     break;
                 case 6:
-                //ViewOperationHistory();
+                    //ViewOperationHistory();
                 case 0:
                     break;
             }
@@ -1116,5 +1119,7 @@ namespace FinancialTracker.UI
             var user = _context.Users.Find(userId);
             return user?.Username ?? "Unknown User";
         }
+
+        ////////////////////////////////////////////////////////
     }
 }

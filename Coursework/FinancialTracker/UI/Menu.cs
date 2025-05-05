@@ -29,10 +29,11 @@ namespace FinancialTracker.UI
 
             Console.WriteLine("1. Account Management");
             Console.WriteLine("2. Transaction Management");
-            Console.WriteLine("3. Categories & Budgets");
-            Console.WriteLine("4. Reports");
-            Console.WriteLine("5. Profile Settings"); //
-            Console.WriteLine("6. Logout");
+            Console.WriteLine("3. Categories");
+            Console.WriteLine("4. Budgets");
+            Console.WriteLine("5. Reports");
+            Console.WriteLine("6. Profile Settings"); //
+            Console.WriteLine("7. Logout");
             Console.Write("Select section: ");
         }
         public void ShowAccountManagementMenu()
