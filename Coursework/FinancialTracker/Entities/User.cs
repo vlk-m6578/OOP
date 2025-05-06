@@ -48,5 +48,19 @@ namespace FinancialTracker.Entities
         }
         public void ActivateAccount() => IsActive = true;
         public void DeactivateAccount() => IsActive = false;
+
+        public void SetUsername(string newUsername)
+        {
+            if (string.IsNullOrWhiteSpace(newUsername))
+                throw new ArgumentException("Username cannot be empty");
+            Username = newUsername;
+        }
+
+        public void SetEmail(string newEmail)
+        {
+            if (string.IsNullOrWhiteSpace(newEmail) || !new EmailAddressAttribute().IsValid(newEmail))
+                throw new ArgumentException("Invalid email format");
+            Email = newEmail;
+        }
     }
 }

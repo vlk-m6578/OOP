@@ -130,8 +130,7 @@ namespace FinancialTracker.UI
 
             Console.WriteLine("1. Change Username");
             Console.WriteLine("2. Change Email");
-            Console.WriteLine("3. Change Password");
-            Console.WriteLine("4. Deactivate Account");
+            Console.WriteLine("3. Deactivate Account");
             Console.WriteLine("0. Back");
             Console.Write("Action: ");
         }

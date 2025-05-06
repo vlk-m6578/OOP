@@ -212,7 +212,7 @@ namespace FinancialTracker.UI
                         ManageReports();
                         break;
                     case 6:
-                        
+                        ManageProfileSettings();
                         break;
                     case 7:
                         _currentUser = null;
@@ -243,7 +243,7 @@ namespace FinancialTracker.UI
                     break;
                 case 5:
                     ManageSharedAccounts();
-                    break;
+                    return;
                 case 6:
                     //ViewOperationHistory();
                 case 0:
@@ -1272,6 +1272,101 @@ namespace FinancialTracker.UI
             Console.WriteLine(report.GetFormattedReport());
             Console.WriteLine("\nНажмите любую клавишу чтобы продолжить...");
             Console.ReadKey();
+        }
+
+        ////////////////////////////
+        ///
+        private void ManageProfileSettings()
+        {
+            while (true)
+            {
+                Console.Clear();
+                _menu.ShowProfileSettingsMenu();
+                int choice = InputValidator.GetIntInput(0, 3);
+
+                switch (choice)
+                {
+                    case 1:
+                        ChangeUsername();
+                        break;
+                    case 2:
+                        ChangeEmail();
+                        break;
+                    case 3:
+                        bool a = DeactivateAccount();
+                        if (a == true) Run();
+                        else ShowDashboard();
+                        break;
+                    case 0:
+                        return;
+                }
+            }
+        }
+        private void ChangeUsername()
+        {
+            try
+            {
+                Console.Write("Enter new username: ");
+                string newUsername = Console.ReadLine().Trim();
+
+                if (_context.Users.Any(u => u.Username == newUsername))
+                {
+                    HandleError("Username already exists");
+                    return;
+                }
+
+                _currentUser.SetUsername(newUsername);
+                _context.SaveChanges();
+                Console.WriteLine("Username updated successfully!");
+            }
+            catch (Exception ex)
+            {
+                HandleError(ex.Message);
+            }
+            Console.ReadKey();
+        }
+
+        private void ChangeEmail()
+        {
+            try
+            {
+                Console.Write("Enter new email: ");
+                string newEmail = Console.ReadLine().Trim();
+
+                if (_context.Users.Any(u => u.Email == newEmail))
+                {
+                    HandleError("Email already registered");
+                    return;
+                }
+
+                _currentUser.SetEmail(newEmail);
+                _context.SaveChanges();
+                Console.WriteLine("Email updated successfully!");
+            }
+            catch (Exception ex)
+            {
+                HandleError(ex.Message);
+            }
+            Console.ReadKey();
+        }
+
+        private bool DeactivateAccount()
+        {
+            bool a = false;
+            Console.Write("Are you sure you want to deactivate your account? (Y/N): ");
+            string confirm = Console.ReadLine().Trim().ToUpper();
+
+            if (confirm == "Y")
+            {
+                _currentUser.DeactivateAccount();
+                _context.SaveChanges();
+                Console.WriteLine("Account deactivated. Logging out...");
+                _currentUser = null;
+                Console.ReadKey();
+                a = true;
+                return a;
+            }
+            return a;
         }
     }
 }
