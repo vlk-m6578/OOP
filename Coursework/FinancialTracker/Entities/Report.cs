@@ -1,62 +1,78 @@
-﻿using FinancialTracker.Interfaces;
+﻿using System.Text;
 
-namespace FinancialTracker.Entities
+public class Report
 {
-    public class Report : IReportService
+    public DateTime StartDate { get; }
+    public DateTime EndDate { get; }
+    public decimal TotalIncome { get; private set; }
+    public decimal TotalExpense { get; private set; }
+
+    // Изменяем тип ключа на string
+    public Dictionary<string, CategoryReportData> CategoryData { get; }
+        = new Dictionary<string, CategoryReportData>();
+
+    public class CategoryReportData
     {
-        public int Id { get; set; }
-        public DateTime StartDate { get; }
-        public DateTime EndDate { get; }
-        public Dictionary<int, CategoryTotal> CategoryTotals { get; } = new Dictionary<int, CategoryTotal>();
-        public Report(DateTime startDate, DateTime endDate) 
+        public string CategoryName { get; set; }
+        public decimal Income { get; set; }
+        public decimal Expense { get; set; }
+        public decimal BudgetLimit { get; set; }
+        public decimal BudgetUsed { get; set; }
+    }
+
+    public Report(DateTime start, DateTime end)
+    {
+        StartDate = start;
+        EndDate = end;
+    }
+
+    public void AddCategoryData(
+        string categoryName,  // Принимаем string как ключ
+        decimal income,
+        decimal expense,
+        decimal budgetLimit,
+        decimal budgetUsed)
+    {
+        var key = categoryName.ToLowerInvariant();
+
+        if (!CategoryData.ContainsKey(key))
         {
-            StartDate = startDate;
-            EndDate = endDate;
-        }
-        public void AddCategoryData(int categoryId, decimal income, decimal expense)
-        {
-            if (!CategoryTotals.ContainsKey(categoryId))
+            CategoryData[key] = new CategoryReportData
             {
-                CategoryTotals[categoryId] = new CategoryTotal();
-            }
-            CategoryTotals[categoryId].TotalIncome += income;
-            CategoryTotals[categoryId].TotalExpense += expense;
-        }
-        public Report GenerateFinancialReport(DateTime startDate, DateTime endDate)
-        {
-            return this;
+                CategoryName = categoryName,
+                BudgetLimit = budgetLimit
+            };
         }
 
-        public void Generate()
+        CategoryData[key].Income += income;
+        CategoryData[key].Expense += expense;
+        CategoryData[key].BudgetUsed += budgetUsed;
+
+        TotalIncome += income;
+        TotalExpense += expense;
+    }
+
+    public string GetFormattedReport()
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine($"===== ОТЧЕТ: {StartDate:dd.MM.yyyy} - {EndDate:dd.MM.yyyy} =====");
+        sb.AppendLine($"Доходы: {TotalIncome:C}");
+        sb.AppendLine($"Расходы: {TotalExpense:C}");
+        sb.AppendLine($"Баланс: {TotalIncome - TotalExpense:C}\n");
+
+        sb.AppendLine("Детали по категориям:");
+        foreach (var entry in CategoryData.Values.OrderByDescending(x => x.Expense))
         {
-            Console.WriteLine("================================================================ REPORT ==============================================================");
-            Console.WriteLine($"Period: {StartDate:d} - {EndDate:d}");
+            sb.AppendLine($"\n[{entry.CategoryName.ToUpper()}]");
+            sb.AppendLine($"Расходы: {entry.Expense:C}");
 
-            decimal totalIncome = 0;
-            decimal totalExpense = 0;
-
-            foreach(var entry in CategoryTotals)
+            if (entry.BudgetLimit > 0)
             {
-                totalIncome += entry.Value.TotalIncome;
-                totalExpense += entry.Value.TotalExpense;
-                Console.WriteLine($"{GetCategoryName(entry.Key)}: " +
-                                  $"Income {entry.Value.TotalIncome:C}, " +
-                                  $"Expense {entry.Value.TotalExpense:C}");
+                decimal percent = entry.BudgetUsed / entry.BudgetLimit * 100;
+                sb.AppendLine($"Использовано бюджета: {percent:0}% ({entry.BudgetUsed:C} / {entry.BudgetLimit:C})");
             }
-            Console.WriteLine("\nSUMMARY: ");
-            Console.WriteLine($"Total Income: {totalIncome:C}");
-            Console.WriteLine($"Total Expenses: {totalExpense:C}");
-            Console.WriteLine($"Net Balance: {totalIncome - totalExpense:C}");
-        }
-        private string GetCategoryName(int categoryId)
-        {
-            return "Category name";
         }
 
-        public class CategoryTotal
-        {
-            public decimal TotalIncome { get; set; }
-            public decimal TotalExpense { get; set; }
-        }
+        return sb.ToString();
     }
 }

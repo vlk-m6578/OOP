@@ -209,7 +209,7 @@ namespace FinancialTracker.UI
                         ManageBudgets();
                         break;
                     case 5:
-
+                        ManageReports();
                         break;
                     case 6:
                         
@@ -751,15 +751,6 @@ namespace FinancialTracker.UI
 
         private void AddTransaction()
         {
-            //var personalAccounts = _accountService.GetPersonalAccounts(_currentUser.Id);
-            //var sharedAccounts = _accountService.GetSharedAccountsForUser(_currentUser.Id);
-            //if (sharedAccounts.Count == 0 || personalAccounts.Count == 0)
-            //{
-            //    Console.WriteLine("No accounts found!");
-            //    Console.Write("Press any key...");
-            //    Console.ReadKey();
-            //    return;
-            //}
             try
             {
                 // Проверка наличия счетов
@@ -829,15 +820,6 @@ namespace FinancialTracker.UI
 
         private void EditTransaction()
         {
-            //var personalAccounts = _accountService.GetPersonalAccounts(_currentUser.Id);
-            //var sharedAccounts = _accountService.GetSharedAccountsForUser(_currentUser.Id);
-            //if (sharedAccounts.Count == 0 || personalAccounts.Count == 0)
-            //{
-            //    Console.WriteLine("No accounts found!");
-            //    Console.Write("Press any key...");
-            //    Console.ReadKey();
-            //    return;
-            //}
             try
             {
                 // Проверка наличия счетов
@@ -916,15 +898,6 @@ namespace FinancialTracker.UI
         }
         private void DeleteTransaction()
         {
-            //var personalAccounts = _accountService.GetPersonalAccounts(_currentUser.Id);
-            //var sharedAccounts = _accountService.GetSharedAccountsForUser(_currentUser.Id);
-            //if (sharedAccounts.Count == 0 || personalAccounts.Count == 0)
-            //{
-            //    Console.WriteLine("No accounts found!");
-            //    Console.Write("Press any key...");
-            //    Console.ReadKey();
-            //    return;
-            //}
             try
             {
                 // Проверка наличия счетов
@@ -961,15 +934,6 @@ namespace FinancialTracker.UI
 
         private void ViewEditHistory()
         {
-            //var personalAccounts = _accountService.GetPersonalAccounts(_currentUser.Id);
-            //var sharedAccounts = _accountService.GetSharedAccountsForUser(_currentUser.Id);
-            //if (sharedAccounts.Count == 0 || personalAccounts.Count == 0)
-            //{
-            //    Console.WriteLine("No accounts found!");
-            //    Console.Write("Press any key...");
-            //    Console.ReadKey();
-            //    return;
-            //}
             try
             {
                 // Проверка наличия счетов
@@ -1033,15 +997,6 @@ namespace FinancialTracker.UI
 
         private void SearchTransactions()
         {
-            //var personalAccounts = _accountService.GetPersonalAccounts(_currentUser.Id);
-            //var sharedAccounts = _accountService.GetSharedAccountsForUser(_currentUser.Id);
-            //if (sharedAccounts.Count == 0 || personalAccounts.Count == 0)
-            //{
-            //    Console.WriteLine("No accounts found!");
-            //    Console.Write("Press any key...");
-            //    Console.ReadKey();
-            //    return;
-            //}
             try
             {
                 // Проверка наличия счетов
@@ -1248,6 +1203,74 @@ namespace FinancialTracker.UI
                 n.IsRead = true;
             }
             _context.SaveChanges();
+            Console.ReadKey();
+        }
+        ///////////////////////////////////////////
+        ///
+        private void ManageReports()
+        {
+            var reportService = new ReportService(_context);
+
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("=== УПРАВЛЕНИЕ ОТЧЕТАМИ ===");
+                Console.WriteLine("1. Отчет за текущий месяц");
+                Console.WriteLine("2. Отчет за предыдущий месяц");
+                Console.WriteLine("3. Отчет за произвольный период");
+                Console.WriteLine("4. Сохранить последний отчет в файл");
+                Console.WriteLine("0. Назад");
+                Console.Write("Выберите действие: ");
+
+                var choice = InputValidator.GetIntInput(0, 4);
+
+                try
+                {
+                    switch (choice)
+                    {
+                        case 1: // Текущий месяц
+                            var currentReport = reportService.GenerateMonthlyReport(
+                                _currentUser.Id, DateTime.Now);
+                            DisplayReport(currentReport);
+                            break;
+
+                        case 2: // Предыдущий месяц
+                            var prevMonthReport = reportService.GenerateMonthlyReport(
+                                _currentUser.Id, DateTime.Now.AddMonths(-1));
+                            DisplayReport(prevMonthReport);
+                            break;
+
+                        case 3: // Произвольный период
+                            var start = InputValidator.GetDateInput("Начальная дата (yyyy-MM-dd): ");
+                            var end = InputValidator.GetDateInput("Конечная дата (yyyy-MM-dd): ");
+                            var customReport = reportService.GenerateCustomReport(
+                                _currentUser.Id, start, end);
+                            DisplayReport(customReport);
+                            break;
+
+                        case 4:
+                            reportService.SaveLastReportToFile();
+                            Console.WriteLine("\nОтчет успешно сохранен в папку 'reports'");
+                            Console.ReadKey();
+                            break;
+
+                        case 0:
+                            return;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Ошибка: {ex.Message}");
+                    Console.ReadKey();
+                }
+            }
+        }
+
+        private void DisplayReport(Report report)
+        {
+            Console.Clear();
+            Console.WriteLine(report.GetFormattedReport());
+            Console.WriteLine("\nНажмите любую клавишу чтобы продолжить...");
             Console.ReadKey();
         }
     }
