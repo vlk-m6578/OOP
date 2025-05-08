@@ -9,6 +9,7 @@ class Program
 {
     static async Task Main()
     {
+        // Регистрация зависимостей
         var services = new ServiceCollection();
 
         services.AddSingleton<IStudentRepository, StudentRepository>();
