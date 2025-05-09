@@ -112,6 +112,12 @@ namespace FinancialTracker.Data
                 .HasOne(i => i.InviterUser)
                 .WithMany()
                 .HasForeignKey(i => i.InviterUserId);
+
+            modelBuilder.Entity<SharedAccount>()
+                .HasMany(s => s.History)
+                .WithOne(e => e.SharedAccount)
+                .HasForeignKey(e => e.SharedAccountId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

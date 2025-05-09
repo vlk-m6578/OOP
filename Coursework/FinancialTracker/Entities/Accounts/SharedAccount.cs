@@ -32,6 +32,8 @@ namespace FinancialTracker.Entities.Accounts
         {
             CreatorUserId = creatorId;
             MemberUserIds = creatorId.ToString();
+
+            History = new List<AccountHistoryEntry>();
         }
         public bool IsCreator(int userId) => CreatorUserId == userId;
         private void AddMember(int userId)
@@ -45,8 +47,15 @@ namespace FinancialTracker.Entities.Accounts
         }
         public void LogHistory(int userId, string action, string details)
         {
-            History.Add(new AccountHistoryEntry(userId, action, details));
-            _context.SaveChanges();
+            History.Add(new AccountHistoryEntry
+            {
+                UserId = userId,
+                Action = action,
+                Details = details,
+                Timestamp = DateTime.UtcNow,
+                SharedAccountId = this.Id
+            });
+            //_context.SaveChanges();
         }
         public override void ApplyTransaction(Transaction transaction)
         {
@@ -75,7 +84,14 @@ namespace FinancialTracker.Entities.Accounts
         {
             outputHandler($"Creator: {getUserName(CreatorUserId)}");
             outputHandler("Members:");
-            foreach (int memberId in MemberUserIds.Where(id => id != CreatorUserId))
+
+            // Используем MemberUserIdsList вместо MemberUserIds и убираем дубликаты
+            var uniqueMembers = MemberUserIdsList
+                .Where(id => id != CreatorUserId)
+                .Distinct()
+                .ToList();
+
+            foreach (int memberId in uniqueMembers)
             {
                 outputHandler($"- {getUserName(memberId)} (ID: {memberId})");
             }

@@ -1,0 +1,24 @@
+===== REPORT: 01.05.2025 - 31.05.2025 =====
+Incomes: 830,0 BYN
+Expenses: 321,97 BYN
+Balance: 508,03 BYN
+
+Details by category:
+
+[FOOD]
+Incomes: 150,0
+Budget used: 47% (150,00 ₽ / 320,00 ₽)
+
+[OTHER]
+Incomes: 115,0
+
+[TRANSPORT]
+Incomes: 56,97
+Budget used: 39% (56,97 ₽ / 145,00 ₽)
+
+[SALARY]
+Incomes: 0
+
+[HOUSING]
+Incomes: 0
+Budget used: 0% (0,00 ₽ / 30,00 ₽)

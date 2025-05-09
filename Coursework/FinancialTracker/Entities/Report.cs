@@ -69,7 +69,7 @@ public class Report
             if (entry.BudgetLimit > 0)
             {
                 decimal percent = entry.BudgetUsed / entry.BudgetLimit * 100;
-                sb.AppendLine($"Budget used: {percent:0}% ({entry.BudgetUsed:C} / {entry.BudgetLimit:C})");
+                sb.AppendLine($"Budget used: {percent:0}% ({entry.BudgetUsed} BYN / {entry.BudgetLimit} BYN)");
             }
         }
 

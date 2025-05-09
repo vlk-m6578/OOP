@@ -116,14 +116,16 @@ namespace FinancialTracker.UI
         {
             var pendingInvites = _context.Invitations
                 .Include(i => i.SharedAccount)
+                .ThenInclude(s => s.History)
                 .Include(i => i.InviterUser)
                 .Where(i => i.InvitedUserId == _currentUser.Id && i.Status == InvitationStatus.Pending)
                 .ToList();
 
             foreach (var invite in pendingInvites)
             {
-                var sharedAccount = _context.Accounts.OfType<SharedAccount>()
-                    .First(a => a.Id == invite.SharedAccountId);
+                var sharedAccount = _context.SharedAccounts
+                    .Include(s => s.History)
+                    .First(s => s.Id == invite.SharedAccountId);
 
                 Console.WriteLine($"\nYou've been invited to shared account '{sharedAccount.Name}' by {invite.InviterUser.Username}");
                 Console.Write("Accept invitation? (Y/N): ");
@@ -133,6 +135,14 @@ namespace FinancialTracker.UI
                 {
                     invite.Status = InvitationStatus.Accepted;
                     var members = sharedAccount.MemberUserIdsList;
+
+                    // Добавляем проверку на дубликат перед добавлением
+                    if (!members.Contains(_currentUser.Id))
+                    {
+                        members.Add(_currentUser.Id);
+                        sharedAccount.MemberUserIds = string.Join(",", members.Distinct());
+                    }
+
                     members.Add(_currentUser.Id);
                     sharedAccount.MemberUserIds = string.Join(",", members.Distinct());
                     sharedAccount.LogHistory(_currentUser.Id, "Member Joined", $"User {_currentUser.Username} accepted invitation");
@@ -367,6 +377,7 @@ namespace FinancialTracker.UI
             var newAccount = _accountService.CreateSharedAccount(accountName, _currentUser.Id);
             newAccount.LogHistory(_currentUser.Id, "Account Created", $"Created by {_currentUser.Username}");
             Console.WriteLine($"Shared account '{newAccount.Name}' created! ID: {newAccount.Id}");
+            _context.SaveChanges();
             Console.Write("Press any key...");
             Console.ReadKey();
         }
@@ -504,7 +515,8 @@ namespace FinancialTracker.UI
 
             var newAccount = _accountService.UpdateSharedAccountName(accountId, newName, _currentUser.Id);
             newAccount.LogHistory(_currentUser.Id, "Account Updated", $"Updated by {_currentUser.Username}");
-            //Console.WriteLine($"Shared account '{newAccount.Name}' updated! ID: {newAccount.Id}");
+            _context.SaveChanges();
+            Console.WriteLine($"Shared account '{newAccount.Name}' updated! ID: {newAccount.Id}");
 
             if (_accountService.UpdateSharedAccountName(accountId, newName, _currentUser.Id) != null)
             {
@@ -596,21 +608,16 @@ namespace FinancialTracker.UI
         }
         private void ViewSharedAccountHistory(SharedAccount account)
         {
+            // Явно загружаем историю из БД
+            var accountWithHistory = _context.SharedAccounts
+                .Include(a => a.History)
+                .FirstOrDefault(a => a.Id == account.Id);
+
             Console.WriteLine("\n=== ACCOUNT HISTORY ===");
-            foreach (var entry in account.History)
+            foreach (var entry in accountWithHistory.History.OrderBy(e => e.Timestamp))
             {
-                Console.WriteLine($"[{entry.Timestamp}] {entry.Action}: {entry.Details}");
-            }
-
-            // Показать отклоненные приглашения
-            var declinedInvites = _context.Invitations
-                .Where(i => i.SharedAccountId == account.Id && i.Status == InvitationStatus.Declined)
-                .ToList();
-
-            foreach (var invite in declinedInvites)
-            {
-                var user = _context.Users.Find(invite.InvitedUserId);
-                Console.WriteLine($"[{invite.Timestamp}] Invitation Declined: {user?.Username ?? "Unknown user"}");
+                var user = _context.Users.Find(entry.UserId);
+                Console.WriteLine($"[{entry.Timestamp}] [{user?.Username}] {entry.Action}: {entry.Details}");
             }
 
             Console.ReadKey();
@@ -679,14 +686,21 @@ namespace FinancialTracker.UI
         private void ViewMembers(SharedAccount account)
         {
             Console.WriteLine("\n=== ACCOUNT MEMBERS ===");
+
+            // Явно загружаем пользователей из базы данных
+            var memberIds = account.MemberUserIdsList
+                .Distinct()
+                .ToList();
+
+            var users = _context.Users
+                .Where(u => memberIds.Contains(u.Id))
+                .ToDictionary(u => u.Id, u => u.Username);
+
             account.ViewMembers(
                 message => Console.WriteLine(message),
-                userId =>
-                {
-                    var user = _context.Users.Find(userId);
-                    return user != null ? user.Username : "Unknown User";
-                }
+                userId => users.TryGetValue(userId, out var name) ? name : "Unknown User"
             );
+
             Console.ReadKey();
         }
         private void ViewPendingInvitations(SharedAccount account)

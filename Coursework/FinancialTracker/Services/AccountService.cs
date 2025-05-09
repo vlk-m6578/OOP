@@ -97,17 +97,18 @@ namespace FinancialTracker.Services
         }
         public SharedAccount UpdateSharedAccountName(int accountId, string newName, int userId)
         {
-            var account = _context.Accounts
-                .OfType<SharedAccount>()
+            var account = _context.SharedAccounts
+                .Include(a => a.History)
                 .FirstOrDefault(a => a.Id == accountId && a.CreatorUserId == userId);
 
             if (account == null) return null;
 
             account.Name = newName;
+            account.LogHistory(userId, "Account Updated", $"New name: {newName}");
             _context.SaveChanges();
+
             return account;
         }
-
         public bool DeleteSharedAccount(int accountId, int userId)
         {
             var account = _context.Accounts
