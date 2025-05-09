@@ -95,5 +95,37 @@ namespace FinancialTracker.Services
             var shared = GetSharedAccountsForUser(userId).Count;
             return personal + shared > 0;
         }
+        public SharedAccount UpdateSharedAccountName(int accountId, string newName, int userId)
+        {
+            var account = _context.Accounts
+                .OfType<SharedAccount>()
+                .FirstOrDefault(a => a.Id == accountId && a.CreatorUserId == userId);
+
+            if (account == null) return null;
+
+            account.Name = newName;
+            _context.SaveChanges();
+            return account;
+        }
+
+        public bool DeleteSharedAccount(int accountId, int userId)
+        {
+            var account = _context.Accounts
+                .OfType<SharedAccount>()
+                .FirstOrDefault(a => a.Id == accountId && a.CreatorUserId == userId);
+
+            if (account == null || account.Balance != 0) return false;
+
+            // Удаляем все связанные сущности
+            var invitations = _context.Invitations.Where(i => i.SharedAccountId == accountId);
+            _context.Invitations.RemoveRange(invitations);
+
+            var history = _context.AccountHistoryEntries.Where(h => h.UserId == accountId);
+            _context.AccountHistoryEntries.RemoveRange(history);
+
+            _context.Accounts.Remove(account);
+            _context.SaveChanges();
+            return true;
+        }
     }
 }

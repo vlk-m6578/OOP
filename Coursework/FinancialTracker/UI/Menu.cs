@@ -48,7 +48,8 @@ namespace FinancialTracker.UI
             Console.WriteLine("3. Delete Personal Account");
             Console.WriteLine("4. Create Shared Account");
             Console.WriteLine("5. Manage Shared Accounts");
-            Console.WriteLine("6. View Operation History"); //
+            Console.WriteLine("6. Edit Shared Account");
+            Console.WriteLine("7. Delete Shared Account");
             Console.WriteLine("0. Back");
             Console.Write("Action: ");
         }

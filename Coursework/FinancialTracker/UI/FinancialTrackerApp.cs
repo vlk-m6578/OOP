@@ -225,7 +225,7 @@ namespace FinancialTracker.UI
         private void ManageAccounts()
         {
             _menu.ShowAccountManagementMenu();
-            int choice = InputValidator.GetIntInput(0, 5);
+            int choice = InputValidator.GetIntInput(0, 7);
 
             switch (choice)
             {
@@ -244,9 +244,12 @@ namespace FinancialTracker.UI
                 case 5:
                     ManageSharedAccounts();
                     return;
-                //case 6:
-                //    ViewOperationHistory();
-                //    break;
+                case 6:
+                    EditSharedAccount();
+                    break;
+                case 7:
+                    DeleteSharedAccount();
+                    break;
                 case 0:
                     break;
             }
@@ -469,6 +472,86 @@ namespace FinancialTracker.UI
                 }
             }
         }
+
+        private void EditSharedAccount()
+        {
+            Console.Clear();
+            Console.WriteLine("=== EDIT SHARED ACCOUNT ===");
+
+            var accounts = _accountService.GetSharedAccountsForUser(_currentUser.Id)
+                .Where(a => a.CreatorUserId == _currentUser.Id)
+                .ToList();
+
+            if (accounts.Count == 0)
+            {
+                Console.WriteLine("No shared accounts found where you are the creator!");
+                Console.ReadKey();
+                return;
+            }
+
+            foreach (var acc in accounts)
+            {
+                Console.WriteLine($"ID: {acc.Id} | Name: {acc.Name} | Members: {acc.MemberUserIdsList.Count}");
+            }
+
+            Console.Write("Enter account ID to edit (0 to back): ");
+            int accountId = InputValidator.GetIntInput(0, int.MaxValue);
+            if (accountId == 0) return;
+
+            Console.Write("Enter new account name: ");
+            string newName = Console.ReadLine().Trim();
+
+
+            var newAccount = _accountService.UpdateSharedAccountName(accountId, newName, _currentUser.Id);
+            newAccount.LogHistory(_currentUser.Id, "Account Updated", $"Updated by {_currentUser.Username}");
+            //Console.WriteLine($"Shared account '{newAccount.Name}' updated! ID: {newAccount.Id}");
+
+            if (_accountService.UpdateSharedAccountName(accountId, newName, _currentUser.Id) != null)
+            {
+                Console.WriteLine("Account updated successfully!");
+            }
+            else
+            {
+                HandleError("Failed to update account. Check permissions or balance");
+            }
+            Console.ReadKey();
+        }
+
+        private void DeleteSharedAccount()
+        {
+            Console.Clear();
+            Console.WriteLine("=== DELETE SHARED ACCOUNT ===");
+
+            var accounts = _accountService.GetSharedAccountsForUser(_currentUser.Id)
+                .Where(a => a.CreatorUserId == _currentUser.Id)
+                .ToList();
+
+            if (accounts.Count == 0)
+            {
+                Console.WriteLine("No shared accounts found where you are the creator!");
+                Console.ReadKey();
+                return;
+            }
+
+            foreach (var acc in accounts)
+            {
+                Console.WriteLine($"ID: {acc.Id} | Name: {acc.Name} | Balance: {acc.Balance:C}");
+            }
+
+            Console.Write("Enter account ID to delete (0 to back): ");
+            int accountId = InputValidator.GetIntInput(0, int.MaxValue);
+            if (accountId == 0) return;
+
+            if (_accountService.DeleteSharedAccount(accountId, _currentUser.Id))
+            {
+                Console.WriteLine("Account deleted successfully!");
+            }
+            else
+            {
+                HandleError("Failed to delete account. Check balance and permissions");
+            }
+            Console.ReadKey();
+        }
         private void InviteMember(SharedAccount account)
         {
             if (_currentUser.Id != account.CreatorUserId)
@@ -537,6 +620,19 @@ namespace FinancialTracker.UI
             Console.Clear();
             Console.WriteLine("=== VIEW OPERATION HISTORY ===");
 
+            var accounts = _accountService.GetPersonalAccounts(_currentUser.Id);
+            if (accounts.Count == 0)
+            {
+                Console.WriteLine("No personal accounts found!");
+                Console.Write("Press any key...");
+                Console.ReadKey();
+                return;
+            }
+
+            foreach (var a in accounts)
+            {
+                Console.WriteLine($"ID: {a.Id} | Name: {a.Name} | Balance: {a.Balance:C}");
+            }
             Console.Write("Enter account ID (0 to back): ");
             int accountId = InputValidator.GetIntInput(1, int.MaxValue);
             if (accountId == 0) return;
@@ -554,7 +650,6 @@ namespace FinancialTracker.UI
             }
             else
             {
-                Console.WriteLine("Personal accounts history not implemented yet");
                 Console.Write("Press any key...");
                 Console.ReadKey();
             }
@@ -774,7 +869,7 @@ namespace FinancialTracker.UI
                 foreach (var acc in accounts)
                 {
                     var type = acc is SharedAccount ? "Shared" : "Personal";
-                    Console.WriteLine($"{acc.Id}. {acc.Name} ({type}) - {acc.Balance}");
+                    Console.WriteLine($"{acc.Id}. {acc.Name} ({type}) - {acc.Balance} BYN");
                 }
 
                 Console.Write("Select an account (0 to back): ");
@@ -842,7 +937,7 @@ namespace FinancialTracker.UI
                 foreach (var t in transactions)
                 {
                     Console.WriteLine($"{t.Id}. {t.Date:dd.MM.yyyy} | " +
-                $"{(t.Type == TransactionType.Income ? "+" : "-")}{Math.Abs(t.Amount)} | " +
+                $"{(t.Type == TransactionType.Income ? "+" : "-")}{Math.Abs(t.Amount)} BYN | " +
                 $"{t.Category?.Name ?? "Without a category"} | " +
                 $"{t.Description}");
                 }
@@ -916,7 +1011,7 @@ namespace FinancialTracker.UI
                 Console.WriteLine("Your transactions:");
                 foreach (var t in transactions)
                 {
-                    Console.WriteLine($"{t.Id}. {t.Date:d} | {t.Amount} | {t.Category.Name}");
+                    Console.WriteLine($"{t.Id}. {t.Date:d} | {t.Amount} BYN | {t.Category.Name}");
                 }
 
                 Console.Write("Enter transaction ID (0 to cancel): ");
@@ -951,7 +1046,7 @@ namespace FinancialTracker.UI
                 foreach (var t in transactions)
                 {
                     Console.WriteLine($"{t.Id}. {t.Date:dd.MM.yyyy} | " +
-                        $"{(t.Type == TransactionType.Income ? "+" : "-")}{Math.Abs(t.Amount)} | " +
+                        $"{(t.Type == TransactionType.Income ? "+" : "-")}{Math.Abs(t.Amount)} BYN| " +
                         $"{GetCategoryName(t.CategoryId)} | " +
                         $"{t.Description}");
                 }
@@ -976,7 +1071,7 @@ namespace FinancialTracker.UI
                         Console.WriteLine($"Account: {transaction.Account.Name} ({transaction.Account.GetType().Name})");
                         Console.WriteLine($"[{entry.EditedAt:dd.MM.yyyy HH:mm}] Edited by: {GetUserName(entry.EditedByUserId)}");
                         Console.WriteLine($"[{entry.EditedAt:dd.MM.yyyy HH:mm}] Edited by user {_currentUser.Username}:");
-                        Console.WriteLine($"Amount: {entry.OldAmount} -> {entry.NewAmount}");
+                        Console.WriteLine($"Amount: {entry.OldAmount} BYN -> {entry.NewAmount} BYN");
                         Console.WriteLine($"Category ID: {GetCategoryName(entry.OldCategoryId)} -> {GetCategoryName(entry.NewCategoryId)}");
                         Console.WriteLine($"Description: '{entry.OldDescription}' -> '{entry.NewDescription}'");
                     }
@@ -1098,7 +1193,7 @@ namespace FinancialTracker.UI
 
                     Console.WriteLine($"[{accountType}] {t.Account.Name}");
                     Console.WriteLine($"{t.Id}. {t.Date:dd.MM.yyyy} | " +
-                        $"{(t.Type == TransactionType.Income ? "+" : "-")}{Math.Abs(t.Amount)} | " +
+                        $"{(t.Type == TransactionType.Income ? "+" : "-")}{Math.Abs(t.Amount)} BYN | " +
                         $"{categoryName} | " +
                         $"{t.Description}");
                     Console.WriteLine($"Created by: {GetUserName(t.CreatedByUserId)}\n");
@@ -1184,8 +1279,8 @@ namespace FinancialTracker.UI
             {
                 var category = _categoryService.GetCategory(budget.CategoryId);
                 Console.WriteLine($"{category.Name}:");
-                Console.WriteLine($"  Limit: {budget.Limit:C}");
-                Console.WriteLine($"  Spent: {budget.CurrentSpending:C}");
+                Console.WriteLine($"  Limit: {budget.Limit} BYN");
+                Console.WriteLine($"  Spent: {budget.CurrentSpending} BYN");
                 Console.WriteLine($"  Progress: {budget.CurrentSpending / budget.Limit * 100}%");
             }
             Console.ReadKey();
