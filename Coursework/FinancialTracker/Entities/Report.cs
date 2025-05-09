@@ -55,21 +55,21 @@ public class Report
     public string GetFormattedReport()
     {
         var sb = new StringBuilder();
-        sb.AppendLine($"===== ОТЧЕТ: {StartDate:dd.MM.yyyy} - {EndDate:dd.MM.yyyy} =====");
-        sb.AppendLine($"Доходы: {TotalIncome:C}");
-        sb.AppendLine($"Расходы: {TotalExpense:C}");
-        sb.AppendLine($"Баланс: {TotalIncome - TotalExpense:C}\n");
+        sb.AppendLine($"===== REPORT: {StartDate:dd.MM.yyyy} - {EndDate:dd.MM.yyyy} =====");
+        sb.AppendLine($"Incomes: {TotalIncome} BYN");
+        sb.AppendLine($"Expenses: {TotalExpense} BYN");
+        sb.AppendLine($"Balance: {TotalIncome - TotalExpense} BYN\n");
 
-        sb.AppendLine("Детали по категориям:");
+        sb.AppendLine("Details by category:");
         foreach (var entry in CategoryData.Values.OrderByDescending(x => x.Expense))
         {
             sb.AppendLine($"\n[{entry.CategoryName.ToUpper()}]");
-            sb.AppendLine($"Расходы: {entry.Expense:C}");
+            sb.AppendLine($"Incomes: {entry.Expense}");
 
             if (entry.BudgetLimit > 0)
             {
                 decimal percent = entry.BudgetUsed / entry.BudgetLimit * 100;
-                sb.AppendLine($"Использовано бюджета: {percent:0}% ({entry.BudgetUsed:C} / {entry.BudgetLimit:C})");
+                sb.AppendLine($"Budget used: {percent:0}% ({entry.BudgetUsed:C} / {entry.BudgetLimit:C})");
             }
         }
 

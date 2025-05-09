@@ -62,12 +62,12 @@ namespace FinancialTracker.Services
             if (budget.IsLimitReached())
             {
                 CreateNotification(budget.UserId,
-                    $"Лимит категории '{GetCategoryName(budget.CategoryId)}' достигнут! ({budget.CurrentSpending}/{budget.Limit})");
+                    $"Category limit '{GetCategoryName(budget.CategoryId)}' reached! ({budget.CurrentSpending}/{budget.Limit})");
             }
             else if (budget.IsWarningThresholdReached())
             {
                 CreateNotification(budget.UserId,
-                    $"Лимит категории '{GetCategoryName(budget.CategoryId)}' достиг 80%! ({budget.CurrentSpending}/{budget.Limit})");
+                    $"Category limit '{GetCategoryName(budget.CategoryId)}' reached 80%! ({budget.CurrentSpending}/{budget.Limit})");
             }
         }
         private string GetCategoryName(int categoryId)

@@ -39,7 +39,7 @@ namespace FinancialTracker.Services
 
             foreach (var transaction in transactions)
             {
-                var categoryName = transaction.Category?.Name ?? "Без категории";
+                var categoryName = transaction.Category?.Name ?? "Without a category";
                 var budget = GetBudget(userId, transaction);
 
                 report.AddCategoryData(
@@ -77,7 +77,7 @@ namespace FinancialTracker.Services
         public void SaveLastReportToFile(string path = "reports")
         {
             if (_lastReport == null)
-                throw new InvalidOperationException("Нет доступных отчетов для сохранения");
+                throw new InvalidOperationException("There are no reports available to save.");
 
             Directory.CreateDirectory(path);
             string fileName = $"report_{DateTime.Now:yyyyMMdd_HHmmss}.txt";

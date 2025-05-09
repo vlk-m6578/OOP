@@ -52,7 +52,7 @@ namespace FinancialTracker.Entities
         public void SetUsername(string newUsername)
         {
             if (string.IsNullOrWhiteSpace(newUsername))
-                throw new ArgumentException("Username cannot be empty");
+                throw new ArgumentException("Username can't be empty");
             Username = newUsername;
         }
 

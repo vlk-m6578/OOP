@@ -225,7 +225,7 @@ namespace FinancialTracker.UI
         private void ManageAccounts()
         {
             _menu.ShowAccountManagementMenu();
-            int choice = InputValidator.GetIntInput(0, 6);
+            int choice = InputValidator.GetIntInput(0, 5);
 
             switch (choice)
             {
@@ -244,8 +244,9 @@ namespace FinancialTracker.UI
                 case 5:
                     ManageSharedAccounts();
                     return;
-                case 6:
-                    //ViewOperationHistory();
+                //case 6:
+                //    ViewOperationHistory();
+                //    break;
                 case 0:
                     break;
             }
@@ -776,7 +777,7 @@ namespace FinancialTracker.UI
                     Console.WriteLine($"{acc.Id}. {acc.Name} ({type}) - {acc.Balance}");
                 }
 
-                Console.Write("Select an account: ");
+                Console.Write("Select an account (0 to back): ");
                 int accountId = InputValidator.GetIntInput(0, int.MaxValue);
                 if (accountId == 0) return;
 
@@ -1162,8 +1163,9 @@ namespace FinancialTracker.UI
                 Console.WriteLine($"{cat.Id}. {cat.Name}");
             }
 
-            Console.Write("Select category ID: ");
-            int categoryId = InputValidator.GetIntInput(1, int.MaxValue);
+            Console.Write("Select category ID (0 to back): ");
+            int categoryId = InputValidator.GetIntInput(0, int.MaxValue);
+            if (categoryId == 0) return;
 
             Console.Write("Enter monthly limit: ");
             decimal limit = InputValidator.GetDecimalInput("", 0.01m, 1000000m);
@@ -1214,13 +1216,13 @@ namespace FinancialTracker.UI
             while (true)
             {
                 Console.Clear();
-                Console.WriteLine("=== УПРАВЛЕНИЕ ОТЧЕТАМИ ===");
-                Console.WriteLine("1. Отчет за текущий месяц");
-                Console.WriteLine("2. Отчет за предыдущий месяц");
-                Console.WriteLine("3. Отчет за произвольный период");
-                Console.WriteLine("4. Сохранить последний отчет в файл");
-                Console.WriteLine("0. Назад");
-                Console.Write("Выберите действие: ");
+                Console.WriteLine("=== REPORT MANAGEMENT ===");
+                Console.WriteLine("1. Report for the current month");
+                Console.WriteLine("2. Report for the previous month");
+                Console.WriteLine("3. Report for any period");
+                Console.WriteLine("4. Save the latest report to a file");
+                Console.WriteLine("0. Back");
+                Console.Write("Action: ");
 
                 var choice = InputValidator.GetIntInput(0, 4);
 
@@ -1241,8 +1243,8 @@ namespace FinancialTracker.UI
                             break;
 
                         case 3: // Произвольный период
-                            var start = InputValidator.GetDateInput("Начальная дата (yyyy-MM-dd): ");
-                            var end = InputValidator.GetDateInput("Конечная дата (yyyy-MM-dd): ");
+                            var start = InputValidator.GetDateInput("Start date (yyyy-MM-dd): ");
+                            var end = InputValidator.GetDateInput("End date (yyyy-MM-dd): ");
                             var customReport = reportService.GenerateCustomReport(
                                 _currentUser.Id, start, end);
                             DisplayReport(customReport);
@@ -1250,7 +1252,7 @@ namespace FinancialTracker.UI
 
                         case 4:
                             reportService.SaveLastReportToFile();
-                            Console.WriteLine("\nОтчет успешно сохранен в папку 'reports'");
+                            Console.WriteLine("\nThe report was successfully saved to the 'reports' folder");
                             Console.ReadKey();
                             break;
 
@@ -1260,7 +1262,7 @@ namespace FinancialTracker.UI
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Ошибка: {ex.Message}");
+                    Console.WriteLine($"Error: {ex.Message}");
                     Console.ReadKey();
                 }
             }
@@ -1270,7 +1272,7 @@ namespace FinancialTracker.UI
         {
             Console.Clear();
             Console.WriteLine(report.GetFormattedReport());
-            Console.WriteLine("\nНажмите любую клавишу чтобы продолжить...");
+            Console.WriteLine("\nPress any key to continue...");
             Console.ReadKey();
         }
 
@@ -1306,8 +1308,9 @@ namespace FinancialTracker.UI
         {
             try
             {
-                Console.Write("Enter new username: ");
+                Console.Write("Enter new username (0 to back): ");
                 string newUsername = Console.ReadLine().Trim();
+                if (newUsername == "0") return;
 
                 if (_context.Users.Any(u => u.Username == newUsername))
                 {
@@ -1330,8 +1333,9 @@ namespace FinancialTracker.UI
         {
             try
             {
-                Console.Write("Enter new email: ");
+                Console.Write("Enter new email (0 to back): ");
                 string newEmail = Console.ReadLine().Trim();
+                if (newEmail == "0") return;
 
                 if (_context.Users.Any(u => u.Email == newEmail))
                 {
