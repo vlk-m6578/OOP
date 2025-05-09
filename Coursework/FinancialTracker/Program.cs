@@ -1,4 +1,5 @@
-﻿using FinancialTracker.UI;
+﻿using FinancialTracker.Presentation.UI;
+
 public static class Program
 {
     public static void Main(string[] args)
