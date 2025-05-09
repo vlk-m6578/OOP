@@ -1,6 +1,5 @@
 ﻿using System.Text.RegularExpressions;
 using FinancialTracker.Data;
-using FinancialTracker.Entities;
 
 namespace FinancialTracker.Utilities
 {

@@ -8,7 +8,6 @@ namespace FinancialTracker.Services
 {
     public class TransactionService : ITransactionService
     {
-        //public virtual ICollection<Transaction> Transactions { get; set; }
         private readonly AppDbContext _context;
         private readonly IBudgetService _budgetService;
 
@@ -20,13 +19,11 @@ namespace FinancialTracker.Services
         public Transaction AddTransaction(decimal amount, int categoryId, int accountId, int userId,
                          string description, TransactionType type)
         {
-            //var transaction = _context.Database.BeginTransaction();
             var account = _context.Accounts
                 .FirstOrDefault(a => a.Id == accountId);
 
             if (account == null) throw new Exception("Account not found");
 
-            // Для SharedAccount проверяем членство
             if (account is SharedAccount shared)
             {
                 if (!shared.MemberUserIdsList.Contains(userId))
@@ -37,7 +34,6 @@ namespace FinancialTracker.Services
                 throw new Exception("No access to this account");
             }
 
-            // Создание транзакции
             var transaction = new Transaction(
                 amount: type == TransactionType.Income ? Math.Abs(amount) : -Math.Abs(amount),
                 categoryId: categoryId,
@@ -82,7 +78,6 @@ namespace FinancialTracker.Services
 
                     if (existing == null) throw new Exception("Transaction not found");
 
-                    // Создаем новый объект для обновления
                     var updatedTransaction = new Transaction
                     {
                         Id = existing.Id,
@@ -96,13 +91,11 @@ namespace FinancialTracker.Services
                         IsDeleted = existing.IsDeleted
                     };
 
-                    // Обновляем баланс счета
                     var account = freshContext.Accounts.Find(existing.AccountId);
                     if (account is SharedAccount shared && !shared.MemberUserIdsList.Contains(editorId))
                         throw new Exception("No permission to edit");
                     account.Balance += (updatedTransaction.Amount - existing.Amount);
 
-                    // Добавляем запись в историю
                     freshContext.TransactionEditHistories.Add(new TransactionEditHistory
                     {
                         TransactionId = existing.Id,
@@ -118,14 +111,12 @@ namespace FinancialTracker.Services
 
                     if (existing.Type == TransactionType.Expense)
                     {
-                        // Откатываем старую сумму
                         _budgetService.UpdateSpending(
                         existing.CreatedByUserId,
                         existing.CategoryId,
                         -Math.Abs(existing.Amount)
                         );
 
-                        // Применяем новую сумму
                         _budgetService.UpdateSpending(
                         existing.CreatedByUserId,
                         newCategoryId,
@@ -133,7 +124,6 @@ namespace FinancialTracker.Services
                         );
                     }
 
-                    // Обновляем транзакцию
                     freshContext.Entry(updatedTransaction).State = EntityState.Modified;
                     freshContext.SaveChanges();
                     transaction.Commit();
@@ -151,7 +141,6 @@ namespace FinancialTracker.Services
             using var dbTransaction = _context.Database.BeginTransaction();
             try
             {
-                // Получаем транзакцию с актуальными данными
                 var existing = _context.Transactions
                     .Include(t => t.Account)
                     .FirstOrDefault(t => t.Id == transactionId);
@@ -159,24 +148,21 @@ namespace FinancialTracker.Services
                 if (existing == null || existing.IsDeleted)
                     throw new Exception("Transaction not found");
 
-                // Проверка прав доступа
                 if (existing.Account is SharedAccount shared &&
                     !shared.MemberUserIdsList.Contains(userId))
                 {
                     throw new Exception("No permission to delete this transaction");
                 }
 
-                // Корректируем баланс с учетом типа транзакции
                 if (existing.Type == TransactionType.Income)
                 {
-                    existing.Account.Balance -= existing.Amount; // Уменьшаем на положительную сумму
+                    existing.Account.Balance -= existing.Amount; 
                 }
                 else
                 {
-                    existing.Account.Balance += Math.Abs(existing.Amount); // Увеличиваем на абсолютное значение
+                    existing.Account.Balance += Math.Abs(existing.Amount); 
                 }
 
-                // Обновляем бюджеты
                 if (existing.Type == TransactionType.Expense)
                 {
                     _budgetService.UpdateSpending(
@@ -186,7 +172,6 @@ namespace FinancialTracker.Services
                     );
                 }
 
-                // Помечаем как удаленную
                 existing.IsDeleted = true;
                 existing.Description = $"[DELETED] {existing.Description}";
 
@@ -207,7 +192,6 @@ namespace FinancialTracker.Services
 
             if (account is SharedAccount)
             {
-                // Для общего счета берем все транзакции
                 return _context.Transactions
                     .Include(t => t.Category)
                     .Include(t => t.Account)
@@ -216,7 +200,6 @@ namespace FinancialTracker.Services
             }
             else
             {
-                // Для личного счета только текущего пользователя
                 return _context.Transactions
                     .Include(t => t.Category)
                     .Include(t => t.Account)
@@ -264,7 +247,6 @@ namespace FinancialTracker.Services
             var history = _context.TransactionEditHistories
                 .Where(h => h.Id == transactionId)
                 .ToList();
-            // Отображение истории
         }
 
     }

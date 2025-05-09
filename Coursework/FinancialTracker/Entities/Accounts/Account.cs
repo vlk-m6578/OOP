@@ -9,7 +9,7 @@ namespace FinancialTracker.Entities.Accounts
         public DateTime CreatedAt { get; set; }
        public virtual ICollection<Transaction> Transactions { get; set; }
 
-        protected Account() { } // Пустой конструктор для EF Core
+        protected Account() { }
 
         protected Account(string name)
         {
@@ -29,7 +29,6 @@ namespace FinancialTracker.Entities.Accounts
                 Transactions.Add(transaction);
             }
 
-            // Защита от отрицательного баланса для личных счетов
             if (this is PersonalAccount && Balance < 0)
             {
                 throw new InvalidOperationException("Insufficient funds");

@@ -1,5 +1,4 @@
-﻿
-using FinancialTracker.Entities.Accounts;
+﻿using FinancialTracker.Entities.Accounts;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -56,14 +55,14 @@ namespace FinancialTracker.Entities
         public void Update(decimal newAmount, int newCategoryId, string newDescription, int editorId)
         {
             EditHistory.Add(new TransactionEditHistory(
-                transactionId: this.Id,      // Добавляем ID текущей транзакции
-                editorId: editorId,          // ID редактора
+                transactionId: this.Id,    
+                editorId: editorId,          
                 oldAmount: this.Amount,
                 newAmount: newAmount,
                 oldCategory: this.CategoryId,
                 newCategory: newCategoryId,
                 oldDesc: this.Description,
-                newDesc: newDescription      // Добавляем недостающий параметр
+                newDesc: newDescription   
         ));
 
             Amount = newAmount;

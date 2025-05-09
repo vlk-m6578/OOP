@@ -6,8 +6,6 @@ public class Report
     public DateTime EndDate { get; }
     public decimal TotalIncome { get; private set; }
     public decimal TotalExpense { get; private set; }
-
-    // Изменяем тип ключа на string
     public Dictionary<string, CategoryReportData> CategoryData { get; }
         = new Dictionary<string, CategoryReportData>();
 
@@ -27,7 +25,7 @@ public class Report
     }
 
     public void AddCategoryData(
-        string categoryName,  // Принимаем string как ключ
+        string categoryName,
         decimal income,
         decimal expense,
         decimal budgetLimit,

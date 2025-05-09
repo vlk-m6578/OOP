@@ -1,12 +1,6 @@
 ﻿using FinancialTracker.Data;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FinancialTracker.Entities.Accounts
 {
@@ -14,7 +8,7 @@ namespace FinancialTracker.Entities.Accounts
     {
         public int CreatorUserId { get; set; }
         [Required]
-        public string MemberUserIds { get; set; }  // Храним ID через запятую
+        public string MemberUserIds { get; set; }
 
         [NotMapped]
         public List<int> MemberUserIdsList
@@ -22,12 +16,10 @@ namespace FinancialTracker.Entities.Accounts
             get => MemberUserIds.Split(',').Select(int.Parse).ToList();
             set => MemberUserIds = string.Join(",", value);
         }
-        public int SharedAccountId { get; set; } // Для связи один-ко-многим
+        public int SharedAccountId { get; set; }
         private readonly AppDbContext _context;
         public List<AccountHistoryEntry> History { get; set; } = new List<AccountHistoryEntry>();
-
         private SharedAccount() { }
-
         public SharedAccount(string name, int creatorId) : base(name)
         {
             CreatorUserId = creatorId;
@@ -85,7 +77,6 @@ namespace FinancialTracker.Entities.Accounts
             outputHandler($"Creator: {getUserName(CreatorUserId)}");
             outputHandler("Members:");
 
-            // Используем MemberUserIdsList вместо MemberUserIds и убираем дубликаты
             var uniqueMembers = MemberUserIdsList
                 .Where(id => id != CreatorUserId)
                 .Distinct()
@@ -96,7 +87,6 @@ namespace FinancialTracker.Entities.Accounts
                 outputHandler($"- {getUserName(memberId)} (ID: {memberId})");
             }
         }
-
         public bool CanEditTransaction(int userId)
         {
             return MemberUserIdsList.Contains(userId);

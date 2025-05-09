@@ -1,5 +1,4 @@
-﻿
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FinancialTracker.Entities
@@ -37,7 +36,6 @@ namespace FinancialTracker.Entities
         [ForeignKey("TransactionId")]
         public virtual Transaction Transaction { get; set; }
 
-        // Конструктор для EF Core
         public TransactionEditHistory() { }
 
         public TransactionEditHistory(int transactionId, int editorId, decimal oldAmount, decimal newAmount,
@@ -54,6 +52,5 @@ namespace FinancialTracker.Entities
             OldDescription = oldDesc;
             NewDescription = newDesc;
         }
-        
     }
 }

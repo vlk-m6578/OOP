@@ -59,6 +59,9 @@ namespace FinancialTracker.UI
             Console.Write("\nGoodbye!");
             Console.ReadKey();
         }
+
+        ///////////////////////////////////////////////////// REGISTRATION/LOGIN/RECOVERY PASSWORD ////////////////////////////////////////////////
+
         private void Registration()
         {
             Console.Clear();
@@ -232,6 +235,9 @@ namespace FinancialTracker.UI
                 }
             }
         }
+
+
+        ///////////////////////////////////////////////////// ACCOUNTS MANAGEMENT ////////////////////////////////////////////////
         private void ManageAccounts()
         {
             _menu.ShowAccountManagementMenu();
@@ -416,6 +422,9 @@ namespace FinancialTracker.UI
                 ManageSharedAccount(account);
             }
         }
+
+        ///////////////////////////////////////////////////// SHARED ACCOUNT MANAGEMENT ////////////////////////////////////////////////
+
         private void ManageSharedAccount(SharedAccount account)
         {
             bool isCreator = _currentUser.Id == account.CreatorUserId;
@@ -1230,8 +1239,8 @@ namespace FinancialTracker.UI
             return user?.Username ?? "Unknown User";
         }
 
-        ////////////////////////////////////////////////////////
-        ///
+        ///////////////////////////////////////////////////// BUDGETS MANAGEMENT ////////////////////////////////////////////////
+        
         private void ManageBudgets()
         {
             while (true)
@@ -1316,8 +1325,9 @@ namespace FinancialTracker.UI
             _context.SaveChanges();
             Console.ReadKey();
         }
-        ///////////////////////////////////////////
-        ///
+
+        ///////////////////////////////////////////////////// REPORTS MANAGEMENT ////////////////////////////////////////////////
+
         private void ManageReports()
         {
             var reportService = new ReportService(_context);
@@ -1385,8 +1395,8 @@ namespace FinancialTracker.UI
             Console.ReadKey();
         }
 
-        ////////////////////////////
-        ///
+        ///////////////////////////////////////////////////// PROFILE SETTINGS MANAGEMENT ////////////////////////////////////////////////
+
         private void ManageProfileSettings()
         {
             while (true)

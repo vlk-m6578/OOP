@@ -1,6 +1,4 @@
 ﻿using FinancialTracker.Data;
-using System;
-using System.Collections.Generic;
 
 namespace FinancialTracker.Services
 {
@@ -11,8 +9,6 @@ namespace FinancialTracker.Services
         private const int CodeTimeMinutes = 5;
 
         private readonly AppDbContext _context;
-
-        //public PasswordRecoveryService() { }
         public PasswordRecoveryService(AppDbContext context)
         {
             _context = context;

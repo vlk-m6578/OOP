@@ -1,5 +1,4 @@
-﻿
-using FinancialTracker.Entities.Accounts;
+﻿using FinancialTracker.Entities.Accounts;
 using System.ComponentModel.DataAnnotations;
 
 namespace FinancialTracker.Entities
@@ -23,7 +22,6 @@ namespace FinancialTracker.Entities
         public int SharedAccountId { get; set; }
         public SharedAccount SharedAccount { get; set; }
 
-        // Конструктор для EF Core
         public AccountHistoryEntry() { }
 
         public AccountHistoryEntry(int userId, string action, string details)

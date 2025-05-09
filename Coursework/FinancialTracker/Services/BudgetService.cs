@@ -7,8 +7,6 @@ namespace FinancialTracker.Services
 {
     public class BudgetService : IBudgetService
     {
-        //private readonly ITransactionService _transactionService;
-
         private readonly AppDbContext _context;
         public BudgetService(AppDbContext context)
         {

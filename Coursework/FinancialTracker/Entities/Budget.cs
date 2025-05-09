@@ -1,5 +1,4 @@
-﻿
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FinancialTracker.Entities
@@ -25,8 +24,6 @@ namespace FinancialTracker.Entities
         [Required]
         [Range(0, 1000000)]
         public decimal Limit { get; set; }
-
-        // Конструктор для EF Core
         private Budget() { }
 
         public Budget(int userId, int categoryId, decimal limit, DateTime month)
@@ -37,7 +34,6 @@ namespace FinancialTracker.Entities
             Month = month;
             CurrentSpending = 0;
         }
-
         public void UpdateLimit(decimal newLimit) => Limit = newLimit;
         public void UpdateSpending(decimal amount) => CurrentSpending += amount;
         public bool IsLimitReached() => CurrentSpending >= Limit;

@@ -39,7 +39,7 @@ namespace FinancialTracker.Services
             if (account == null) return false;
 
             account.Name = newName;
-            _context.SaveChanges(); // Важно сохранить изменения
+            _context.SaveChanges();
 
             return true;
         }
@@ -66,7 +66,7 @@ namespace FinancialTracker.Services
         {
             return _context.Transactions
                 .Include(t => t.Category)
-                .Include(t => t.Account) // Добавляем загрузку счета
+                .Include(t => t.Account)
                 .Where(t => t.CreatedByUserId == userId && !t.IsDeleted)
                 .ToList();
         }
@@ -75,7 +75,7 @@ namespace FinancialTracker.Services
         {
             return _context.Accounts
                 .OfType<SharedAccount>()
-                .AsEnumerable() // Фильтрация в памяти
+                .AsEnumerable() 
                 .Where(a => a.MemberUserIdsList.Contains(userId))
                 .ToList();
         }
@@ -117,7 +117,6 @@ namespace FinancialTracker.Services
 
             if (account == null || account.Balance != 0) return false;
 
-            // Удаляем все связанные сущности
             var invitations = _context.Invitations.Where(i => i.SharedAccountId == accountId);
             _context.Invitations.RemoveRange(invitations);
 

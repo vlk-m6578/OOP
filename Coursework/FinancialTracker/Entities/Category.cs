@@ -1,5 +1,4 @@
-﻿
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace FinancialTracker.Entities
 {
@@ -16,8 +15,6 @@ namespace FinancialTracker.Entities
 
         [Required]
         public bool IsSystemCategory { get; set; }
-
-        // Конструктор для EF Core
         private Category() { }
 
         public Category(string name, bool isSystem = false)

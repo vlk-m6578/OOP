@@ -15,7 +15,6 @@ namespace FinancialTracker.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Budget> Budgets { get; set; }
         public DbSet<RecoveryCode> RecoveryCodes { get; set; }
-
         public DbSet<AccountHistoryEntry> AccountHistoryEntries { get; set; }
         public DbSet<TransactionEditHistory> TransactionEditHistories { get; set; }
         public DbSet<Invitation> Invitations { get; set; }
@@ -40,7 +39,6 @@ namespace FinancialTracker.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Настройка наследования
             modelBuilder.Entity<Account>()
                 .HasDiscriminator<string>("AccountType")
                 .HasValue<PersonalAccount>("Personal")
@@ -56,13 +54,11 @@ namespace FinancialTracker.Data
                 .WithMany()
                 .HasForeignKey(p => p.UserId);
 
-            // Настройка SharedAccount
             modelBuilder.Entity<SharedAccount>()
                     .Property(s => s.MemberUserIds)
                     .IsRequired()
                     .HasDefaultValue("");
 
-            // Настройка истории
             modelBuilder.Entity<AccountHistoryEntry>()
                 .HasOne<SharedAccount>()
                 .WithMany(a => a.History)
@@ -80,20 +76,17 @@ namespace FinancialTracker.Data
                 .HasForeignKey(b => b.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-
             modelBuilder.Entity<Category>()
                 .Property(c => c.Name)
                 .IsRequired()
                 .HasMaxLength(100);
 
-            // Настройка Transaction
             modelBuilder.Entity<Transaction>()
                 .HasOne(t => t.Category)
                 .WithMany()
                 .HasForeignKey(t => t.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Настройка AccountHistoryEntry
             modelBuilder.Entity<AccountHistoryEntry>()
                 .Property(e => e.Timestamp)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");

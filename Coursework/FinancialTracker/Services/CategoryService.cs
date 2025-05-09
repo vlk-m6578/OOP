@@ -14,25 +14,6 @@ namespace FinancialTracker.Services
             InitializeSystemCategories();
         }
 
-        //private void InitializeSystemCategories()
-        //{
-        //    if (!_context.Categories.Any())
-        //    {
-        //        var systemCategories = new List<Category>
-        //    {
-        //        new Category("Food", true),
-        //        new Category("Transport", true),
-        //        new Category("Housing", true),
-        //        new Category("Services", true),
-        //        new Category("Cafe", true),
-        //        new Category("Entertainment", true)
-        //    };
-
-        //        _context.Categories.AddRange(systemCategories);
-        //        _context.SaveChanges();
-        //    }
-        //}
-
         private void InitializeSystemCategories()
         {
             if (!_context.Categories.Any())
