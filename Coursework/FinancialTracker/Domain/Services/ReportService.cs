@@ -1,10 +1,11 @@
 ﻿using FinancialTracker.Data;
 using FinancialTracker.Domain.Entities;
+using FinancialTracker.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinancialTracker.Domain.Services
 {
-    public class ReportService
+    public class ReportService :IReportService
     {
         private readonly AppDbContext _context;
         private Report _lastReport;
