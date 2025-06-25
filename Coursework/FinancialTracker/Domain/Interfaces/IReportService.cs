@@ -7,6 +7,5 @@ namespace FinancialTracker.Domain.Interfaces
         Report GenerateMonthlyReport(int userId, DateTime month);
         Report GenerateCustomReport(int userId, DateTime start, DateTime end);
         void SaveLastReportToFile(string path = "reports");
-        //string GetFormattedReport();
     }
 }

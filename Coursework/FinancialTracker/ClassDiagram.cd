@@ -14,6 +14,9 @@
       <HashCode>AACCAAAAAAAAAAAAACgAAAQAAAAAABAAAAAAAAAAAAA=</HashCode>
       <FileName>Domain\Entities\Accounts\Account.cs</FileName>
     </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Transactions" />
+    </ShowAsCollectionAssociation>
   </Class>
   <Class Name="FinancialTracker.Domain.Entities.Accounts.PersonalAccount" Collapsed="true">
     <Position X="3.75" Y="1.5" Width="1.5" />
@@ -25,7 +28,7 @@
   <Class Name="FinancialTracker.Domain.Entities.Accounts.SharedAccount" Collapsed="true">
     <Position X="5.75" Y="1.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAQAAAABGABAAAAAAAAAQAgABABgIACCAAAAQA=</HashCode>
+      <HashCode>AAAAAAAQAAAAAGABAAAAAAAAAQAgABABgIACCAAAAQA=</HashCode>
       <FileName>Domain\Entities\Accounts\SharedAccount.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
@@ -118,7 +121,7 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="FinancialTracker.Data.AppDbContext" Collapsed="true">
-    <Position X="11.25" Y="7.75" Width="1.5" />
+    <Position X="12" Y="9.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AACAASAAAQAgAAAAAAAAAEABEIAAEAiAEAAAAAAAABA=</HashCode>
       <FileName>DataAccess\AppDbContext.cs</FileName>
@@ -130,6 +133,9 @@
       <HashCode>AAAAQAAAAAAABAIAACAAABAAgAAAAAAAAAAAAAAIAAQ=</HashCode>
       <FileName>Domain\Services\BudgetService.cs</FileName>
     </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_context" />
+    </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="FinancialTracker.Domain.Services.CategoryService" Collapsed="true">
@@ -138,6 +144,9 @@
       <HashCode>ACEAAAAAAAIABACAAAACAAAAAAAAgAAAAgAAAAAAAAA=</HashCode>
       <FileName>Domain\Services\CategoryService.cs</FileName>
     </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_context" />
+    </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="FinancialTracker.Domain.Services.TransactionService" Collapsed="true">
@@ -146,24 +155,40 @@
       <HashCode>AAAAEAAAICQBFgAAAAIAAAAACAAAAAAAAAIAAAABAAg=</HashCode>
       <FileName>Domain\Services\TransactionService.cs</FileName>
     </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_context" />
+    </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="FinancialTracker.Domain.Services.ReportService" Collapsed="true">
-    <Position X="8.25" Y="11.5" Width="1.5" />
+    <Position X="8.25" Y="11.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AKIAIAAAAAAABAAAAAAAAAAAAAAgAAAIAAAAAAIAAAA=</HashCode>
       <FileName>Domain\Services\ReportService.cs</FileName>
     </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_context" />
+    </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>
+  <Class Name="FinancialTracker.Domain.Services.PasswordRecoveryService" Collapsed="true">
+    <Position X="8.25" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAABAAAAAAAJAAAAAAAAAAAAAQAIAAAAAA=</HashCode>
+      <FileName>Domain\Services\PasswordRecoveryService.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_context" />
+    </ShowAsAssociation>
+  </Class>
   <Interface Name="FinancialTracker.Domain.Interfaces.IAuthService" Collapsed="true">
-    <Position X="7.75" Y="0.5" Width="1.5" />
+    <Position X="7.75" Y="0.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAIAAAAACABAAAAAAAAABAAAAgAEQAAAAAAI=</HashCode>
       <FileName>Domain\Interfaces\IAuthService.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Enum Name="InvitationStatus" Collapsed="true">
+  <Enum Name="InvitationStatus">
     <Position X="10.25" Y="5.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAQAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAIAAAAAA=</HashCode>

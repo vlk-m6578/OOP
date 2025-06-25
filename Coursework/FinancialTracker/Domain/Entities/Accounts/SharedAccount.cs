@@ -18,7 +18,6 @@ namespace FinancialTracker.Domain.Entities.Accounts
             set => MemberUserIds = string.Join(",", value);
         }
         public int SharedAccountId { get; set; }
-        private readonly AppDbContext _context;
         public List<AccountHistoryEntry> History { get; set; } = new List<AccountHistoryEntry>();
         private SharedAccount() { }
         public SharedAccount(string name, int creatorId) : base(name)
